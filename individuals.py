@@ -1,5 +1,6 @@
 import json
 import re
+import pydantic
 import inspect
 from dateutil.parser import parse
 from pydantic import (
@@ -8,6 +9,8 @@ from pydantic import (
     ValidationInfo,
     field_validator,
     Field,
+    PrivateAttr,
+    ConfigDict
 )
 
 from typing import Optional, Union
@@ -46,7 +49,7 @@ class ReferenceRange(BaseModel, extra='forbid'):
     unit: OntologyTerm
 
 class Quantity(BaseModel, extra='forbid'):
-    referenceRange: Optional[ReferenceRange]
+    referenceRange: Optional[ReferenceRange] = None
     unit: OntologyTerm
     value: Union[int, float]
 
@@ -58,6 +61,62 @@ class Members(BaseModel, extra='forbid'):
     affected: bool
     memberId: str
     role: OntologyTerm
+
+class Reference(BaseModel, extra='forbid'):
+    id: Optional[str] = None
+    notes: Optional[str] = None
+    reference: Optional[str] = None
+
+class Evidence(BaseModel, extra='forbid'):
+    evidenceCode: OntologyTerm
+    reference: Optional[Reference] = None
+
+class DoseIntervals(BaseModel, extra='forbid'):
+    interval: Union[str,dict]
+    quantity: Quantity
+    scheduleFrequency: OntologyTerm
+    @field_validator('interval')
+    @classmethod
+    def check_interval(cls, v: Union[str,dict]= Field(union_mode='left_to_right')) -> Union[str,dict]:
+        if isinstance(v, str):
+            try:
+                parse(v)
+            except Exception as e:
+                raise ValueError('interval, if string, must be Timestamp, getting this error: {}'.format(e))
+            return v.title()
+        elif isinstance(v, dict):
+            fits_in_class=False
+            try:
+                Age(**v)
+                fits_in_class=True
+            except Exception:
+                fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    AgeRange(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    GestationalAge(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    TimeInterval(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    OntologyTerm(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                raise ValueError('interval, if object, must be any format possible between age, ageRange, gestationalAge, timeInterval or OntologyTerm')
 
 class Diseases(BaseModel, extra='forbid'):
     ageOfOnset: Optional[Union[str,dict]]=None
@@ -123,11 +182,11 @@ class Ethnicity(BaseModel, extra='forbid'):
     
 class Exposures(BaseModel, extra='forbid'):
     ageAtExposure: Age
-    date: Optional[str]
+    date: Optional[str] = None
     duration: str
     exposureCode: OntologyTerm
     unit: OntologyTerm
-    value: Optional[Union[int, float]]
+    value: Optional[Union[int, float]] = None
 
 class GeographicOrigin(BaseModel, extra='forbid'):
     id: str
@@ -253,26 +312,151 @@ class Pedigrees(BaseModel, extra='forbid'):
     disease: Diseases
     id: str
     members: list
-    numSubjects: Optional[int]
+    numSubjects: Optional[int] = None
     @field_validator('members')
     @classmethod
-    def check_members(cls, v: dict) -> dict:
+    def check_members(cls, v: list) -> list:
         for member in v:
             Members(**member)
 
 class PhenotypicFeatures(BaseModel, extra='forbid'):
-    evidence: Diseases
-    id: str
-    members: list
-    numSubjects: Optional[int]
-    @field_validator('members')
+    evidence: Optional[Evidence]=None
+    id: Optional[str] = None
+    excluded: Optional[bool]=None
+    featureType: OntologyTerm
+    modifiers: Optional[list]=None
+    notes: Optional[str]=None
+    onset: Optional[Union[str,dict]]=None
+    resolution: Optional[Union[str,dict]]=None
+    severity: Optional[OntologyTerm]=None
+    @field_validator('evidence')
     @classmethod
-    def check_members(cls, v: dict) -> dict:
-        for member in v:
-            Members(**member)
+    def check_evidence(cls, v: dict) -> dict:
+        Evidence(**v)
+    @field_validator('modifiers')
+    @classmethod
+    def check_modifiers(cls, v: list) -> list:
+        for modifier in v:
+            OntologyTerm(**modifier)
+    @field_validator('onset')
+    @classmethod
+    def check_onset(cls, v: Union[str,dict]= Field(union_mode='left_to_right')) -> Union[str,dict]:
+        if isinstance(v, str):
+            try:
+                parse(v)
+            except Exception as e:
+                raise ValueError('onset, if string, must be Timestamp, getting this error: {}'.format(e))
+            return v.title()
+        elif isinstance(v, dict):
+            fits_in_class=False
+            try:
+                Age(**v)
+                fits_in_class=True
+            except Exception:
+                fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    AgeRange(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    GestationalAge(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    TimeInterval(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    OntologyTerm(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                raise ValueError('onset, if object, must be any format possible between age, ageRange, gestationalAge, timeInterval or OntologyTerm')
+    @field_validator('resolution')
+    @classmethod
+    def check_resolution(cls, v: Union[str,dict]= Field(union_mode='left_to_right')) -> Union[str,dict]:
+        if isinstance(v, str):
+            try:
+                parse(v)
+            except Exception as e:
+                raise ValueError('resolution, if string, must be Timestamp, getting this error: {}'.format(e))
+            return v.title()
+        elif isinstance(v, dict):
+            fits_in_class=False
+            try:
+                Age(**v)
+                fits_in_class=True
+            except Exception:
+                fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    AgeRange(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    GestationalAge(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    TimeInterval(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                try:
+                    OntologyTerm(**v)
+                    fits_in_class=True
+                except Exception:
+                    fits_in_class=False
+            if fits_in_class == False:
+                raise ValueError('resolution, if object, must be any format possible between age, ageRange, gestationalAge, timeInterval or OntologyTerm')
+
+class Sex(BaseModel, extra='forbid'):
+    id: str
+    label: Optional[str]=None
+    @field_validator('id')
+    @classmethod
+    def id_must_be_CURIE(cls, v: str) -> str:
+        if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
+            pass
+        else:
+            raise ValueError('id must be CURIE, e.g. NCIT:C42331')
+        return v.title()
+            
+class Treatment(BaseModel, extra='forbid'):
+    ageAtOnset: Optional[Age] = None
+    cumulativeDose: Optional[Quantity] = None
+    doseIntervals: Optional[list] = None
+    routeOfAdministration: Optional[OntologyTerm] = None
+    treatmentCode: OntologyTerm
+    @field_validator('doseIntervals')
+    @classmethod
+    def check_doseIntervals(cls, v: list) -> list:
+        for doseInterval in v:
+            DoseIntervals(**doseInterval)
 
 class Individuals(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    def __init__(self, **data) -> None:
+        for private_key in self.__class__.__private_attributes__.keys():
+            try:
+                value = data.pop(private_key)
+            except KeyError:
+                pass
+
+        super().__init__(**data)
+    _id: Optional[str] = PrivateAttr()
     diseases: Optional[list] = None
     ethnicity: Optional[dict] = None
     exposures: Optional[list] = None
@@ -284,7 +468,7 @@ class Individuals(BaseModel, extra='forbid'):
     measures: Optional[list]=None
     pedigrees: Optional[list] = None
     phenotypicFeatures: Optional[list] = None
-    sex: dict
+    sex: Sex
     treatments: Optional[list] = None
     @field_validator('ethnicity')
     @classmethod
@@ -306,7 +490,7 @@ class Individuals(BaseModel, extra='forbid'):
         GeographicOrigin(**v)
     @field_validator('interventionsOrProcedures')
     @classmethod
-    def check_diseases(cls, v: list) -> list:
+    def check_interventions(cls, v: list) -> list:
         for procedure in v:
             InterventionsOrProcedures(**procedure)
     @field_validator('measures')
@@ -318,12 +502,18 @@ class Individuals(BaseModel, extra='forbid'):
     @classmethod
     def check_pedigrees(cls, v: list) -> list:
         for pedigree in v:
-            Measurement(**pedigree)
+            Pedigrees(**pedigree)
     @field_validator('phenotypicFeatures')
     @classmethod
     def check_phenotypicFeatures(cls, v: list) -> list:
         for phenotypicFeature in v:
-            Measurement(**phenotypicFeature)
+            PhenotypicFeatures(**phenotypicFeature)
+    @field_validator('treatments')
+    @classmethod
+    def check_treatments(cls, v: list) -> list:
+        for treatment in v:
+            Treatment(**treatment)
+
 
 with open("test.json", "r") as f:
     docs = json.load(f)
