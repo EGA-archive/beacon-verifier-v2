@@ -460,9 +460,9 @@ class Individuals(BaseModel, extra='forbid'):
     diseases: Optional[list] = None
     ethnicity: Optional[dict] = None
     exposures: Optional[list] = None
-    geographicOrigin: Optional[object] = None
+    geographicOrigin: Optional[dict] = None
     id: str
-    info: Optional[object] = None
+    info: Optional[dict] = None
     interventionsOrProcedures: Optional[list] = None
     karyotypicSex: Optional[str] = None
     measures: Optional[list]=None
@@ -515,7 +515,7 @@ class Individuals(BaseModel, extra='forbid'):
             Treatment(**treatment)
 
 
-with open("test.json", "r") as f:
+with open("individuals_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:

@@ -6,12 +6,9 @@ from dateutil.parser import parse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
     Field,
-    PrivateAttr,
-    ConfigDict,
-    AliasChoices
+    PrivateAttr
 )
 
 from typing import Optional, Union
@@ -141,12 +138,12 @@ class SequenceInterval(BaseModel, extra='forbid'):
         return v.title()
 
 class ChromosomeLocation(BaseModel, extra='forbid'):
-    _id: Optional[str]=Field(validation_alias=AliasChoices('first_name', 'fname'))
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     species_id: str
     chr: str
     interval: CytobandInterval
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -181,11 +178,11 @@ class ChromosomeLocation(BaseModel, extra='forbid'):
         return v.title()
     
 class SequenceLocation(BaseModel, extra='forbid'):
-    _id: Optional[str]=None
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     sequence_id: str
     interval: Union[SequenceInterval,SimpleInterval]
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -292,11 +289,11 @@ class ComposedSequenceExpression(BaseModel, extra='forbid'):
                 raise ValueError('components must be an array containing any format possible between DerivedSequenceExpression, LiteralSequenceExpression or RepeatedSequenceExpression. It is mandatory to at least be one of DerivedSequenceExpression or RepeatedSequenceExpression')
 
 class Allele(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    id: Optional[str] = Field(default=None, alias='_id')
     type: str
     location: Union[str,ChromosomeLocation,SequenceLocation]
     state: Union[ComposedSequenceExpression, DerivedSequenceExpression, LiteralSequenceExpression, RepeatedSequenceExpression]
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -314,7 +311,7 @@ class Allele(BaseModel, extra='forbid'):
         return v.title()
     @field_validator('location')
     @classmethod
-    def id_must_be_CURIE(cls, v: str) -> str:
+    def location_must_be_CURIE(cls, v: str) -> str:
         if isinstance(v, str):
             if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
                 pass
@@ -323,10 +320,10 @@ class Allele(BaseModel, extra='forbid'):
             return v.title()
         
 class Haplotype(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     members: list
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -383,11 +380,11 @@ class Gene(BaseModel, extra='forbid'):
         return v.title()
 
 class CopyNumberChange(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     subject: Union[str, ChromosomeLocation, Gene, SequenceLocation]
     copy_change: str
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -413,11 +410,11 @@ class CopyNumberChange(BaseModel, extra='forbid'):
         return v.title()
     
 class CopyNumberCount(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     subject: Union[str, ChromosomeLocation, Gene, SequenceLocation]
     copies: Union[DefiniteRange, IndefiniteRange, Number]
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -448,11 +445,11 @@ class GenotypeMember(BaseModel, extra='forbid'):
         return v.title()
     
 class Genotype(BaseModel, extra='forbid'):
-    _id: Optional[str] = None
+    id: Optional[str]=Field(default=None, alias='_id')
     type: str
     members: list
     count: Union[DefiniteRange, IndefiniteRange, Number]
-    @field_validator('_id')
+    @field_validator('id')
     @classmethod
     def id_must_be_CURIE(cls, v: str) -> str:
         if re.match("[A-Za-z0-9]+:[A-Za-z0-9]", v):
@@ -597,7 +594,7 @@ class MolecularAttributes(BaseModel, extra='forbid'):
                 pass
             else:
                 raise ValueError('aminoacidChanges must be an array of strings')
-        return v.title()
+        return aminoacidChange.title()
     @field_validator('geneIds')
     @classmethod
     def check_geneIds(cls, v: list) -> list:
@@ -606,7 +603,7 @@ class MolecularAttributes(BaseModel, extra='forbid'):
                 pass
             else:
                 raise ValueError('geneIds must be an array of strings')
-        return v.title()
+        return geneId.title()
     @field_validator('genomicFeatures')
     @classmethod
     def check_genomicFeatures(cls, v: list) -> list:
@@ -639,7 +636,6 @@ class GenomicVariations(BaseModel, extra='forbid'):
                 value = data.pop(private_key)
             except KeyError:
                 pass
-
         super().__init__(**data)
     _id: Optional[str] = PrivateAttr()
     caseLevelData: Optional[list] = None
@@ -660,6 +656,7 @@ class GenomicVariations(BaseModel, extra='forbid'):
         for fp in v:
             PopulationFrequency(**fp)
 
+
 with open("genomicVariations_test.json", "r") as f:
     docs = json.load(f)
     try:
@@ -668,7 +665,7 @@ with open("genomicVariations_test.json", "r") as f:
     except ValidationError as e:
         print(e)
 ''' 
-f = requests.get('http://localhost:5050/api/individuals')
+f = requests.get('http://localhost:5050/api/g_variants')
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
@@ -677,7 +674,7 @@ for resultset in resultsets:
     results = resultset["results"]
     for result in results:
         try:
-            Individuals(**result)
+            GenomicVariations(**result)
         except ValidationError as e:
             print(e)
             continue
