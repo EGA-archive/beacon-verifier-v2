@@ -514,12 +514,13 @@ class Individuals(BaseModel, extra='forbid'):
         for treatment in v:
             Treatment(**treatment)
 
-
-with open("individuals_test.json", "r") as f:
+'''
+with open("test/individuals_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:
             Individuals(**doc)
+        print("individuals is OK")
     except ValidationError as e:
         print(e)
 ''' 
@@ -530,10 +531,12 @@ resultsets = total_response["response"]["resultSets"]
 
 for resultset in resultsets:
     results = resultset["results"]
-    for result in results:
-        try:
+    dataset = resultset["id"]
+    try:
+        for result in results:
             Individuals(**result)
-        except ValidationError as e:
-            print(e)
-            continue
-'''
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue

@@ -358,26 +358,26 @@ class Cohorts(BaseModel, extra='forbid'):
         for collectionEvent in v:
             CollectionEvent(**collectionEvent)
 
-
-with open("cohorts_test.json", "r") as f:
+'''
+with open("test/cohorts_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:
             Cohorts(**doc)
+        print("cohorts is OK")
     except ValidationError as e:
         print(e)
 ''' 
-f = requests.get('http://localhost:5050/api/biosamples')
+f = requests.get('http://localhost:5050/api/cohorts')
 total_response = json.loads(f.text)
-resultsets = total_response["response"]["resultSets"]
+resultsets = total_response["response"]["collections"]
+dataset = resultsets["id"]
+try:
+    for result in resultsets:
+        Cohorts(**result)
+    print("{} is OK".format(dataset))
+except ValidationError as e:
+    print("{} got the next validation errors:".format(dataset))
+    print(e)
+    
 
-
-for resultset in resultsets:
-    results = resultset["results"]
-    for result in results:
-        try:
-            Biosamples(**result)
-        except ValidationError as e:
-            print(e)
-            continue
-'''

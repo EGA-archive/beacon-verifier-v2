@@ -37,12 +37,13 @@ class Analyses(BaseModel, extra='forbid'):
     runId: Optional[str]=None
     variantCaller: Optional[str]=None
 
-
-with open("analyses_test.json", "r") as f:
+'''
+with open("test/analyses_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:
             Analyses(**doc)
+        print("analyses is OK")
     except ValidationError as e:
         print(e)
 ''' 
@@ -53,10 +54,13 @@ resultsets = total_response["response"]["resultSets"]
 
 for resultset in resultsets:
     results = resultset["results"]
-    for result in results:
-        try:
+    dataset = resultset["id"]
+    try:
+        for result in results:
             Analyses(**result)
-        except ValidationError as e:
-            print(e)
-            continue
-'''
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+

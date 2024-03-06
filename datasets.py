@@ -66,7 +66,7 @@ class Datasets(BaseModel, extra='forbid'):
         super().__init__(**data)
     _id: Optional[str] = PrivateAttr()
     createDateTime: Optional[str] = None
-    dataUseConditions: DataUseConditions
+    dataUseConditions: Optional[DataUseConditions]=None
     description: Optional[str] = None
     externalUrl: Optional[str] = None
     id: str
@@ -92,26 +92,28 @@ class Datasets(BaseModel, extra='forbid'):
             except Exception as e:
                 raise ValueError('updateDateTime, if string, must be Timestamp, getting this error: {}'.format(e))
             return v.title()
-
-with open("datasets_test.json", "r") as f:
+'''
+with open("test/datasets_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:
             Datasets(**doc)
+        print("datasets is OK")
     except ValidationError as e:
         print(e)
 ''' 
 f = requests.get('http://localhost:5050/api/datasets')
 total_response = json.loads(f.text)
-resultsets = total_response["response"]["resultSets"]
 
 
-for resultset in resultsets:
-    results = resultset["results"]
-    for result in results:
-        try:
-            Datasets(**result)
-        except ValidationError as e:
-            print(e)
-            continue
-'''
+resultsets = total_response["response"]["collections"]
+dataset = resultsets["id"]
+try:
+    for result in resultsets:
+        Datasets(**result)
+    print("{} is OK".format(dataset))
+except ValidationError as e:
+    print("{} got the next validation errors:".format(dataset))
+    print(e)
+    
+
