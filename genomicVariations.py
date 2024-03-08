@@ -539,6 +539,17 @@ class PopulationFrequency(BaseModel, extra='forbid'):
     alleleFrequency: Union[float, int]
     population: str
 
+class FrequencyInPopulation(BaseModel, extra='forbid'):
+    frequencies: list
+    source: str
+    sourceReference: str
+    version: Optional[str]=None
+    @field_validator('frequencies')
+    @classmethod
+    def check_frequencies(cls, v: list) -> list:
+        for frequency in v:
+            PopulationFrequency(**frequency)
+
 class Identifiers(BaseModel, extra='forbid'):
     clinvarVariantId: Optional[str]=None
     genomicHGVSId: Optional[str]=None
@@ -654,10 +665,10 @@ class GenomicVariations(BaseModel, extra='forbid'):
     @classmethod
     def check_frequencyInPopulations(cls, v: list) -> list:
         for fp in v:
-            PopulationFrequency(**fp)
+            FrequencyInPopulation(**fp)
 
-'''
-with open("test/genomicVariations_test.json", "r") as f:
+
+with open("genomicVariations_test.json", "r") as f:
     docs = json.load(f)
     try:
         for doc in docs:
@@ -682,3 +693,4 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
+'''
