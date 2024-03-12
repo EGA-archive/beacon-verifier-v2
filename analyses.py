@@ -1,20 +1,18 @@
 import json
-import re
-import pydantic
-import inspect
+import argparse
 from dateutil.parser import parse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
-    field_validator,
-    Field,
-    PrivateAttr,
-    ConfigDict
+    PrivateAttr
 )
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class Analyses(BaseModel, extra='forbid'):
     def __init__(self, **data) -> None:
@@ -37,27 +35,20 @@ class Analyses(BaseModel, extra='forbid'):
     runId: Optional[str]=None
     variantCaller: Optional[str]=None
 
-'''
-with open("test/analyses_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            Analyses(**doc)
-        print("analyses is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/analyses')
+url = args.url + '/analyses'
+
+f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-
+print("analyses:")
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
         for result in results:
             Analyses(**result)
+        
         print("{} is OK".format(dataset))
     except ValidationError as e:
         print("{} got the next validation errors:".format(dataset))

@@ -1,20 +1,20 @@
 import json
 import re
-import pydantic
-import inspect
+import argparse
 from dateutil.parser import parse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
-    Field,
-    PrivateAttr,
-    ConfigDict
+    PrivateAttr
 )
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class OntologyTerm(BaseModel, extra='forbid'):
     id: str
@@ -92,24 +92,18 @@ class Datasets(BaseModel, extra='forbid'):
             except Exception as e:
                 raise ValueError('updateDateTime, if string, must be Timestamp, getting this error: {}'.format(e))
             return v.title()
-'''
-with open("test/datasets_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            Datasets(**doc)
-        print("datasets is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/datasets')
+
+url = args.url + '/datasets'
+
+f = requests.get(url)
 total_response = json.loads(f.text)
 
 
 resultsets = total_response["response"]["collections"]
-dataset = resultsets["id"]
+print("datasets:")
 try:
     for result in resultsets:
+        dataset = result["id"]
         Datasets(**result)
     print("{} is OK".format(dataset))
 except ValidationError as e:

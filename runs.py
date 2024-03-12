@@ -1,20 +1,20 @@
 import json
 import re
-import pydantic
-import inspect
-from dateutil.parser import parse
+import argparse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
     Field,
-    PrivateAttr,
-    ConfigDict
+    PrivateAttr
 )
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class OntologyTerm(BaseModel, extra='forbid'):
     id: str
@@ -50,21 +50,13 @@ class Runs(BaseModel, extra='forbid'):
     platformModel: Optional[OntologyTerm] = None
     runDate: Optional[str] = None
 
-'''
-with open("test/runs_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            Runs(**doc)
-        print("runs is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/runs')
+url = args.url + '/runs'
+
+f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-
+print("runs:")
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]

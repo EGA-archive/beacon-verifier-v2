@@ -1,20 +1,21 @@
 import json
 import re
-import pydantic
-import inspect
+import argparse
 from dateutil.parser import parse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
     Field,
-    PrivateAttr,
-    ConfigDict
+    PrivateAttr
 )
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class OntologyTerm(BaseModel, extra='forbid'):
     id: str
@@ -514,21 +515,13 @@ class Individuals(BaseModel, extra='forbid'):
         for treatment in v:
             Treatment(**treatment)
 
-'''
-with open("test/individuals_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            Individuals(**doc)
-        print("individuals is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/individuals')
+url = args.url + '/individuals'
+
+f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-
+print("individuals:")
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]

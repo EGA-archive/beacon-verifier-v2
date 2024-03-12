@@ -1,8 +1,6 @@
 import json
 import re
-import pydantic
-import inspect
-from dateutil.parser import parse
+import argparse
 from pydantic import (
     BaseModel,
     ValidationError,
@@ -13,6 +11,10 @@ from pydantic import (
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class OntologyTerm(BaseModel, extra='forbid'):
     id: str
@@ -667,21 +669,13 @@ class GenomicVariations(BaseModel, extra='forbid'):
         for fp in v:
             FrequencyInPopulation(**fp)
 
+url = args.url + '/g_variants'
 
-with open("genomicVariations_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            GenomicVariations(**doc)
-        print("genomicVariations is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/g_variants')
+f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-
+print("g_variants:")
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -693,4 +687,3 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
-'''

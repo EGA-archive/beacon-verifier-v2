@@ -1,20 +1,21 @@
 import json
 import re
-import pydantic
-import inspect
+import argparse
 from dateutil.parser import parse
 from pydantic import (
     BaseModel,
     ValidationError,
-    ValidationInfo,
     field_validator,
     Field,
-    PrivateAttr,
-    ConfigDict
+    PrivateAttr
 )
 
 from typing import Optional, Union
 import requests
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-url", "--url")
+args = parser.parse_args()
 
 class OntologyTerm(BaseModel, extra='forbid'):
     id: str
@@ -206,21 +207,13 @@ class Biosamples(BaseModel, extra='forbid'):
         for measurement in v:
             Measurement(**measurement)
 
-'''
-with open("test/biosamples_test.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            Biosamples(**doc)
-        print("biosamples is OK")
-    except ValidationError as e:
-        print(e)
-''' 
-f = requests.get('http://localhost:5050/api/biosamples')
+url = args.url + '/biosamples'
+
+f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-
+print("biosamples:")
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
