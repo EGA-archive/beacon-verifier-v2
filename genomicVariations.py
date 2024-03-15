@@ -669,6 +669,15 @@ class GenomicVariations(BaseModel, extra='forbid'):
         for fp in v:
             FrequencyInPopulation(**fp)
 
+with open("genomicVariations.json", "r") as f:
+    docs = json.load(f)
+    try:
+        for doc in docs:
+            GenomicVariations(**doc)
+        print("genomicVariations is OK")
+    except ValidationError as e:
+        print(e)
+'''
 url = args.url + '/g_variants'
 
 f = requests.get(url)
@@ -687,3 +696,4 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
+'''
