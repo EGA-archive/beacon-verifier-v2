@@ -521,7 +521,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("individuals:")
+print("{}:".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -533,3 +533,70 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
+
+url = args.url + '/datasets'
+
+c = requests.get(url)
+
+total_response = json.loads(c.text)
+
+resultsets = total_response["response"]["collections"]
+uri_id = resultsets[0]["id"]
+
+url = args.url + '/datasets/' + uri_id + '/individuals'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            Individuals(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/g_variants'
+
+b = requests.get(url)
+total_response = json.loads(b.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["variantInternalId"]
+
+url = args.url + '/g_variants/' + uri_id + '/individuals'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            Individuals(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+
+
+'''
+with open("individuals.json", "r") as f:
+    docs = json.load(f)
+    try:
+        for doc in docs:
+            Individuals(**doc)
+    except ValidationError as e:
+        print(e)
+'''

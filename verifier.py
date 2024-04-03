@@ -11,7 +11,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -22,7 +21,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -33,7 +31,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -44,7 +41,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -55,7 +51,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -66,7 +61,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -77,7 +71,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output
@@ -88,7 +81,6 @@ try:
     bash = subprocess.check_output([bash_string], shell=True)
     stringed_bash = bash.decode("utf-8") 
     replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
     print(replaced_stringed_bash)
 except subprocess.CalledProcessError as e:
     output = e.output

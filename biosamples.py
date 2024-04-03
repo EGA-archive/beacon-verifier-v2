@@ -213,26 +213,6 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("biosamples:")
-for resultset in resultsets:
-    results = resultset["results"]
-    dataset = resultset["id"]
-    try:
-        for result in results:
-            uri_id=result["id"]
-            Biosamples(**result)
-        print("{} is OK".format(dataset))
-    except ValidationError as e:
-        print("{} got the next validation errors:".format(dataset))
-        print(e)
-        continue
-'''
-url = args.url + '/biosamples'
-
-f = requests.get(url)
-total_response = json.loads(f.text)
-resultsets = total_response["response"]["resultSets"]
-
 print("{}:".format(url))
 for resultset in resultsets:
     results = resultset["results"]
@@ -247,7 +227,33 @@ for resultset in resultsets:
         print(e)
         continue
 
-print(uri_id)
+url = args.url + '/biosamples'
+
+a = requests.get(url)
+total_response = json.loads(a.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            Biosamples(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/g_variants'
+
+b = requests.get(url)
+total_response = json.loads(b.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["variantInternalId"]
+
 url = args.url + '/g_variants/' + uri_id + '/biosamples'
 
 f = requests.get(url)
@@ -266,5 +272,58 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
-        '''
 
+url = args.url + '/datasets'
+
+c = requests.get(url)
+
+total_response = json.loads(c.text)
+
+resultsets = total_response["response"]["collections"]
+uri_id = resultsets[0]["id"]
+
+url = args.url + '/datasets/' + uri_id + '/biosamples'
+
+d = requests.get(url)
+total_response = json.loads(d.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            Biosamples(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/individuals'
+
+e = requests.get(url)
+total_response = json.loads(e.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["id"]
+
+url = args.url + '/individuals/' + uri_id + '/biosamples'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            Biosamples(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue

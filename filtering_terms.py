@@ -39,7 +39,7 @@ class FilteringTerm(BaseModel, extra='forbid'):
     @classmethod
     def check_scope(cls, v: list) -> list:
         for scope in v:
-            if scope in ["analyses","biosamples","cohorts","datasets","individuals","genomicVariations","runs"]:
+            if scope in ["analyse","biosample","cohort","dataset","individual","genomicVariation","run"]:
                 pass
             else:
                 raise ValueError('scope must be a valid array with items as strings from ["analyses","biosamples","cohorts","datasets","individuals","genomicVariations","runs"]')
@@ -68,7 +68,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 
 resultsets = total_response["response"]
-print("filtering_terms:")
+print("{}:".format(url))
 try:
     FilteringTerms(**resultsets)
     print("is OK")

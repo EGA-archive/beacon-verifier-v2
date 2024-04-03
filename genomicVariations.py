@@ -669,22 +669,14 @@ class GenomicVariations(BaseModel, extra='forbid'):
         for fp in v:
             FrequencyInPopulation(**fp)
 
-with open("genomicVariations.json", "r") as f:
-    docs = json.load(f)
-    try:
-        for doc in docs:
-            GenomicVariations(**doc)
-        print("genomicVariations is OK")
-    except ValidationError as e:
-        print(e)
-'''
+
 url = args.url + '/g_variants'
 
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("g_variants:")
+print("{}:".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -696,4 +688,150 @@ for resultset in resultsets:
         print("{} got the next validation errors:".format(dataset))
         print(e)
         continue
+
+url = args.url + '/analyses'
+
+e = requests.get(url)
+total_response = json.loads(e.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["id"]
+
+url = args.url + '/analyses/' + uri_id + '/g_variants'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+    
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            GenomicVariations(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/biosamples'
+
+e = requests.get(url)
+total_response = json.loads(e.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["id"]
+
+url = args.url + '/biosamples/' + uri_id + '/g_variants'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            GenomicVariations(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/datasets'
+
+c = requests.get(url)
+
+total_response = json.loads(c.text)
+
+resultsets = total_response["response"]["collections"]
+uri_id = resultsets[0]["id"]
+
+url = args.url + '/datasets/' + uri_id + '/g_variants'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            GenomicVariations(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/individuals'
+
+e = requests.get(url)
+total_response = json.loads(e.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["id"]
+
+url = args.url + '/individuals/' + uri_id + '/g_variants'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            GenomicVariations(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+url = args.url + '/runs'
+
+e = requests.get(url)
+total_response = json.loads(e.text)
+resultsets = total_response["response"]["resultSets"]
+results = resultsets[0]["results"]
+uri_id = results[0]["id"]
+
+url = args.url + '/runs/' + uri_id + '/g_variants'
+
+f = requests.get(url)
+total_response = json.loads(f.text)
+resultsets = total_response["response"]["resultSets"]
+
+print("{}:".format(url))
+for resultset in resultsets:
+    results = resultset["results"]
+    dataset = resultset["id"]
+    try:
+        for result in results:
+            GenomicVariations(**result)
+        print("{} is OK".format(dataset))
+    except ValidationError as e:
+        print("{} got the next validation errors:".format(dataset))
+        print(e)
+        continue
+
+'''
+with open("genomicVariations.json", "r") as f:
+    docs = json.load(f)
+    try:
+        for doc in docs:
+            GenomicVariations(**doc)
+        print("genomicVariations is OK")
+    except ValidationError as e:
+        print(e)
 '''
