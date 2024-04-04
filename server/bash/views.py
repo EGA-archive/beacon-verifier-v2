@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 import subprocess
-from angelweb.forms import BamForm
+from verifierweb.forms import BamForm
 import time
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import logging
