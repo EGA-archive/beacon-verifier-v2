@@ -41,7 +41,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("{}:".format(url))
+print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -69,7 +69,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("{}:".format(url))
+print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -96,7 +96,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("{}:".format(url))
+print("{}".format(url))
 
 for resultset in resultsets:
     results = resultset["results"]
@@ -124,7 +124,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("{}:".format(url))
+print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
@@ -151,7 +151,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
 
-print("{}:".format(url))
+print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]

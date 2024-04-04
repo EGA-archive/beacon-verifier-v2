@@ -100,7 +100,7 @@ total_response = json.loads(f.text)
 
 
 resultsets = total_response["response"]["collections"]
-print("{}:".format(url))
+print("{}".format(url))
 try:
     for result in resultsets:
         dataset = result["id"]

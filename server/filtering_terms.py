@@ -68,7 +68,7 @@ f = requests.get(url)
 total_response = json.loads(f.text)
 
 resultsets = total_response["response"]
-print("{}:".format(url))
+print("{}".format(url))
 try:
     FilteringTerms(**resultsets)
     print("is OK")

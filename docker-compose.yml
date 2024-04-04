@@ -1,0 +1,21 @@
+# docker-compose.yml
+
+version: "3.8"
+
+networks:
+  my-app-network:
+    external: true
+
+services:
+
+  server:
+    build:
+      context: ./server
+    container_name: verifier
+    command: [ "bash", "start.sh" ]
+    ports:
+      - 8003:8000
+    volumes:
+      - ./server:/usr/src/app
+    networks:
+      - my-app-network
