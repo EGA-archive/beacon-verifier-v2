@@ -21,7 +21,7 @@ The variable you have to modify at the moment is SECRET_KEY, as OIDC is still no
 ```bash
 from django.core.management.utils import get_random_secret_key  
 get_random_secret_key()
-```bash
+```
 
 To light up the container with beacon verifier v2, execute the next command inside the root folder (where docker-compose is located at):
 ```bash
