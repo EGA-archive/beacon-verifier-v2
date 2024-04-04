@@ -49,6 +49,7 @@
                     <p>{{f.help_text|safe}} {{f}} </p>   
                     {% endfor %}
                 </div>
+
               </div>
               <div class="row">
                   <div class="col-5">
@@ -59,6 +60,13 @@
                   </div>
               </div>
                   </form>
+                  {% if success %}
+                  {% if 'CONGRATULATIONS' in success %}
+                  <div class="green"><b>{{success}}</b></div>
+                  {% else %}
+                  <div class="red"><b>{{success}}</b></div>
+                  {% endif %}
+                  {% endif %}
             </div>
 
             </div>
@@ -86,7 +94,10 @@
               {% elif 'further' not in bash %}
               <div class="text-nowrap bg-body-secondary border-start" style="width: 100%;">{{bash}}</div>
               {% endif %}
+
               {% endfor %}
+
+              
               {% endif %}
 
 

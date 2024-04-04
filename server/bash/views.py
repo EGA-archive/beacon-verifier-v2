@@ -43,11 +43,21 @@ def bash_view(request):
 
             bash_out = verify_command(form.cleaned_data['url_link'])
             one = bash_out.split('\n')
+            count=0
+            for onep in one:
+                if 'errors' in onep:
+                    count+=1
+            if count ==0:
+                success = 'CONGRATULATIONS! The review finished and your beacon has successfully passed the tests.'
+            else:
+                success = 'ERRORS FOUND! Your beacon has some errors, please review them and verify it back.'
+
 
    
             context = {
                 'url_link': form.cleaned_data['url_link'],
                 'bash_out': one,
+                'success': success,
                 'form': form
 
             }
