@@ -17,7 +17,7 @@ OIDC_RP_CLIENT_ID='your_client_id'
 OIDC_RP_CLIENT_SECRET='your_client_secret'
 ```
 
-The variable you have to modify at the moment is SECRET_KEY, as OIDC is still not implemented. To generate a Django SECRET_KEY and copy it to .env file, you can install python django package with pip install Django and generate yours with a script like this:
+We *STRONGLY RECOMMEND* to modify the variable SECRET_KEY. To generate a safe Django SECRET_KEY and copy it to .env file, you can install python django package with pip install Django and generate yours with a script like this:
 ```bash
 from django.core.management.utils import get_random_secret_key  
 get_random_secret_key()
