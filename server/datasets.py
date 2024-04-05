@@ -11,6 +11,7 @@ from pydantic import (
 
 from typing import Optional, Union
 import requests
+from meta import Meta
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
@@ -97,11 +98,13 @@ url = args.url + '/datasets'
 
 f = requests.get(url)
 total_response = json.loads(f.text)
+meta = total_response["meta"]
 
 
 resultsets = total_response["response"]["collections"]
 print("{}".format(url))
 try:
+    Meta(**meta)
     for result in resultsets:
         dataset = result["id"]
         Datasets(**result)

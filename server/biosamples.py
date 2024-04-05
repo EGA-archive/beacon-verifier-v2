@@ -12,6 +12,7 @@ from pydantic import (
 
 from typing import Optional, Union
 import requests
+from meta import Meta
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
@@ -212,12 +213,14 @@ url = args.url + '/biosamples'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             uri_id=result["id"]
             Biosamples(**result)
@@ -232,12 +235,14 @@ url = args.url + '/biosamples'
 a = requests.get(url)
 total_response = json.loads(a.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             Biosamples(**result)
         print("{} is OK".format(dataset))
@@ -259,12 +264,14 @@ url = args.url + '/g_variants/' + uri_id + '/biosamples'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             Biosamples(**result)
         print("{} is OK".format(dataset))
@@ -287,12 +294,14 @@ url = args.url + '/datasets/' + uri_id + '/biosamples'
 d = requests.get(url)
 total_response = json.loads(d.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             Biosamples(**result)
         print("{} is OK".format(dataset))
@@ -314,12 +323,14 @@ url = args.url + '/individuals/' + uri_id + '/biosamples'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             Biosamples(**result)
         print("{} is OK".format(dataset))

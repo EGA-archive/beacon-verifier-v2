@@ -11,6 +11,7 @@ from pydantic import (
 
 from typing import Optional, Union
 import requests
+from meta import Meta
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
@@ -675,12 +676,14 @@ url = args.url + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
@@ -702,12 +705,14 @@ url = args.url + '/analyses/' + uri_id + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
     
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
@@ -729,12 +734,14 @@ url = args.url + '/biosamples/' + uri_id + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
@@ -757,12 +764,14 @@ url = args.url + '/datasets/' + uri_id + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
@@ -784,12 +793,14 @@ url = args.url + '/individuals/' + uri_id + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
@@ -811,12 +822,14 @@ url = args.url + '/runs/' + uri_id + '/g_variants'
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]["resultSets"]
+meta = total_response["meta"]
 
 print("{}".format(url))
 for resultset in resultsets:
     results = resultset["results"]
     dataset = resultset["id"]
     try:
+        Meta(**meta)
         for result in results:
             GenomicVariations(**result)
         print("{} is OK".format(dataset))
