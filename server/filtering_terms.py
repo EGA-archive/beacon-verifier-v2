@@ -73,7 +73,7 @@ try:
     FilteringTerms(**resultsets)
     print("is OK")
 except ValidationError as e:
-    print("got the next validation errors:")
+    print("filtering_terms got the next validation errors:")
     print(e)
     
 

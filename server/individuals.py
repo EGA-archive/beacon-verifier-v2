@@ -516,6 +516,52 @@ class Individuals(BaseModel, extra='forbid'):
         for treatment in v:
             Treatment(**treatment)
 
+
+class ResultsetInstance(BaseModel, extra='forbid'):
+    def __init__(self, **data) -> None:
+        for private_key in self.__class__.__private_attributes__.keys():
+            try:
+                value = data.pop(private_key)
+            except KeyError:
+                pass
+
+        super().__init__(**data)
+    _id: Optional[str] = PrivateAttr()
+    exists: bool
+    id: str
+    info: Optional[dict] = None
+    results: list
+    resultsCount: int
+    resultsHandovers: Optional[list] = None
+    setType: str
+    @field_validator('results')
+    @classmethod
+    def check_results(cls, v: list) -> list:
+        if v != []:
+            for result in v:
+                Individuals(**result)
+        return v.title()
+    
+class IndividualsResultsets(BaseModel, extra='forbid'):
+    def __init__(self, **data) -> None:
+        for private_key in self.__class__.__private_attributes__.keys():
+            try:
+                value = data.pop(private_key)
+            except KeyError:
+                pass
+
+        super().__init__(**data)
+    _id: Optional[str] = PrivateAttr()
+    schema_: Optional[str]=Field(default=None, alias='$schema')
+    resultSets: list
+    @field_validator('resultSets')
+    @classmethod
+    def check_resultSets(cls, v: list) -> list:
+        for resultset in v:
+            ResultsetInstance(**resultset)
+        return v.title()
+    
+'''
 url = args.url + '/individuals'
 
 f = requests.get(url)
@@ -597,8 +643,6 @@ for resultset in resultsets:
         continue
 
 
-
-'''
 with open("individuals.json", "r") as f:
     docs = json.load(f)
     try:

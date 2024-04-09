@@ -36,27 +36,43 @@ class Analyses(BaseModel, extra='forbid'):
     runId: Optional[str]=None
     variantCaller: Optional[str]=None
 
+
 url = args.url + '/analyses'
 
 f = requests.get(url)
 total_response = json.loads(f.text)
-resultsets = total_response["response"]["resultSets"]
+
 meta = total_response["meta"]
 
-print("{}".format(url))
-for resultset in resultsets:
+try:
+    resultsets = total_response["response"]["resultSets"]
+    print("{}".format(url))
+    for resultset in resultsets:
+        results = resultset["results"]
+        dataset = resultset["id"]
+        try:
+            Meta(**meta)
+            for result in results:
+                Analyses(**result)
+            
+            print("{} is OK".format(dataset))
+        except ValidationError as e:
+            print("{} got the next validation errors:".format(dataset))
+            print(e)
+            continue
+except Exception:
     results = resultset["results"]
-    dataset = resultset["id"]
+    dataset = resultsets["id"]
     try:
         Meta(**meta)
         for result in results:
-            Analyses(**result)
+            Analyses(**resultsets)
         
         print("{} is OK".format(dataset))
     except ValidationError as e:
         print("{} got the next validation errors:".format(dataset))
         print(e)
-        continue
+
 
 url = args.url + '/g_variants'
 
