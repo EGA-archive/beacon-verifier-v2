@@ -120,20 +120,5 @@ class Info(BaseModel, extra='forbid'):
             raise ValueError('welcomeUrl must be a valid https url')
         return v.title()
 
-url = args.url + '/info'
-
-f = requests.get(url)
-total_response = json.loads(f.text)
-resultsets = total_response["response"]
-meta = total_response["meta"]
-
-print("{}".format(url))
-try:
-    #Meta(**meta)
-    Info(**resultsets)
-    print("info is OK")
-except ValidationError as e:
-    print("info got the next validation errors:")
-    print(e)
     
 

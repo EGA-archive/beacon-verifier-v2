@@ -112,16 +112,6 @@ def list_endpoints(list_of_endpoints, endpoints):
     return list_of_endpoints
 
 endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
-print(endpoints_to_verify)
-meta = total_response["meta"]
 
-print("{}".format(url))
-try:
-    #Meta(**meta)
-    Map(**resultsets)
-    print("map is OK")
-except ValidationError as e:
-    print("info got the next validation errors:")
-    print(e)
     
 

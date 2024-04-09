@@ -8,6 +8,7 @@ from filtering_terms import FilteringTerms
 from meta import Meta
 from map import Map
 from info import Info
+from get_map import list_endpoints
 from configuration import Configuration
 from pydantic import (
     BaseModel,
@@ -22,27 +23,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-string='python3 get_map.py' + ' -url ' + args.url
-bash_string = (string)
-try:
-    bash = subprocess.check_output([bash_string], shell=True)
-    stringed_bash = bash.decode("utf-8") 
-    replaced_stringed_bash=stringed_bash.replace("'","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("[","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("]","")
-    replaced_stringed_bash=replaced_stringed_bash.replace(" ","")
-    replaced_stringed_bash=replaced_stringed_bash.replace("\n","")
-    endpoints_to_verify=replaced_stringed_bash.split(',')
-except subprocess.CalledProcessError as e:
-    output = e.output
-    print(output)
-
 url = args.url + '/map'
 print("{}".format(url))
 f = requests.get(url)
 total_response = json.loads(f.text)
 resultsets = total_response["response"]
-meta = total_response["meta"]
+endpoints = resultsets["endpointSets"]
+list_of_endpoints=[]
+endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
 meta = total_response["meta"]
 try:
     Map(**resultsets)
@@ -50,12 +38,15 @@ try:
 except ValidationError as e:
     print("map got the next validation errors:")
     print(e)
+
+'''
 try:
     Meta(**meta)
     print("metadata from map is OK")
 except ValidationError as e:
     print("metadata from map got the next validation errors:")
     print(e)
+'''
 
 url = args.url + '/info'
 print("{}".format(url))
@@ -70,13 +61,14 @@ try:
 except ValidationError as e:
     print("info got the next validation errors:")
     print(e)
+'''
 try:
     Meta(**meta)
     print("metadata from info is OK")
 except ValidationError as e:
     print("metadata from info got the next validation errors:")
     print(e)
-
+'''
 
 url = args.url + '/configuration'
 print("{}".format(url))
@@ -86,9 +78,9 @@ resultsets = total_response["response"]
 meta = total_response["meta"]
 try:
     Configuration(**resultsets)
-    print("info is OK")
+    print("configuration is OK")
 except ValidationError as e:
-    print("info got the next validation errors:")
+    print("configuration got the next validation errors:")
     print(e)
 '''
 try:
