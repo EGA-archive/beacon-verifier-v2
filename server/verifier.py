@@ -120,9 +120,9 @@ for endpoint in endpoints_to_verify:
             if granularity == 'record':
                 BiosamplesResultsetsResponse(**total_response)
             elif granularity == 'count':
-                CountResponse(**response)
+                CountResponse(**total_response)
             elif granularity == 'boolean':
-                BooleanResponse(**response)
+                BooleanResponse(**total_response)
             print("{} is OK".format(dataset))
         except ValidationError as e:
             print("{} got the next validation errors:".format(dataset))
@@ -152,9 +152,9 @@ for endpoint in endpoints_to_verify:
             if granularity == 'record':
                 GenomicVariationsResultsetsResponse(**total_response)
             elif granularity == 'count':
-                CountResponse(**response)
+                CountResponse(**total_response)
             elif granularity == 'boolean':
-                BooleanResponse(**response)
+                BooleanResponse(**total_response)
             print("{} is OK".format(dataset))
         except ValidationError as e:
             print("{} got the next validation errors:".format(dataset))
@@ -182,6 +182,7 @@ for endpoint in endpoints_to_verify:
             if granularity == 'record':
                 IndividualsResultsetsResponse(**total_response)
             elif granularity == 'count':
+                print(total_response)
                 CountResponse(**total_response)
             elif granularity == 'boolean':
                 BooleanResponse(**total_response)

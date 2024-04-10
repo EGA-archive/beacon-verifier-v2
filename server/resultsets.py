@@ -86,7 +86,7 @@ class ResultsetsResponse(BaseModel):
         super().__init__(**data)
     _id: Optional[str] = PrivateAttr()
     beaconHandovers: Optional[list]=None
-    info: list
+    info: Optional[dict] = None
     meta: Meta
     response: Resultsets
     responseSummary: SummaryResponseSection

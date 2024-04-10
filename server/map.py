@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class Endpoints(BaseModel, extra='forbid'):
+class Endpoints(BaseModel):
     url: str
     returnedEntryType: str
     @field_validator('url')
@@ -31,7 +31,7 @@ class Endpoints(BaseModel, extra='forbid'):
             raise ValueError('url must be a valid https url')
         return v.title()
             
-class Endpoint2(BaseModel, extra='forbid'):
+class Endpoint2(BaseModel):
     entryType: str
     openAPIEndpointsDefinition: Optional[str]=None
     rootUrl: str
@@ -73,7 +73,7 @@ class Endpoint(BaseModel):
     def check_all(cls, v: dict) -> dict:
         Endpoint2(**v)
 
-class Map(BaseModel, extra='forbid'):
+class Map(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:
