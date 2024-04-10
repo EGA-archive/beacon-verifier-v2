@@ -182,7 +182,6 @@ for endpoint in endpoints_to_verify:
             if granularity == 'record':
                 IndividualsResultsetsResponse(**total_response)
             elif granularity == 'count':
-                print(total_response)
                 CountResponse(**total_response)
             elif granularity == 'boolean':
                 BooleanResponse(**total_response)
