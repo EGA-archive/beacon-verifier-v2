@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class OntologyTerm(BaseModel, extra='forbid'):
+class OntologyTerm(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -29,7 +29,7 @@ class OntologyTerm(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
 
-class Runs(BaseModel, extra='forbid'):
+class Runs(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

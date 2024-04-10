@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class Analyses(BaseModel, extra='forbid'):
+class Analyses(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

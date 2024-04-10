@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class OntologyTerm(BaseModel, extra='forbid'):
+class OntologyTerm(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -29,7 +29,7 @@ class OntologyTerm(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
             
-class DUODataUse(BaseModel, extra='forbid'):
+class DUODataUse(BaseModel):
     id: str
     label: Optional[str]=None
     modifiers: Optional[list] = None
@@ -48,7 +48,7 @@ class DUODataUse(BaseModel, extra='forbid'):
         for modifier in v:
             OntologyTerm(**modifier)
 
-class DataUseConditions(BaseModel, extra='forbid'):
+class DataUseConditions(BaseModel):
     duoDataUse: Optional[list] = None
     @field_validator('duoDataUse')
     @classmethod
@@ -56,7 +56,7 @@ class DataUseConditions(BaseModel, extra='forbid'):
         for duoData in v:
             DUODataUse(**duoData)
 
-class Datasets(BaseModel, extra='forbid'):
+class Datasets(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
             
-class FilteringTerm(BaseModel, extra='forbid'):
+class FilteringTerm(BaseModel):
     id: str
     type: str
     label: Optional[str] = None
@@ -45,7 +45,7 @@ class FilteringTerm(BaseModel, extra='forbid'):
                 raise ValueError('scope must be a valid array with items as strings from ["analyses","biosamples","cohorts","datasets","individuals","genomicVariations","runs"]')
             return scope.title()    
 
-class FilteringTerms(BaseModel, extra='forbid'):
+class FilteringTerms(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

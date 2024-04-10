@@ -19,26 +19,26 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class Description(BaseModel, extra='forbid'):
+class Description(BaseModel):
     description: str
 
-class ReferenceToSchemaDefinition(BaseModel, extra='forbid'):
+class ReferenceToSchemaDefinition(BaseModel):
     referenceToSchemaDefinition: str
     schemaVersion: Optional[str]=None
     description: Optional[str]=None
 
-class ReferenceToSchemaDefinitionAndBasicElement(BaseModel, extra='forbid'):
+class ReferenceToSchemaDefinitionAndBasicElement(BaseModel):
     referenceToSchemaDefinition: str
     schemaVersion: Optional[str]=None
     description: Optional[str]=None
     id: str
     name: str
 
-class BasicElement(BaseModel, extra='forbid'):
+class BasicElement(BaseModel):
     id: str
     name: str
 
-class OntologyTerm(BaseModel, extra='forbid'):
+class OntologyTerm(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -50,7 +50,7 @@ class OntologyTerm(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
             
-class EntryTypeDefinition(BaseModel, extra='forbid'):
+class EntryTypeDefinition(BaseModel):
     aCollectionOf: Optional[list]=None
     additionallySupportedSchemas: Optional[list]=None
     defaultSchema: dict
@@ -71,13 +71,12 @@ class EntryTypeDefinition(BaseModel, extra='forbid'):
     def check_additionallySupportedSchemas(cls, v: list) -> list:
         for element in v:
             ReferenceToSchemaDefinitionAndBasicElement(**element)
-        return v.title()
     @field_validator('defaultSchema')
     @classmethod
     def check_defaultSchema(cls, v: dict) -> dict:
         ReferenceToSchemaDefinitionAndBasicElement(**v)
     
-class MaturityAttributes(BaseModel, extra='forbid'):
+class MaturityAttributes(BaseModel):
     productionStatus: str
     @field_validator('productionStatus')
     @classmethod
@@ -88,7 +87,7 @@ class MaturityAttributes(BaseModel, extra='forbid'):
             raise ValueError('productionStatus must be DEV, TEST or PROD')
         return v.title()
     
-class SecurityAttributes(BaseModel, extra='forbid'):
+class SecurityAttributes(BaseModel):
     defaultGranularity: str
     securityLevels: list
     @field_validator('defaultGranularity')
@@ -109,7 +108,7 @@ class SecurityAttributes(BaseModel, extra='forbid'):
                 raise ValueError('securityLevel must be PUBLIC, REGISTERED or CONTROLLED')
         return securityLevel.title()
 
-class Configuration(BaseModel, extra='forbid'):
+class Configuration(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:
@@ -127,11 +126,10 @@ class Configuration(BaseModel, extra='forbid'):
     @classmethod
     def check_entryTypes(cls, v: dict) -> dict:
         for key, value in v.items():
-            if key in ['analysis', 'biosample', 'cohort', 'dataset', 'genomicVariation', 'individual', 'run']:
+            if key in ['analysis', 'biosample', 'cohort', 'dataset', 'genomicVariant', 'individual', 'run']:
                 EntryTypeDefinition(**value)
             else:
-                raise ValueError('entryType must be one of analysys, biosample, cohort, dataset, genomicVariation, individual, run')
-        return v.title()
+                raise ValueError('entryType must be one of analysis, biosample, cohort, dataset, genomicVariant, individual, run')
     @field_validator('maturityAttributes')
     @classmethod
     def check_createDateTime(cls, v: dict) -> dict:

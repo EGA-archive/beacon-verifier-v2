@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class OntologyTerm(BaseModel, extra='forbid'):
+class OntologyTerm(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -30,36 +30,36 @@ class OntologyTerm(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
 
-class Age(BaseModel, extra='forbid'):
+class Age(BaseModel):
     iso8601duration: str
 
-class AgeRange(BaseModel, extra='forbid'):
+class AgeRange(BaseModel):
     end: Age
     start: Age
 
-class GestationalAge(BaseModel, extra='forbid'):
+class GestationalAge(BaseModel):
     days: Optional[int] = None
     weeks: int
 
-class TimeInterval(BaseModel, extra='forbid'):
+class TimeInterval(BaseModel):
     end: str
     start: str
 
-class ReferenceRange(BaseModel, extra='forbid'):
+class ReferenceRange(BaseModel):
     high: Union[int,float]
     low: Union[int, float]
     unit: OntologyTerm
 
-class Quantity(BaseModel, extra='forbid'):
+class Quantity(BaseModel):
     referenceRange: Optional[ReferenceRange] = None
     unit: OntologyTerm
     value: Union[int, float]
 
-class TypedQuantity(BaseModel, extra='forbid'):
+class TypedQuantity(BaseModel):
     quantity: Quantity
     quantityType: OntologyTerm
 
-class EventTimeline(BaseModel, extra='forbid'):
+class EventTimeline(BaseModel):
     end: Optional[str]=None
     start: Optional[str]=None
     @field_validator('end')
@@ -82,7 +82,7 @@ class EventTimeline(BaseModel, extra='forbid'):
             return v.title()
         
 
-class Diseases(BaseModel, extra='forbid'):
+class Diseases(BaseModel):
     ageOfOnset: Optional[Union[str,dict]]=None
     diseaseCode: OntologyTerm
     familyHistory: Optional[bool]=None
@@ -132,7 +132,7 @@ class Diseases(BaseModel, extra='forbid'):
             if fits_in_class == False:
                 raise ValueError('ageOfOnset, if object, must be any format possible between age, ageRange, gestationalAge, timeInterval or OntologyTerm')
             
-class Ethnicity(BaseModel, extra='forbid'):
+class Ethnicity(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -144,7 +144,7 @@ class Ethnicity(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
     
-class Sex(BaseModel, extra='forbid'):
+class Sex(BaseModel):
     id: str
     label: Optional[str]=None
     @field_validator('id')
@@ -156,16 +156,16 @@ class Sex(BaseModel, extra='forbid'):
             raise ValueError('id must be CURIE, e.g. NCIT:C42331')
         return v.title()
     
-class Reference(BaseModel, extra='forbid'):
+class Reference(BaseModel):
     id: Optional[str] = None
     notes: Optional[str] = None
     reference: Optional[str] = None
     
-class Evidence(BaseModel, extra='forbid'):
+class Evidence(BaseModel):
     evidenceCode: OntologyTerm
     reference: Optional[Reference] = None
 
-class PhenotypicFeatures(BaseModel, extra='forbid'):
+class PhenotypicFeatures(BaseModel):
     evidence: Optional[Evidence]=None
     id: Optional[str] = None
     excluded: Optional[bool]=None
@@ -269,7 +269,7 @@ class PhenotypicFeatures(BaseModel, extra='forbid'):
             if fits_in_class == False:
                 raise ValueError('resolution, if object, must be any format possible between age, ageRange, gestationalAge, timeInterval or OntologyTerm')
 
-class CohortCriteria(BaseModel, extra='forbid'):
+class CohortCriteria(BaseModel):
     ageRange: AgeRange
     diseaseConditions: Optional[list]=None
     ethnicities: Optional[list]=None
@@ -302,12 +302,12 @@ class CohortCriteria(BaseModel, extra='forbid'):
         for phenotypicCondition in v:
             PhenotypicFeatures(**phenotypicCondition)
 
-class DataAvailabilityAndDistribution(BaseModel, extra='forbid'):
+class DataAvailabilityAndDistribution(BaseModel):
     availability: bool
     availabilityCount: Optional[int]=None
     distribution: Optional[dict]=None
             
-class CollectionEvent(BaseModel, extra='forbid'):
+class CollectionEvent(BaseModel):
     eventAgeRange: Optional[DataAvailabilityAndDistribution]=None
     eventCases: Optional[int] = None
     eventControls: Optional[int] = None
@@ -330,7 +330,7 @@ class CollectionEvent(BaseModel, extra='forbid'):
                 raise ValueError('eventDate, if string, must be Timestamp, getting this error: {}'.format(e))
             return v.title()
 
-class Cohorts(BaseModel, extra='forbid'):
+class Cohorts(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

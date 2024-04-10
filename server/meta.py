@@ -17,18 +17,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
-class RequestedSchema(BaseModel, extra='forbid'):
+class RequestedSchema(BaseModel):
     entityType: Optional[str] = None
     schema_: Optional[str]=Field(default=None, alias='schema')
 
-class Pagination(BaseModel, extra='forbid'):
+class Pagination(BaseModel):
     currentPage: Optional[str] = None
     limit: Optional[int] = None
     nextPage: Optional[str] = None
     previousPage: Optional[str] = None
     skip: Optional[int] = None
 
-class ReceivedRequestSummary(BaseModel, extra='forbid'):
+class ReceivedRequestSummary(BaseModel):
     apiVersion: str
     filters: Optional[list] = None
     includeResultsetResponses: Optional[str] = None
@@ -71,7 +71,7 @@ class ReceivedRequestSummary(BaseModel, extra='forbid'):
         for requestedSchema in v:
             RequestedSchema(**requestedSchema)
 
-class Meta(BaseModel, extra='forbid'):
+class Meta(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:

@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
             
-class BeaconOrganization(BaseModel, extra='forbid'):
+class BeaconOrganization(BaseModel):
     address: Optional[str]=None
     contactUrl: Optional[str]=None
     description: Optional[str]=None
@@ -45,7 +45,7 @@ class BeaconOrganization(BaseModel, extra='forbid'):
             raise ValueError('logoUrl must be a valid https url')
         return v.title()
 
-class Info(BaseModel, extra='forbid'):
+class Info(BaseModel):
     def __init__(self, **data) -> None:
         for private_key in self.__class__.__private_attributes__.keys():
             try:
