@@ -174,9 +174,9 @@ for endpoint in endpoints_to_verify:
         print("{}".format(url))
         try:
             Meta(**meta)
-            print("metadata from g_variants is OK")
+            print("metadata from individuals is OK")
         except ValidationError as e:
-            print("metadata from g_variants got the next validation errors:")
+            print("metadata from individuals got the next validation errors:")
             print(e)
         try:
             if granularity == 'record':
