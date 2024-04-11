@@ -138,5 +138,4 @@ GitHub.sublime-settings
 .DS_Store
 conf/__pycache__/*
 __pycache__/*
-ref_schemas
 test
