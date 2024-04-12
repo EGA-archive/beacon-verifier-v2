@@ -12,20 +12,38 @@ args = parser.parse_args()
 
 root_path = '/usr/src/app/'
 
-def endpoint_check(endpoint:str, id_parameter: bool):
+def list_endpoints(list_of_endpoints, endpoints):
+    for k, v in endpoints.items():
+        for k2, v2 in v.items():
+            if k2 == 'rootUrl':
+                list_of_endpoints.append(v2)
+            elif k2 == 'endpoints':
+                for k3, v3 in v2.items():
+                    for k4, v4 in v3.items():
+                        if k4 == 'url':
+                            list_of_endpoints.append(v4)
+
+    return list_of_endpoints
+
+def endpoint_check(endpoint:str, id_parameter: bool, url: str):
+    endpoint_validation=[]
+    root_path = '/usr/src/app/'
     if endpoint != 'genomicVariations' and id_parameter == False:
-        url = args.url + '/' + endpoint
+        url = url + '/' + endpoint
         f = requests.get(url)
         total_response = json.loads(f.text)
     elif id_parameter == False:
-        url = args.url + '/' + 'g_variants'
+        url = url + '/' + 'g_variants'
         f = requests.get(url)
         total_response = json.loads(f.text)
     else:
         last_part = endpoint.split('/')
-        url = args.url + '/' + last_part[-3]
-        f = requests.get(url)
-        total_response = json.loads(f.text)
+        url = url + '/' + last_part[-3]
+        try:
+            f = requests.get(url)
+            total_response = json.loads(f.text)
+        except Exception:
+            raise ValueError('{} is not a valid URL. Please review urls from /map endpoint'.format(url))
         if last_part[-3] == 'g_variants':
             id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
             url = endpoint.replace('{variantInternalId}', id)
@@ -47,7 +65,7 @@ def endpoint_check(endpoint:str, id_parameter: bool):
         
         
     meta = total_response["meta"]
-    print("{}".format(url))
+    endpoint_validation.append(url)
     try:
         granularity = meta["returnedGranularity"]
     except Exception:
@@ -58,8 +76,7 @@ def endpoint_check(endpoint:str, id_parameter: bool):
         try:
             resultsets=total_response["response"]["resultSets"][0]["results"]
         except Exception:
-            if granularity == 'record':
-                granularity = 'count'
+            granularity = 'boolean'
     if granularity == 'record':
         if endpoint in ['cohorts', 'datasets']:
             with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
@@ -72,115 +89,160 @@ def endpoint_check(endpoint:str, id_parameter: bool):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
-        print(output_validation)
+        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+
         with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file://{0}/'.format(
                 os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        for result in resultsets:
-            output_validation=JSONSchemaValidator.validate(result, response, resolver)
-            print(output_validation)
+        if endpoint in ['cohorts', 'datasets']:
+            resultsets=total_response["response"]["collections"]
+            for resultset in resultsets:
+                dataset = resultset["id"]
+                endpoint_validation.append(dataset)
+                endpoint_validation.append(JSONSchemaValidator.validate(resultset, response, resolver))
+        else:
+            resultsets=total_response["response"]["resultSets"]
+            for resultset in resultsets:
+                dataset = resultset["id"]
+                results = resultset["results"]
+                endpoint_validation.append(dataset)
+                for result in results:
+                    endpoint_validation.append(JSONSchemaValidator.validate(result, response, resolver))
+    
     elif granularity == 'count':
         with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
                 os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
-        print(output_validation)
+        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+
     elif granularity == 'boolean':
         with open(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
                 os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
-        print(output_validation)
+        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+    return endpoint_validation
 
-url = args.url + '/map'
-f = requests.get(url)
-total_response = json.loads(f.text)
-resultsets = total_response["response"]
-endpoints = resultsets["endpointSets"]
-list_of_endpoints=[]
-endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
 
-url = args.url + '/map'
-print("{}".format(url))
-f = requests.get(url)
-total_response = json.loads(f.text)
-with open(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json', 'r') as f:
-    map = json.load(f)
-schema_path = 'file:///{0}/'.format(
-        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
-resolver = RefResolver(schema_path, map)
-output_validation=JSONSchemaValidator.validate(total_response, map, resolver)
-print(output_validation)
+def general_checks(url: str):
+    output_validation=[]
+    root_path = '/usr/src/app/'
+    new_url = url + '/map'
+    f = requests.get(new_url)
+    total_response = json.loads(f.text)
+    resultsets = total_response["response"]
+    endpoints = resultsets["endpointSets"]
+    list_of_endpoints=[]
+    endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
+    new_url = url + '/map'
+    output_validation.append(new_url)
+    f = requests.get(new_url)
+    total_response = json.loads(f.text)
+    with open(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json', 'r') as f:
+        map = json.load(f)
+    schema_path = 'file:///{0}/'.format(
+            os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
+    resolver = RefResolver(schema_path, map)
+    output_validation.append(JSONSchemaValidator.validate(total_response, map, resolver))
 
-url = args.url + '/info'
-print("{}".format(url))
-f = requests.get(url)
-total_response = json.loads(f.text)
-with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
-    info = json.load(f)
-schema_path = 'file:///{0}/'.format(
-        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
-resolver = RefResolver(schema_path, info)
-output_validation=JSONSchemaValidator.validate(total_response, info, resolver)
-print(output_validation)
+    new_url = url + '/info'
+    output_validation.append(new_url)
+    f = requests.get(new_url)
+    total_response = json.loads(f.text)
+    with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
+        info = json.load(f)
+    schema_path = 'file:///{0}/'.format(
+            os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
+    resolver = RefResolver(schema_path, info)
+    output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver))
 
-url = args.url + '/configuration'
-print("{}".format(url))
-f = requests.get(url)
-total_response = json.loads(f.text)
-with open(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json', 'r') as f:
-    configuration = json.load(f)
-schema_path = 'file:///{0}/'.format(
-        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
-resolver = RefResolver(schema_path, configuration)
-output_validation=JSONSchemaValidator.validate(total_response, configuration, resolver)
-print(output_validation)
+    new_url = url + '/configuration'
+    output_validation.append(new_url)
+    f = requests.get(new_url)
+    total_response = json.loads(f.text)
+    with open(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json', 'r') as f:
+        configuration = json.load(f)
+    schema_path = 'file:///{0}/'.format(
+            os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
+    resolver = RefResolver(schema_path, configuration)
+    output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver))
 
-url = args.url + '/filtering_terms'
-print("{}".format(url))
-f = requests.get(url)
-total_response = json.loads(f.text)
-with open(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json', 'r') as f:
-    filtering_terms = json.load(f)
-schema_path = 'file:///{0}/'.format(
-        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json').replace("\\", "/"))
-resolver = RefResolver(schema_path, filtering_terms)
-output_validation=JSONSchemaValidator.validate(total_response, filtering_terms, resolver)
-print(output_validation)
+    new_url = url + '/filtering_terms'
+    output_validation.append(new_url)
+    f = requests.get(new_url)
+    total_response = json.loads(f.text)
+    with open(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json', 'r') as f:
+        filtering_terms = json.load(f)
+    schema_path = 'file:///{0}/'.format(
+            os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json').replace("\\", "/"))
+    resolver = RefResolver(schema_path, filtering_terms)
+    output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver))
 
-for endpoint in endpoints_to_verify:
-    if endpoint.endswith('analyses') and 'd}' not in endpoint:
-        endpoint_check('analyses', False)
-    elif endpoint.endswith('analyses'):
-        endpoint_check(endpoint, True)
-    elif endpoint.endswith('biosamples') and 'd}' not in endpoint:
-        endpoint_check('biosamples', False)
-    elif endpoint.endswith('biosamples'):
-         endpoint_check(endpoint, True)
-    elif endpoint.endswith('g_variants') and 'd}' not in endpoint:
-        endpoint_check('genomicVariations', False)
-    elif endpoint.endswith('g_variants'):
-        endpoint_check(endpoint, True)
-    elif endpoint.endswith('individuals') and 'd}' not in endpoint:
-        endpoint_check('individuals', False)
-    elif endpoint.endswith('individuals'):
-        endpoint_check(endpoint, True)
-    elif endpoint.endswith('runs') and 'd}' not in endpoint:
-        endpoint_check('runs', False)
-    elif endpoint.endswith('runs'):
-        endpoint_check(endpoint, True)
-    elif endpoint.endswith('datasets') and 'd}' not in endpoint:
-        endpoint_check('datasets', False)
-    elif endpoint.endswith('datasets'):
-        endpoint_check(endpoint, True)
-    elif endpoint.endswith('cohorts') and 'd}' not in endpoint:
-        endpoint_check('cohorts', False)
-    elif endpoint.endswith('cohorts'):
-        endpoint_check(endpoint, True)
+    for endpoint in endpoints_to_verify:
+        if endpoint.endswith('analyses') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('analyses', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('analyses'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('biosamples') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('biosamples', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('biosamples'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('g_variants') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('genomicVariations', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('g_variants'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('individuals') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('individuals', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('individuals'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('runs') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('runs', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('runs'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('datasets') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('datasets', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('datasets'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('cohorts') and 'd}' not in endpoint:
+            endpoint_validation=endpoint_check('cohorts', False, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+        elif endpoint.endswith('cohorts'):
+            endpoint_validation=endpoint_check(endpoint, True, url)
+            for validated_endpoint in endpoint_validation:
+                output_validation.append(validated_endpoint)
+    return output_validation
+
+general_checks(args.url)
+
+
+

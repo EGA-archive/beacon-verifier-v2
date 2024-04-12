@@ -18,21 +18,12 @@ def list_endpoints(list_of_endpoints, endpoints):
         for k2, v2 in v.items():
             if k2 == 'rootUrl':
                 list_of_endpoints.append(v2)
-                try:
-                    f = requests.get(v2)
-                    total_response = json.loads(f.text)
-                except Exception:
-                    raise ValueError('{} is not a valid URL, review rootUrl field from /map endpoint')
             elif k2 == 'endpoints':
                 for k3, v3 in v2.items():
                     for k4, v4 in v3.items():
                         if k4 == 'url':
                             list_of_endpoints.append(v4)
-                            try:
-                                f = requests.get(v2)
-                                total_response = json.loads(f.text)
-                            except Exception:
-                                raise ValueError('{} is not a valid URL, review endpoints field from /map endpoint')
+
     return list_of_endpoints
 
 def endpoint_check(endpoint:str, id_parameter: bool, url: str):
@@ -49,8 +40,11 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
     else:
         last_part = endpoint.split('/')
         url = url + '/' + last_part[-3]
-        f = requests.get(url)
-        total_response = json.loads(f.text)
+        try:
+            f = requests.get(url)
+            total_response = json.loads(f.text)
+        except Exception:
+            raise ValueError('{} is not a valid URL. Please review urls from /map endpoint'.format(url))
         if last_part[-3] == 'g_variants':
             id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
             url = endpoint.replace('{variantInternalId}', id)
