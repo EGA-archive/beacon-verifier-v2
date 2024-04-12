@@ -49,18 +49,21 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
             error = total_response["error"]
             is_error = True
         except Exception:
-            if last_part[-3] == 'g_variants':
-                id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
-                url = endpoint.replace('{variantInternalId}', id)
-            elif last_part[-3] == 'cohorts':
-                id = total_response["response"]["collections"][0]["id"]
-                url = endpoint.replace('{id}', id)
-            elif last_part[-3] == 'datasets':
-                id = total_response["response"]["collections"][0]["id"]
-                url = endpoint.replace('{id}', id)
-            else:
-                id = total_response["response"]["resultSets"][0]["results"][0]["id"]
-                url = endpoint.replace('{id}', id)
+            try:
+                if last_part[-3] == 'g_variants':
+                    id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
+                    url = endpoint.replace('{variantInternalId}', id)
+                elif last_part[-3] == 'cohorts':
+                    id = total_response["response"]["collections"][0]["id"]
+                    url = endpoint.replace('{id}', id)
+                elif last_part[-3] == 'datasets':
+                    id = total_response["response"]["collections"][0]["id"]
+                    url = endpoint.replace('{id}', id)
+                else:
+                    id = total_response["response"]["resultSets"][0]["results"][0]["id"]
+                    url = endpoint.replace('{id}', id)
+            except Exception:
+                pass
 
        
         f = requests.get(url)
@@ -70,12 +73,16 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
             endpoint = 'genomicVariations'
 
         
-    meta = total_response["meta"]
     endpoint_validation.append(url)
     try:
+        meta = total_response["meta"]
         granularity = meta["returnedGranularity"]
     except Exception:
-        granularity = meta["receivedRequestSummary"]["requestedGranularity"]
+        try:
+            meta = total_response["meta"]
+            granularity = meta["receivedRequestSummary"]["requestedGranularity"]
+        except Exception:
+            granularity = 'record'
     if endpoint in ['cohorts', 'datasets']:
         resultsets = total_response["response"]["collections"]
     else:

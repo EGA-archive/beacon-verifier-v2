@@ -87,12 +87,10 @@
               {% for bash in bash_out %}
               {% if 'http' in bash and 'further' not in bash %}
               <div><a href={{bash}}>{{bash}}</a></div>
-              {% elif 'is OK' in bash %}
-              <div class="text-nowrap bg-body-secondary border" style="width: 100%;"><b>{{bash}}</b></div>
-              {% elif 'next validation errors' in bash %}
-              <div class="text-nowrap bg-body-secondary border-top border-end border-start" style="width: 100%;"><b>{{bash}}</b></div>
-              {% elif 'further' not in bash %}
-              <div class="text-nowrap bg-body-secondary border-start" style="width: 100%;">{{bash}}</div>
+              {% else %}
+              {% for bashed in bash %}
+              <div class="text-nowrap bg-body-secondary border-start" style="width: 100%;">{{bashed}}</div>
+              {% endfor %}
               {% endif %}
 
               {% endfor %}
