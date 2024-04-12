@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'verifierweb.wsgi.application'
 
-
+FILES_DIR = os.path.join(BASE_DIR, "files")
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 

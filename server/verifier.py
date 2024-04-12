@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-url", "--url")
 args = parser.parse_args()
 
+root_path = '/usr/src/app/'
+
 def endpoint_check(endpoint:str, id_parameter: bool):
     if endpoint != 'genomicVariations' and id_parameter == False:
         url = args.url + '/' + endpoint
@@ -44,53 +46,58 @@ def endpoint_check(endpoint:str, id_parameter: bool):
             endpoint = 'genomicVariations'
         
         
-    if endpoint in ['cohorts', 'datasets']:
-        resultsets = total_response["response"]["collections"]
-    else:
-        try:
-            resultsets=total_response["response"]["resultSets"][0]["results"]
-        except Exception:
-            return('empty response for {}'.format(url))
     meta = total_response["meta"]
     print("{}".format(url))
     try:
         granularity = meta["returnedGranularity"]
     except Exception:
         granularity = meta["receivedRequestSummary"]["requestedGranularity"]
+    if endpoint in ['cohorts', 'datasets']:
+        resultsets = total_response["response"]["collections"]
+    else:
+        try:
+            resultsets=total_response["response"]["resultSets"][0]["results"]
+        except Exception:
+            if granularity == 'record':
+                granularity = 'count'
     if granularity == 'record':
         if endpoint in ['cohorts', 'datasets']:
-            with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
+            with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file:///{0}/'.format(
-                    os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconCollectionsResponse.json').replace("\\", "/"))
+                    os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json').replace("\\", "/"))
         else:
-            with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconResultsetsResponse.json', 'r') as f:
+            with open(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file:///{0}/'.format(
-                    os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
+                    os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        JSONSchemaValidator.validate(total_response, response, resolver)
-        with open('beacon-verifier-v2/server/ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
+        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
+        print(output_validation)
+        with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file://{0}/'.format(
-                os.path.dirname('beacon-verifier-v2/server/ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
+                os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
         for result in resultsets:
-            JSONSchemaValidator.validate(result, response, resolver)
+            output_validation=JSONSchemaValidator.validate(result, response, resolver)
+            print(output_validation)
     elif granularity == 'count':
-        with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
+        with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
-                os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
+                os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        JSONSchemaValidator.validate(total_response, response, resolver)
+        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
+        print(output_validation)
     elif granularity == 'boolean':
-        with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
+        with open(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
-                os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
+                os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        JSONSchemaValidator.validate(total_response, response, resolver)
+        output_validation=JSONSchemaValidator.validate(total_response, response, resolver)
+        print(output_validation)
 
 url = args.url + '/map'
 f = requests.get(url)
@@ -104,34 +111,49 @@ url = args.url + '/map'
 print("{}".format(url))
 f = requests.get(url)
 total_response = json.loads(f.text)
-with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconMapResponse.json', 'r') as f:
+with open(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json', 'r') as f:
     map = json.load(f)
 schema_path = 'file:///{0}/'.format(
-        os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
+        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
 resolver = RefResolver(schema_path, map)
-JSONSchemaValidator.validate(total_response, map, resolver)
+output_validation=JSONSchemaValidator.validate(total_response, map, resolver)
+print(output_validation)
 
 url = args.url + '/info'
 print("{}".format(url))
 f = requests.get(url)
 total_response = json.loads(f.text)
-with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
+with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
     info = json.load(f)
 schema_path = 'file:///{0}/'.format(
-        os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
+        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
 resolver = RefResolver(schema_path, info)
-JSONSchemaValidator.validate(total_response, info, resolver)
+output_validation=JSONSchemaValidator.validate(total_response, info, resolver)
+print(output_validation)
 
 url = args.url + '/configuration'
 print("{}".format(url))
 f = requests.get(url)
 total_response = json.loads(f.text)
-with open('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconConfigurationResponse.json', 'r') as f:
+with open(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json', 'r') as f:
     configuration = json.load(f)
 schema_path = 'file:///{0}/'.format(
-        os.path.dirname('beacon-verifier-v2/server/ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
+        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
 resolver = RefResolver(schema_path, configuration)
-JSONSchemaValidator.validate(total_response, configuration, resolver)
+output_validation=JSONSchemaValidator.validate(total_response, configuration, resolver)
+print(output_validation)
+
+url = args.url + '/filtering_terms'
+print("{}".format(url))
+f = requests.get(url)
+total_response = json.loads(f.text)
+with open(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json', 'r') as f:
+    filtering_terms = json.load(f)
+schema_path = 'file:///{0}/'.format(
+        os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json').replace("\\", "/"))
+resolver = RefResolver(schema_path, filtering_terms)
+output_validation=JSONSchemaValidator.validate(total_response, filtering_terms, resolver)
+print(output_validation)
 
 for endpoint in endpoints_to_verify:
     if endpoint.endswith('analyses') and 'd}' not in endpoint:
