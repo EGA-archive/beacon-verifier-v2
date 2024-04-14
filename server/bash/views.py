@@ -300,9 +300,12 @@ def bash_view(request):
             new_bash_out=[]
             for bashed in bash_out:
                 if bashed != []:
-                    new_bash_out.append(bashed)
                     if isinstance(bashed, list):
                         count+=1
+                        for basheditem in bashed:
+                            new_bash_out.append(basheditem)
+                    else:
+                        new_bash_out.append(bashed)
 
 
             

@@ -84,21 +84,48 @@
                 </button>
             </div>
               {% if bash_out %}
+              
               {% for bash in bash_out %}
-              {% if 'http' in bash and 'further' not in bash %}
-              <div><a href={{bash}}>{{bash}}</a></div>
+              
+              {% if 'http' in bash and 'map' in bash %}
+              <div class="card m-2">
+              <div class="card-header">
+                <a href={{bash}}>{{bash}}</a>
+              </div>
+              <div class="card-body">
+                {% elif 'http' in bash and 'map' not in bash %}
+                <p class="card-text">Validation finished</p>
+              </div>
+              </div>
+                <div class="card m-2">
+                <div class="card-header">
+                  <a href={{bash}}>{{bash}}</a>
+                </div>
+                <div class="card-body">
+              {% elif 'Failed' not in bash %}
+              
+              <h5 class="card-title">{{bash}}</h5>
               {% else %}
-              {% for bashed in bash %}
-              <div class="text-nowrap bg-body-secondary border-start" style="width: 100%;">{{bashed}}</div>
-              {% endfor %}
+              
+                
+                  <p class="card-text">{{bash}}</p>
+                
               {% endif %}
-
+            
+            
+            
+            
               {% endfor %}
+            
+            
+          
 
               
+            
               {% endif %}
+            
 
-
+            
 
 
 
@@ -110,8 +137,7 @@
          
         
             
-            </div>
-          </div>
+
         </div>
 
         
