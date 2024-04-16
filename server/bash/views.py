@@ -86,7 +86,10 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
         except Exception:
             granularity = 'record'
     if endpoint in ['cohorts', 'datasets']:
-        resultsets = total_response["response"]["collections"]
+        try:
+            resultsets = total_response["response"]["collections"]
+        except Exception:
+            resultsets = total_response["response"]["resultSets"]
     else:
         try:
             resultsets=total_response["response"]["resultSets"][0]["results"]
@@ -120,9 +123,15 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                     os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
             if endpoint in ['cohorts', 'datasets']:
-                resultsets=total_response["response"]["collections"]
+                try:
+                    resultsets = total_response["response"]["collections"]
+                except Exception:
+                    resultsets = total_response["response"]["resultSets"]
                 for resultset in resultsets:
-                    dataset = resultset["id"]
+                    try:
+                        dataset = resultset["id"]
+                    except Exception:
+                        dataset = 'dataset unknown'
                     endpoint_validation.append(dataset)
                     endpoint_validation.append(JSONSchemaValidator.validate(resultset, response, resolver))
             else:
