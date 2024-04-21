@@ -20,8 +20,7 @@
           <span class="navbar-text ">
             <img src="media/logo.png" alt="EGA" height="70px">
           </span>
-          <a class="navbar-brand " href="/"><h1 class="bi bi-patch-check display-6 mx-auto p-2 fw-bold ms-5" style="color: #239B56;">Beacon RI Phenopackets demo example</h1></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <a class="navbar-brand " href="/"><h1 class="bi bi-prescription display-6 mx-auto p-2 fw-bold ms-5" style="color: #D63384;">Beacon RI Phenopackets demo example</h1></a>          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarText">
@@ -42,31 +41,41 @@
 
               <div class="row">
                 <div class="col">
+                    <h2><pre>Chosen Phenopacket:</pre></h2>
+                    <pre style="height: 500px;"><code>
+                    <div style="padding-left: 20px"><b>sampledTissue:</b></div>
+                    <div style="padding-left: 25px"><b>id:</b> ICD10:C18.7</div>
+                    <div style="padding-left: 25px"><b>label:</b> Sigmoid colon</div>
+                    <div style="padding-left: 20px"><b>timeOfCollection:</b></div>
+                    <div style="padding-left: 25px"><b>age:</b></div>
+                    <div style="padding-left: 30px"><b>iso8601duration:</b> P77Y</div>
+                    <div style="padding-left: 20px"><b>histologicalDiagnosis:</b></div>
+                    <div style="padding-left: 25px"><b>id: ICDO3:8480/3</b></div>
+                    <div style="padding-left: 25px"><b>label:</b> Mucinous adenocarcinoma</div>
+                    <div style="padding-left: 20px"><b>tumorProgression:</b></div>
+                    <div style="padding-left: 25px"><b>id:</b> NCIT:C27979</div>
+                    <div style="padding-left: 25px"><b>label:</b> STAGE IVA</div>
+                    <div style="padding-left: 20px"><b>tumorGrade:</b></div>
+                    <div style="padding-left: 25px"><b>id:</b> NCIT:C27979</div>
+                    <div style="padding-left: 25px"><b>label:</b> STAGE IVA</div>
+                    </pre>
+                    </code>
                   <form method="post" onsubmit="openLoader()">
                     {% csrf_token %}
-                    <div class="row"><div>
+                    <div class="row" style="height: 0px; visibility: hidden;"><div>
                     {% for f in form %}
-                    <p>{{f.help_text|safe}} {{f}} </p>   
+                    <p style="height: 0px;">{{f.help_text|safe}} {{f}} </p>   
                     {% endfor %}
                 </div>
 
               </div>
               <div class="row">
                   <div class="col-5">
-                    <button type="submit" class="btn btn-success mb-3">Search</button>    
-                  </div>
-                  <div class="col-6">
-                    <a href="/" type="submit" class="btn btn-secondary">Reset</a>
+                    <button type="submit" class="btn mb-3" style="color: #D63384; border: 1px solid #D63384">Search</button>    
                   </div>
               </div>
                   </form>
-                  {% if success %}
-                  {% if 'CONGRATULATIONS' in success %}
-                  <div class="green"><b>{{success}}</b></div>
-                  {% else %}
-                  <div class="red"><b>{{success}}</b></div>
-                  {% endif %}
-                  {% endif %}
+
             </div>
 
             </div>
@@ -76,6 +85,13 @@
               
                 
             </div>  
+            {% if prequest %}
+            
+            <div class="col">
+                <h2><pre>Query body request</pre></h2>
+            <div style="height: 500px; max-width: 300px; overflow-x: hidden; overflow-y: scroll;"><b><code>{{prequest}}</b></code></div>
+          </div>
+            {% endif %}
             <div class="col" style="height: 1000px; overflow: scroll;">
               <div id="missatge" style="display: none;">
                 <button class="btn btn-success" type="button" disabled>
@@ -85,38 +101,9 @@
             </div>
               {% if bash_out %}
               
-              {% for bash in bash_out %}
-              
-              {% if 'http' in bash and 'map' in bash %}
-              <div class="card m-2">
-              <div class="card-header">
-                <a href={{bash}}>{{bash}}</a>
-              </div>
-              <div class="card-body">
-                {% elif 'http' in bash and 'map' not in bash %}
-                <p class="card-text">Validation finished</p>
-              </div>
-              </div>
-                <div class="card m-2">
-                <div class="card-header">
-                  <a href={{bash}}>{{bash}}</a>
-                </div>
-                <div class="card-body">
-              {% elif 'Failed' not in bash %}
-              
-              <h5 class="card-title">{{bash}}</h5>
-              {% else %}
-              
-                
-                  <p class="card-text">{{bash}}</p>
-                
-              {% endif %}
-            
-            
-            
-            
-              {% endfor %}
-            
+              <div>
+                <h2><pre>Beacon RI response</pre></h2>
+                <b><code>{{bash_out}}</b></code></div>
             
           
 

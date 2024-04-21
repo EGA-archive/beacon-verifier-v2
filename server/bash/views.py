@@ -1,7 +1,9 @@
-from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views.generic import FormView
+from .models import AgeOfOnset
 import subprocess
-from verifierweb.forms import BamForm
+from verifierweb.forms import BamForm, AgeOfOnsetForm
 import time
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import logging
@@ -336,6 +338,49 @@ def bash_view(request):
 
 
             return render(request, 'base.html', context)
+
+            
+    
+    return render(request, template, context)
+
+def phenopackets_view(request):
+    template = "phenopackets.html"
+    form =AgeOfOnsetForm()
+    context = {'form': form}
+    if request.method == 'POST':
+        form = AgeOfOnsetForm(request.POST)
+        
+        if form.is_valid():
+            post_data = {"meta": {"apiVersion": "2.0"},
+    "query":{ "requestParameters": {        },
+        "filters": [
+        {"id":"ICD10:C18.7", "scope":"biosample"}, {"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P77Y","scope":"individual"}, {"id":"ICDO3:8480/3", "scope":"biosample"}, {"id":"NCIT:C27979", "scope":"biosample"}, {"id":"NCIT:C27979", "scope":"individual"}],
+        "includeResultsetResponses": "HIT",
+        "pagination": {
+            "skip": 0,
+            "limit": 10
+        },
+        "requestedGranularity": "record"
+    }
+
+
+
+            }
+            response = requests.post('https://beacon-apis-demo.ega-archive.org/api/individuals', json=post_data)
+            content = response.content
+
+
+
+   
+            context = {
+                'prequest': post_data,
+                'bash_out': json.loads(content),
+                'form': form
+
+            }
+
+
+            return render(request, 'phenopackets.html', context)
 
             
     
