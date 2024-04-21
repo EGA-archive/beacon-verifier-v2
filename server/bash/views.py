@@ -370,6 +370,12 @@ def phenopackets_view(request):
                 if form.is_valid():
                     
                     filters=[]
+                    if form.cleaned_data['biosampleId'] == True:
+                        biosampleId={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P0Y","scope":"individual"}
+                        filters.append(biosampleId)
+                    if form.cleaned_data['individualId'] == True:
+                        individualId={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P0Y","scope":"individual"}
+                        filters.append(individualId)
                     if form.cleaned_data['sampledTissue'] == True:
                         sampledTissue={"id":"ICD10:C18.7", "scope":"biosample"}
                         filters.append(sampledTissue)
@@ -404,7 +410,10 @@ def phenopackets_view(request):
                     response = requests.post('https://beacon-apis-demo.ega-archive.org/api/individuals', json=post_data)
                     content = response.content
                     content = json.loads(content)
-                    count = content['responseSummary']['numTotalResults']
+                    try:
+                        count = content['responseSummary']['numTotalResults']
+                    except Exception:
+                        count = '0'
 
 
 

@@ -36,30 +36,31 @@
           <div class="containerfirst">
             <div class="row">
 
-            <div class="col-3" style="display: inline">
+            <div class="col" style="display: inline">
           
             {% if file != 'loaded' %}
               <div class="row">
-                <div class="col">
+                <div class="col" style="margin-left: 220px;">
                     <h2><pre>Load Phenopacket:</pre></h2>
-                    <pre style="height: 500px;"><code>
-                    <div style="padding-left: 20px"><b>sampledTissue:</b></div>
-                    <div style="padding-left: 25px"><b>id:</b> ICD10:C18.7</div>
-                    <div style="padding-left: 25px"><b>label:</b> Sigmoid colon</div>
-                    <div style="padding-left: 20px"><b>timeOfCollection:</b></div>
-                    <div style="padding-left: 25px"><b>age:</b></div>
-                    <div style="padding-left: 30px"><b>iso8601duration:</b> P77Y</div>
-                    <div style="padding-left: 20px"><b>histologicalDiagnosis:</b></div>
-                    <div style="padding-left: 25px"><b>id: ICDO3:8480/3</b></div>
-                    <div style="padding-left: 25px"><b>label:</b> Mucinous adenocarcinoma</div>
-                    <div style="padding-left: 20px"><b>tumorProgression:</b></div>
-                    <div style="padding-left: 25px"><b>id:</b> NCIT:C27979</div>
-                    <div style="padding-left: 25px"><b>label:</b> STAGE IVA</div>
-                    <div style="padding-left: 20px"><b>tumorGrade:</b></div>
-                    <div style="padding-left: 25px"><b>id:</b> NCIT:C27979</div>
-                    <div style="padding-left: 25px"><b>label:</b> STAGE IVA</div>
-                    </pre>
-                    </code>
+                    <h5><code style="height: 500px; color: black;">
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>id:</b> sample2</div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>individualId:</b> patient1</div>
+                    <div style="padding-left: 20px; padding-top: 15px;"><b>sampledTissue:</b></div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>id:</b> ICD10:C18.7</div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>label:</b> Sigmoid colon</div>
+                    <div style="padding-left: 20px; padding-top: 15px;"><b>timeOfCollection:</b></div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>age:</b></div>
+                    <div style="padding-left: 30px; padding-top: 5px;"><b>iso8601duration:</b> P77Y</div>
+                    <div style="padding-left: 20px; padding-top: 15px;"><b>histologicalDiagnosis:</b></div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>id:</b> ICDO3:8480/3</div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>label:</b> Mucinous adenocarcinoma</div>
+                    <div style="padding-left: 20px; padding-top: 15px;"><b>tumorProgression:</b></div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>id:</b> NCIT:C27979</div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>label:</b> STAGE IVA</div>
+                    <div style="padding-left: 20px; padding-top: 15px;"><b>tumorGrade:</b></div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>id:</b> NCIT:C27979</div>
+                    <div style="padding-left: 25px; padding-top: 5px;"><b>label:</b> STAGE IVA</div>
+                    </code></h5>
                   <form method="post" onsubmit="openLoader()">
                     {% csrf_token %}
                     <div class="row" style="height: 0px; visibility: hidden;"><div>
@@ -81,14 +82,14 @@
             {% else %}
                   <form method="post" onsubmit="openLoader()">
                     {% csrf_token %}
-                    <div class="row"><div>
+                    <div class="row" style="margin-left: 220px;"><div>
                     {% for f in form %}
-                    <p style="margin-top: 10px;">{{f.help_text|safe}} {{f}} </p>   
+                    <h5><p style="margin-top: 10px;">{{f.help_text|safe}} {{f}} </p></h5>
                     {% endfor %}
                 </div>
 
               </div>
-              <div class="row">
+              <div class="row" style="margin-left: 220px;">
                   <div class="col-5">
                     <button type="submit" class="btn mb-3" style="color: #D63384; border: 1px solid #D63384">Search</button>    
                   </div>
@@ -109,7 +110,7 @@
               {% if bash_out %}
               
               {% if bash_out != 3096 %}
-              <div>
+              <div style="margin-left: 220px;">
                 <h3><b><code>RESULTS: {{bash_out}}</b></code></div></h3>
                 </div>
                 {% endif %}

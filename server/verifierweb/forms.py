@@ -24,6 +24,8 @@ class NewForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(NewForm, self).__init__(*args, **kwargs)
         # assign a (computed, I assume) default value to the choice field 
+    biosampleId = forms.BooleanField(initial=False, required=False,help_text="id=sample2")
+    individualId = forms.BooleanField(initial=False, required=False,help_text="individualId=patient1")
     sampledTissue = forms.BooleanField(initial=False, required=False,help_text="sampledTissue.id=ICD10:C18.7")
     timeOfCollection = forms.BooleanField(initial=False,required=False,help_text="timeOfCollection.age.iso8601duration=P77Y")
     histologicalDiagnosis = forms.BooleanField(initial=False,required=False,help_text="histologicalDiagnosis.id=ICDO3:8480/3")
