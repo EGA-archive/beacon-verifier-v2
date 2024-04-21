@@ -5,5 +5,5 @@ app_name = 'bash'
 
 urlpatterns = [
     path('', views.bash_view, name='index'),
-    path('phenopackets', views.phenopackets_view, name='phenopackets'),
+    path('phenopackets', views.phenopackets_view, name='phenopackets')
 ]

@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import FormView
 from .models import AgeOfOnset
 import subprocess
-from verifierweb.forms import BamForm, AgeOfOnsetForm
+from verifierweb.forms import BamForm, AgeOfOnsetForm, NewForm
 import time
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import logging
@@ -346,42 +346,80 @@ def bash_view(request):
 def phenopackets_view(request):
     template = "phenopackets.html"
     form =AgeOfOnsetForm()
-    context = {'form': form}
+    file = 'not loaded'
+    context = {'form': form, 'file': file}
+    view = 'YES'
     if request.method == 'POST':
-        form = AgeOfOnsetForm(request.POST)
-        
-        if form.is_valid():
-            post_data = {"meta": {"apiVersion": "2.0"},
-    "query":{ "requestParameters": {        },
-        "filters": [
-        {"id":"ICD10:C18.7", "scope":"biosample"}, {"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P77Y","scope":"individual"}, {"id":"ICDO3:8480/3", "scope":"biosample"}, {"id":"NCIT:C27979", "scope":"biosample"}, {"id":"NCIT:C27979", "scope":"individual"}],
-        "includeResultsetResponses": "HIT",
-        "pagination": {
-            "skip": 0,
-            "limit": 10
-        },
-        "requestedGranularity": "record"
-    }
+        view = 'YES'
+        file = 'loaded'
+        form = NewForm()
+        context = {
+            'file':file,
+            'form': form,
+            'view': view
 
-
-
-            }
-            response = requests.post('https://beacon-apis-demo.ega-archive.org/api/individuals', json=post_data)
-            content = response.content
-
-
-
-   
-            context = {
-                'prequest': post_data,
-                'bash_out': json.loads(content),
-                'form': form
-
-            }
-
-
-            return render(request, 'phenopackets.html', context)
-
+        }
+        view='YES'
+        if request.method == 'POST':
+            form = NewForm(request.POST)
             
-    
+            
+            if form.is_valid():
+
+                form = NewForm(request.POST)
+                if form.is_valid():
+                    
+                    filters=[]
+                    if form.cleaned_data['sampledTissue'] == True:
+                        sampledTissue={"id":"ICD10:C18.7", "scope":"biosample"}
+                        filters.append(sampledTissue)
+                    if form.cleaned_data['timeOfCollection'] == True:
+                        timeOfCollection={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P77Y","scope":"individual"}
+                        filters.append(timeOfCollection)
+                    if form.cleaned_data['histologicalDiagnosis'] == True:
+                        histologicalDiagnosis={"id":"ICDO3:8480/3", "scope":"biosample"}
+                        filters.append(histologicalDiagnosis)
+                    if form.cleaned_data['tumorProgression'] == True:
+                        tumorProgression={"id":"NCIT:C27979", "scope":"biosample"}
+                        filters.append(tumorProgression)
+                    if form.cleaned_data['tumorGrade'] == True:
+                        tumorGrade={"id":"NCIT:C27979", "scope":"individual"}
+                        filters.append(tumorGrade)
+
+
+                    post_data = {"meta": {"apiVersion": "2.0"},
+            "query":{ "requestParameters": {        },
+                "filters": filters,
+                "includeResultsetResponses": "HIT",
+                "pagination": {
+                    "skip": 0,
+                    "limit": 10
+                },
+                "requestedGranularity": "record"
+            }
+
+
+
+                    }
+                    response = requests.post('https://beacon-apis-demo.ega-archive.org/api/individuals', json=post_data)
+                    content = response.content
+                    content = json.loads(content)
+                    count = content['responseSummary']['numTotalResults']
+
+
+
+        
+                    context = {
+                        'file':file,
+                        'prequest': post_data,
+                        'bash_out': count,
+                        'view': view,
+                        'form': form
+
+                    }
+                    
+
+                    return render(request, 'phenopackets.html', context)
+            
+        return render(request, 'phenopackets.html', context)
     return render(request, template, context)

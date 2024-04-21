@@ -38,10 +38,10 @@
 
             <div class="col-3" style="display: inline">
           
-
+            {% if file != 'loaded' %}
               <div class="row">
                 <div class="col">
-                    <h2><pre>Chosen Phenopacket:</pre></h2>
+                    <h2><pre>Load Phenopacket:</pre></h2>
                     <pre style="height: 500px;"><code>
                     <div style="padding-left: 20px"><b>sampledTissue:</b></div>
                     <div style="padding-left: 25px"><b>id:</b> ICD10:C18.7</div>
@@ -71,12 +71,33 @@
               </div>
               <div class="row">
                   <div class="col-5">
+                    <button type="submit" class="btn mb-3" style="color: #D63384; border: 1px solid #D63384">Load</button>    
+                  </div>
+              </div>
+                  </form>
+
+            </div>
+
+            {% else %}
+                  <form method="post" onsubmit="openLoader()">
+                    {% csrf_token %}
+                    <div class="row"><div>
+                    {% for f in form %}
+                    <p style="margin-top: 10px;">{{f.help_text|safe}} {{f}} </p>   
+                    {% endfor %}
+                </div>
+
+              </div>
+              <div class="row">
+                  <div class="col-5">
                     <button type="submit" class="btn mb-3" style="color: #D63384; border: 1px solid #D63384">Search</button>    
                   </div>
               </div>
                   </form>
 
             </div>
+
+            {% endif %}
 
             </div>
               <div>
@@ -85,25 +106,13 @@
               
                 
             </div>  
-            {% if prequest %}
-            
-            <div class="col">
-                <h2><pre>Query body request</pre></h2>
-            <div style="height: 500px; max-width: 300px; overflow-x: hidden; overflow-y: scroll;"><b><code>{{prequest}}</b></code></div>
-          </div>
-            {% endif %}
-            <div class="col" style="height: 1000px; overflow: scroll;">
-              <div id="missatge" style="display: none;">
-                <button class="btn btn-success" type="button" disabled>
-                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                  Verifying your beacon ...
-                </button>
-            </div>
               {% if bash_out %}
               
+              {% if bash_out != 3096 %}
               <div>
-                <h2><pre>Beacon RI response</pre></h2>
-                <b><code>{{bash_out}}</b></code></div>
+                <h3><b><code>RESULTS: {{bash_out}}</b></code></div></h3>
+                </div>
+                {% endif %}
             
           
 
