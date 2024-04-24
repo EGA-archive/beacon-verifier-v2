@@ -36,7 +36,10 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
     if endpoint != 'genomicVariations' and id_parameter == False:
         url = url + '/' + endpoint
         f = requests.get(url)
-        total_response = json.loads(f.text)
+        try:
+            total_response = json.loads(f.text)
+        except Exception as e:
+            endpoint_validation.append(e)
     elif id_parameter == False:
         url = url + '/' + 'g_variants'
         f = requests.get(url)
