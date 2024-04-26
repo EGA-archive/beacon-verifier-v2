@@ -43,15 +43,18 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
     elif id_parameter == False:
         url = url + '/' + 'g_variants'
         f = requests.get(url)
-        total_response = json.loads(f.text)
+        try:
+            total_response = json.loads(f.text)
+        except Exception as e:
+            endpoint_validation.append(e)
     else:
         last_part = endpoint.split('/')
         url = url + '/' + last_part[-3]
         try:
             f = requests.get(url)
             total_response = json.loads(f.text)
-        except Exception:
-            raise ValueError('{} is not a valid URL. Please review urls from /map endpoint'.format(url))
+        except Exception as e:
+            endpoint_validation.append(e)
         try:
             error = total_response["error"]
             is_error = True
@@ -74,7 +77,10 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
 
        
         f = requests.get(url)
-        total_response = json.loads(f.text)
+        try:
+            total_response = json.loads(f.text)
+        except Exception as e:
+            endpoint_validation.append(e)
         endpoint = last_part[-1]
         if endpoint == 'g_variants':
             endpoint = 'genomicVariations'
@@ -171,7 +177,10 @@ def general_checks(url: str):
     root_path = '/usr/src/app/'
     new_url = url + '/map'
     f = requests.get(new_url)
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
     resultsets = total_response["response"]
     endpoints = resultsets["endpointSets"]
     list_of_endpoints=[]
@@ -179,7 +188,10 @@ def general_checks(url: str):
     new_url = url + '/map'
     output_validation.append(new_url)
     f = requests.get(new_url)
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
     with open(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json', 'r') as f:
         map = json.load(f)
     schema_path = 'file:///{0}/'.format(
@@ -190,7 +202,10 @@ def general_checks(url: str):
     new_url = url + '/info'
     output_validation.append(new_url)
     f = requests.get(new_url)
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
     with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
         info = json.load(f)
     schema_path = 'file:///{0}/'.format(
@@ -201,7 +216,10 @@ def general_checks(url: str):
     new_url = url + '/configuration'
     output_validation.append(new_url)
     f = requests.get(new_url)
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
     with open(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json', 'r') as f:
         configuration = json.load(f)
     schema_path = 'file:///{0}/'.format(
@@ -209,10 +227,27 @@ def general_checks(url: str):
     resolver = RefResolver(schema_path, configuration)
     output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver))
 
+    new_url = url + '/error'
+    output_validation.append(new_url)
+    f = requests.get(new_url)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
+    with open(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json', 'r') as f:
+        error = json.load(f)
+    schema_path = 'file:///{0}/'.format(
+            os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json').replace("\\", "/"))
+    resolver = RefResolver(schema_path, error)
+    output_validation.append(JSONSchemaValidator.validate(total_response, error, resolver))
+
     new_url = url + '/filtering_terms'
     output_validation.append(new_url)
     f = requests.get(new_url)
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
     with open(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json', 'r') as f:
         filtering_terms = json.load(f)
     schema_path = 'file:///{0}/'.format(
