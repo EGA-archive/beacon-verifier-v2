@@ -37,6 +37,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bash',
     'crispy_forms',
-    'mozilla_django_oidc'
+    'mozilla_django_oidc',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -78,16 +80,21 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'verifierweb.wsgi.application'
+#WSGI_APPLICATION = 'verifierweb.wsgi.application'
+ASGI_APPLICATION = 'verifierweb.asgi.application'
 
 FILES_DIR = os.path.join(BASE_DIR, "files")
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -161,3 +168,15 @@ LOGOUT_REDIRECT_URL = "http://localhost:8003"
 OIDC_RP_SIGN_ALGO = 'RS256'
 #OIDC_OP_JWKS_ENDPOINT = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/certs'
 OIDC_OP_JWKS_ENDPOINT = 'https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/certs'
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://127.0.0.1:6379/0")
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(os.environ.get("CHANNELS_REDIS", "redis://127.0.0.1:6379/0"))],
+        },
+    },
+}

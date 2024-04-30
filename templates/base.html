@@ -1,0 +1,427 @@
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="media/mystyle.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link href="https://unpkg.com/@popperjs/core@2" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="media/tablesorter.js"></script>
+    <script src="media/arrows.js"></script>
+  </head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <span class="navbar-text ">
+            <img src="media/logo.png" alt="EGA" height="70px">
+          </span>
+          <a class="navbar-brand " href="/"><h1 class="bi bi-patch-check display-6 mx-auto p-2 fw-bold ms-5" style="color: #239B56;">Beacon RI Phenopackets demo example</h1></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+          </div>
+        </div>
+
+      </nav>
+      
+      <div class="container pt-3 " style="font-size: 14px; "> 
+        <div class="col">
+          <div class="containerfirst">
+            <div class="row">
+
+            <div class="col-3" style="display: inline">
+          
+
+              <div class="row">
+                <div class="col">
+                  <form id="your-form" method="post">
+                    {% csrf_token %}
+                    <div class="row"><div>
+                    {% for f in form %}
+                    <p>{{f.help_text|safe}} {{f}} </p>   
+                    {% endfor %}
+                </div>
+
+              </div>
+              <div class="row">
+                  <div class="col-5">
+                    <div class="mb-3" id="messages"></div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                  <div class="col-6">
+                    <a href="/" type="submit" class="btn btn-secondary">Reset</a>
+                  </div>
+              </div>
+                  </form>
+                  {% if success %}
+                  {% if 'CONGRATULATIONS' in success %}
+                  <div class="green"><b>{{success}}</b></div>
+                  {% else %}
+                  <div class="red"><b>{{success}}</b></div>
+                  {% endif %}
+                  {% endif %}
+            </div>
+
+            </div>
+              <div>
+            </div>
+
+              
+                
+            </div>  
+            <div class="col" style="height: 1000px; overflow: scroll;">
+              <div id="messages" style="display: none;">
+                <button class="btn btn-success" type="button" disabled>
+                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                  Verifying your beacon ...
+                </button>
+            </div>
+            <div id="cardinitial" hidden="hidden" class="card m-2">
+              <div id="results_validation" class="card-header">
+                <a id="result_validation"></a>
+                <a id="resulted_validation"></a>
+              </div>
+            </div>
+            <div id="card0" hidden="hidden" class="card m-2">
+              <div id="results0_validation" class="card-header">
+                <a id="result0_validation"></a>
+                <a id="resulted0_validation"></a>
+              </div>
+            </div>
+              <div id="card1" hidden="hidden" class="card m-2">
+              <div id="results1_validation" class="card-header">
+                <a id="result1_validation"></a>
+              </div>
+              </div>
+              <div id="card2" hidden="hidden" class="card m-2">
+                <div id="results2_validation" class="card-header">
+                  <a id="result2_validation"></a>
+                </div>
+                </div>
+                <div id="card3" hidden="hidden" class="card m-2">
+                  <div id="results3_validation" class="card-header">
+                    <a id="result3_validation"></a>
+                  </div>
+                  </div>
+                  <div id="card4" hidden="hidden" class="card m-2">
+                    <div id="results4_validation" class="card-header">
+                      <a id="result4_validation"></a>
+                    </div>
+                    </div>
+                    <div id="card5" hidden="hidden" class="card m-2">
+                      <div id="results5_validation" class="card-header">
+                        <a id="result5_validation"></a>
+                      </div>
+                      </div>
+                      <div id="card6" hidden="hidden" class="card m-2">
+                        <div id="results6_validation" class="card-header">
+                          <a id="result6_validation"></a>
+                        </div>
+                        </div>
+                        <div id="card7" hidden="hidden" class="card m-2">
+                          <div id="results7_validation" class="card-header">
+                            <a id="result7_validation"></a>
+                          </div>
+                          </div>
+                          <div id="card8" hidden="hidden" class="card m-2">
+                            <div id="results8_validation" class="card-header">
+                              <a id="result8_validation"></a>
+                            </div>
+                            </div>
+                            <div id="card9" hidden="hidden" class="card m-2">
+                              <div id="results9_validation" class="card-header">
+                                <a id="result9_validation"></a>
+                              </div>
+                              </div>
+                              <div id="card10" hidden="hidden" class="card m-2">
+                                <div id="results10_validation" class="card-header">
+                                  <a id="result10_validation"></a>
+                                </div>
+                                </div>
+                                <div id="card11" hidden="hidden" class="card m-2">
+                                  <div id="results11_validation" class="card-header">
+                                    <a id="result11_validation"></a>
+                                  </div>
+                                  </div>
+                                  <div id="card12" hidden="hidden" class="card m-2">
+                                    <div id="results12_validation" class="card-header">
+                                      <a id="result12_validation"></a>
+                                    </div>
+                                    </div>
+                                    <div id="card13" hidden="hidden" class="card m-2">
+                                      <div id="results13_validation" class="card-header">
+                                        <a id="result13_validation"></a>
+                                      </div>
+                                      </div>
+                                      <div id="card14" hidden="hidden" class="card m-2">
+                                        <div id="results14_validation" class="card-header">
+                                          <a id="result14_validation"></a>
+                                        </div>
+                                        </div>
+                                        <div id="card15" hidden="hidden" class="card m-2">
+                                          <div id="results15_validation" class="card-header">
+                                            <a id="result15_validation"></a>
+                                          </div>
+                                          </div>
+                                          <div id="card16" hidden="hidden" class="card m-2">
+                                            <div id="results16_validation" class="card-header">
+                                              <a id="result16_validation"></a>
+                                            </div>
+                                            </div>
+                                            <div id="card17" hidden="hidden" class="card m-2">
+                                              <div id="results17_validation" class="card-header">
+                                                <a id="result17_validation"></a>
+                                              </div>
+                                              </div>
+                                              <div id="card18" hidden="hidden" class="card m-2">
+                                                <div id="results18_validation" class="card-header">
+                                                  <a id="result18_validation"></a>
+                                                </div>
+                                                </div>
+                                                <div id="card19" hidden="hidden" class="card m-2">
+                                                  <div id="results19_validation" class="card-header">
+                                                    <a id="result19_validation"></a>
+                                                  </div>
+                                                  </div>
+                                                  <div id="card20" hidden="hidden" class="card m-2">
+                                                    <div id="results20_validation" class="card-header">
+                                                      <a id="result20_validation"></a>
+                                                    </div>
+                                                    </div>
+                                                    <div id="card21" hidden="hidden" class="card m-2">
+                                                      <div id="results21_validation" class="card-header">
+                                                        <a id="result21_validation"></a>
+                                                      </div>
+                                                      </div>
+            
+
+            
+
+
+
+
+
+
+              
+
+         
+        
+            
+
+        </div>
+
+        
+          </div>
+          </div>
+              </div>
+
+            
+        </div>
+      </div>
+      </div>
+      {% include "footer.html" %}
+<script>
+  function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "block";
+  }
+}
+</script>
+<script>
+  function myFunction2() {
+  var x = document.getElementById("example");
+  if (x.style.display === "inline-flex") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "inline-flex";
+  }
+}
+</script>
+
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring) {
+    const ws_url = `/ws/task_status/${task_id}/`;
+    const WS = new WebSocket((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + window.location.host + ws_url);
+
+    WS.onmessage = function (event) {
+      const res = JSON.parse(event.data);
+      const taskStatus = res.state;
+
+      if (['SUCCESS', 'FAILURE'].includes(taskStatus)) {
+        const msg = yourForm.querySelector('#messages');
+        const submitBtn = yourForm.querySelector('button[type="submit"]');
+
+        if (taskStatus === 'SUCCESS') {
+          const yourMessage = document.getElementById("results_validation");
+            const rsv = yourMessage.querySelector('#result_validation');
+            msg.innerHTML = 'basket is good';
+            rsv.innerHTML = mapstring
+
+        } else if (taskStatus === 'FAILURE') {
+          msg.innerHTML = res.error;
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = btnHtml;
+
+        // close the websocket because we do not need it now
+        WS.close();
+      }
+    }
+  }
+
+  function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring) {
+    const ws_url = `/ws/task_status/${task_id}/`;
+    const WS = new WebSocket((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + window.location.host + ws_url);
+
+    WS.onmessage = function (event) {
+      const res = JSON.parse(event.data);
+      const taskStatus = res.state;
+
+      if (['SUCCESS', 'FAILURE'].includes(taskStatus)) {
+        const msg = yourForm.querySelector('#messages');
+        const submitBtn = yourForm.querySelector('button[type="submit"]');
+
+        if (taskStatus === 'SUCCESS') {
+          let resultsvalidationstart = 'results'
+          let resultvalidationstart = '#result'
+          let resultedvalidationstart = '#resulted'
+          let resultsvalidationfinish = '_validation'
+          let card = 'card'
+          let finalresults = resultsvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalresult = resultvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalresulted = resultedvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalcard = card.concat(iteration)
+          let element0 = document.getElementById('cardinitial');
+          element0.removeAttribute("hidden");
+          let element = document.getElementById(finalcard);
+          element.removeAttribute("hidden");
+          console.log(finalresults)
+          console.log(finalresult)
+          console.log(finalresulted)
+          const yourMessage2 = document.getElementById("results_validation");
+            const rsv2 = yourMessage2.querySelector('#result_validation');
+            msg.innerHTML = 'basket is good';
+            console.log(mapstring)
+            rsv2.innerHTML = mapstring
+          const yourMessage = document.getElementById(finalresults);
+            const rsv = yourMessage.querySelector(finalresult);
+            const rsved = yourMessage.querySelector(finalresulted);
+            msg.innerHTML = 'basket is good';
+            console.log(map_out[0])
+            rsv.innerHTML = map_out[0]
+            rsved.innerHTML = map_out[1]
+
+        } else if (taskStatus === 'FAILURE') {
+          msg.innerHTML = res.error;
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = btnHtml;
+
+        // close the websocket because we do not need it now
+        WS.close();
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const yourForm = document.getElementById("your-form");
+    yourForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const submitBtn = yourForm.querySelector('button[type="submit"]');
+      const btnHtml = submitBtn.innerHTML;
+      const spinnerHtml = 'Laprovittoling...';
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = spinnerHtml;
+
+      const msg = yourForm.querySelector('#messages');
+      msg.innerHTML = '';
+
+      // Get all field data from the form
+      const formData = new URLSearchParams(new FormData(yourForm));
+      console.log(formData);
+
+      fetch('/validator/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: formData,
+      })
+        .then(response => response.json())
+        .then((res) => {
+          // after we get Celery task id, we start polling
+          const task_id = res.task_id;
+          const bash_out = res.bash_out;
+          const mapstring = res.map;
+          console.log(mapstring)
+          
+          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring);
+          console.log(res);
+          const mapping = bash_out
+          console.log(mapping)
+          for (let i = 0; i < mapping.length; i++) {
+          const formData2 =new FormData();
+          formData2.set('url_link', mapping[i]);
+          fetch('/validator/', {
+                  method: 'POST',
+                  headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                  },
+                  body: formData2,
+                })
+          .then(response => response.json())
+          .then((res) => {
+            // after we get Celery task id, we start polling
+            const task_id = res.task_id;
+            const map_out = res.map_out;
+            const iteration = i.toString();
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring);
+            console.log(res);
+          })
+          .catch((error) => {
+            console.error('Error:', error)
+          });
+          
+          }
+        })
+        
+        .catch((error) => {
+          console.error('Error:', error)
+        });
+
+    });
+  });
+
+</script>
+</body>
+</html>
+

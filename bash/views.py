@@ -12,6 +12,19 @@ import requests
 import json
 from jsonschema import validate, RefResolver, Draft202012Validator
 import os
+from bash.tasks import sample_task, task_retry, sample_task_info, sample_task_endpoints, sample_task_configuration, sample_task_error, sample_task_filtering_terms
+import json
+import random
+
+import requests
+from celery.result import AsyncResult
+from django.http import JsonResponse, HttpResponse                   # update
+from django.views.decorators.csrf import csrf_exempt                 # new
+
+
+logger = logging.getLogger(__name__)
+
+
 
 
 
@@ -29,61 +42,66 @@ def list_endpoints(list_of_endpoints, endpoints):
     return list_of_endpoints
 
 
-def endpoint_check(endpoint:str, id_parameter: bool, url: str):
+def endpoint_check(url: str):
     endpoint_validation=[]
     is_error = False
-    root_path = '/usr/src/app/'
-    if endpoint != 'genomicVariations' and id_parameter == False:
-        url = url + '/' + endpoint
-        f = requests.get(url)
-        try:
-            total_response = json.loads(f.text)
-        except Exception as e:
-            endpoint_validation.append(e)
-    elif id_parameter == False:
-        url = url + '/' + 'g_variants'
+    root_path = '/app/'
+    if 'd}' in url:
+        LOG.error('eoeoeoeo is {}'.format(url))
+        id_parameter = True
+    else:
+        id_parameter = False
+    url_part = url.split('/')
+    endpoint = url_part[-1]
+    
+    if id_parameter == False:
         f = requests.get(url)
         try:
             total_response = json.loads(f.text)
         except Exception as e:
             endpoint_validation.append(e)
     else:
-        last_part = endpoint.split('/')
-        url = url + '/' + last_part[-3]
+
+        last_part = url.split('{')
+        new_url = last_part[0][0:-1]
+        LOG.error('the endpoint is {} and the url is.... {}'.format(endpoint,new_url))
         try:
-            f = requests.get(url)
+            f = requests.get(new_url)
             total_response = json.loads(f.text)
         except Exception as e:
+            LOG.error('what happened to ... {}'.format(new_url))
             endpoint_validation.append(e)
         try:
-            error = total_response["error"]
-            is_error = True
-        except Exception:
-            try:
-                if last_part[-3] == 'g_variants':
-                    id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
-                    url = endpoint.replace('{variantInternalId}', id)
-                elif last_part[-3] == 'cohorts':
-                    id = total_response["response"]["collections"][0]["id"]
-                    url = endpoint.replace('{id}', id)
-                elif last_part[-3] == 'datasets':
-                    id = total_response["response"]["collections"][0]["id"]
-                    url = endpoint.replace('{id}', id)
-                else:
-                    id = total_response["response"]["resultSets"][0]["results"][0]["id"]
-                    url = endpoint.replace('{id}', id)
-            except Exception:
-                pass
+            if url_part[-3] == 'g_variants':
+                id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
+                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
+                url = url.replace('{variantInternalId}', id)
+            elif url_part[-3] == 'cohorts':
+                LOG.error('cohorts response is...')
+                LOG.error(total_response)
+                id = total_response["response"]["collections"][0]["id"]
+                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
+                url = url.replace('{id}', id)
+            elif url_part[-3] == 'datasets':
+                id = total_response["response"]["collections"][0]["id"]
+                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
+                url = url.replace('{id}', id)
+            else:
+                id = total_response["response"]["resultSets"][0]["results"][0]["id"]
+                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
+                url = url.replace('{id}', id)
+        except Exception as e:
+            LOG.error('what happened 2 to ... {}'.format(new_url))
 
-       
+        LOG.error('the brand new url is ... {}'.format(url))
         f = requests.get(url)
         try:
             total_response = json.loads(f.text)
+            LOG.error(total_response)
         except Exception as e:
             endpoint_validation.append(e)
-        endpoint = last_part[-1]
-        if endpoint == 'g_variants':
-            endpoint = 'genomicVariations'
+    if endpoint == 'g_variants':
+        endpoint = 'genomicVariations'
 
         
     endpoint_validation.append(url)
@@ -172,9 +190,10 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
     return endpoint_validation
 
 
-def general_checks(url: str):
+def map_check(url: str):
     output_validation=[]
-    root_path = '/usr/src/app/'
+    LOG.error(url)
+    root_path = '/app/'
     new_url = url + '/map'
     f = requests.get(new_url)
     try:
@@ -198,12 +217,19 @@ def general_checks(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, map)
     output_validation.append(JSONSchemaValidator.validate(total_response, map, resolver))
+    return endpoints_to_verify, output_validation
 
-    new_url = url + '/info'
+def info_check(url: str):
+    output_validation=[]
+    root_path = '/app/'
+    new_url = url
     output_validation.append(new_url)
     f = requests.get(new_url)
+    LOG.error(f.text)
     try:
+        LOG.error('jajajaaj')
         total_response = json.loads(f.text)
+        LOG.error(total_response)
     except Exception as e:
         output_validation.append(e)
     with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
@@ -212,8 +238,12 @@ def general_checks(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, info)
     output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver))
+    return output_validation
 
-    new_url = url + '/configuration'
+def configuration_check(url: str):
+    output_validation=[]
+    root_path = '/app/'
+    new_url = url
     output_validation.append(new_url)
     f = requests.get(new_url)
     try:
@@ -226,8 +256,12 @@ def general_checks(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, configuration)
     output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver))
+    return output_validation
 
-    new_url = url + '/error'
+def error_check(url: str):
+    output_validation=[]
+    root_path = '/app/'
+    new_url = url
     output_validation.append(new_url)
     f = requests.get(new_url)
     try:
@@ -240,8 +274,12 @@ def general_checks(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, error)
     output_validation.append(JSONSchemaValidator.validate(total_response, error, resolver))
+    return output_validation
 
-    new_url = url + '/filtering_terms'
+def filtering_terms_check(url: str):
+    output_validation=[]
+    root_path = '/app/'
+    new_url = url
     output_validation.append(new_url)
     f = requests.get(new_url)
     try:
@@ -254,64 +292,6 @@ def general_checks(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, filtering_terms)
     output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver))
-
-    for endpoint in endpoints_to_verify:
-        if endpoint.endswith('analyses') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('analyses', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('analyses'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('biosamples') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('biosamples', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('biosamples'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('g_variants') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('genomicVariations', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('g_variants'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('individuals') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('individuals', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('individuals'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('runs') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('runs', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('runs'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('datasets') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('datasets', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('datasets'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('cohorts') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('cohorts', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('cohorts'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
     return output_validation
 
 LOG = logging.getLogger(__name__)
@@ -329,57 +309,81 @@ def verify_command(value):
 
     return bash
 
+def validate_beacon(url_link):
+    
+    count=0
+    bash_out = general_checks(url_link)
+    new_bash_out=[]
+    for bashed in bash_out:
+        if bashed != []:
+            if isinstance(bashed, list):
+                count+=1
+                for basheditem in bashed:
+                    new_bash_out.append(basheditem)
+            else:
+                new_bash_out.append(bashed)
+
+
+    
+
+    if count ==0:
+        success = 'CONGRATULATIONS! The review finished and your beacon has successfully passed the tests.'
+    else:
+        success = 'ERRORS FOUND! Your beacon has some errors, please review them and verify it back.'
+    return new_bash_out, success
+
 
 def bash_view(request):
     template = "home.html"
     form =BamForm()
     context = {'form': form}
-    if request.user.is_authenticated:
-        current_email=request.user.email
-        #print(current_email)
-        #LOG.debug(current_email)
-    else:
-        current_email = ''
     if request.method == 'POST':
         form = BamForm(request.POST)
         
         if form.is_valid():
-            count=0
-            bash_out = general_checks(form.cleaned_data['url_link'])
-            new_bash_out=[]
-            for bashed in bash_out:
-                if bashed != []:
-                    if isinstance(bashed, list):
-                        count+=1
-                        for basheditem in bashed:
-                            new_bash_out.append(basheditem)
-                    else:
-                        new_bash_out.append(bashed)
+            if form.cleaned_data['url_link'] == '':
+                task = sample_task.delay(request['url_link'])
+                map_out = task.get()
+                
 
-
-            
-
-            if count ==0:
-                success = 'CONGRATULATIONS! The review finished and your beacon has successfully passed the tests.'
+                # return the task id so the JS can poll the state
+                context={
+                    'task_id': task.task_id,
+                    'bash_out': map_out
+                }
+                return render(request, template, context)
             else:
-                success = 'ERRORS FOUND! Your beacon has some errors, please review them and verify it back.'
+                task = sample_task.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                
 
+                # return the task id so the JS can poll the state
+                context={
+                    'task_id': task.task_id,
+                    'bash_out': map_out
+                }
+                return render(request, template, context)
 
-   
-            context = {
-                'url_link': form.cleaned_data['url_link'],
-                'bash_out': new_bash_out,
-                'success': success,
-                'form': form
-
-            }
-
-
-            return render(request, 'base.html', context)
-
-            
-    
     return render(request, template, context)
+
+def task_status(request):
+    task_id = request.GET.get('task_id')
+
+    if task_id:
+        task = AsyncResult(task_id)
+        state = task.state
+
+        if state == 'FAILURE':
+            error = str(task.result)
+            response = {
+                'state': state,
+                'error': error,
+            }
+        else:
+            response = {
+                'state': state,
+            }
+        return JsonResponse(response)
 
 def phenopackets_view(request):
     template = "phenopackets.html"
@@ -470,3 +474,92 @@ def phenopackets_view(request):
             
         return render(request, 'phenopackets.html', context)
     return render(request, template, context)
+
+@csrf_exempt
+def web(request):
+    print('ok')
+
+    #requests.post('https://...')
+    return HttpResponse('ok')
+
+@csrf_exempt
+def async_web(request):
+    task = task_retry.delay()
+    logger.info(task.id)
+    return HttpResponse('ok')
+
+def channel(request):
+    if request.method == 'POST':
+        form = BamForm(request.POST)
+        if form.is_valid():
+            LOG.error(form.cleaned_data['url_link'])
+            LOG.error(type(form.cleaned_data['url_link']))
+            if form.cleaned_data['url_link'].endswith('api'):
+                LOG.error('yeaaaaaah')
+                task = sample_task.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                initial_list=[]
+                initial_list.append(form.cleaned_data['url_link']+'/info')
+                initial_list.append(form.cleaned_data['url_link']+'/configuration')
+                initial_list.append(form.cleaned_data['url_link']+'/error')
+                initial_list.append(form.cleaned_data['url_link']+'/filtering_terms')
+                mapstring= form.cleaned_data['url_link']+'/map'
+                for map in map_out[0]:
+                    initial_list.append(map)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'bash_out': initial_list,
+                    'map': mapstring
+                })
+            elif form.cleaned_data['url_link'].endswith('info'):
+                task = sample_task_info.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out
+                })
+            elif form.cleaned_data['url_link'].endswith('configuration'):
+                task = sample_task_configuration.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out
+                })
+            elif form.cleaned_data['url_link'].endswith('error'):
+                task = sample_task_error.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out
+                })
+            elif form.cleaned_data['url_link'].endswith('filtering_terms'):
+                task = sample_task_filtering_terms.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out
+                })
+            else:
+                task = sample_task_endpoints.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out
+                })
+
+
+    form = BamForm()
+    return render(request, 'home.html', {'form': form})
+
+

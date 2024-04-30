@@ -2,20 +2,79 @@
 
 version: "3.8"
 
-networks:
-  my-app-network:
-    external: true
-
 services:
 
   server:
     build:
-      context: ./server
-    container_name: verifier
-    command: [ "bash", "start.sh" ]
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: verifierweb
+    command: /start
+    volumes:
+      - .:/app
     ports:
       - 8003:8000
+    env_file:
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:16-alpine
     volumes:
-      - ./server:/usr/src/app
-    networks:
-      - my-app-network
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=hello_django
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+
+  redis:
+    image: redis:7-alpine
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: verifierweb_worker
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: verifierweb_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    depends_on:
+      - redis
+      - db
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: verifierweb_flower
+    command: /start-flower
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.dev-sample
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_data:
