@@ -6,49 +6,58 @@ import requests
 from celery.utils.log import get_task_logger
 from time import sleep
 from celery.contrib.abortable import AbortableTask
+from celery.result import AsyncResult
 
 logger = get_task_logger(__name__)
 
 
-@shared_task()
-def sample_task(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task(self, url_link):
     from bash.views import map_check
+    if self.is_aborted():
+        return 'Task stopped!'
 
     endpoints, bash_out = map_check(url_link)
     return endpoints, bash_out
 
-@shared_task()
-def sample_task_info(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task_info(self, url_link):
     from bash.views import info_check
+    if self.is_aborted():
+        return 'Task stopped!'
 
     bash_out = info_check(url_link)
     return bash_out
 
-@shared_task()
-def sample_task_configuration(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task_configuration(self, url_link):
     from bash.views import configuration_check
-
+    if self.is_aborted():
+        return 'Task stopped!'
     bash_out = configuration_check(url_link)
     return bash_out
 
-@shared_task()
-def sample_task_error(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task_error(self, url_link):
     from bash.views import error_check
-
+    if self.is_aborted():
+        return 'Task stopped!'
     bash_out = error_check(url_link)
     return bash_out
 
-@shared_task()
-def sample_task_filtering_terms(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task_filtering_terms(self, url_link):
     from bash.views import filtering_terms_check
-
+    if self.is_aborted():
+        return 'Task stopped!'
     bash_out = filtering_terms_check(url_link)
     return bash_out
 
-@shared_task()
-def sample_task_endpoints(url_link):
+@shared_task(bind=True, base=AbortableTask)
+def sample_task_endpoints(self, url_link):
     from bash.views import endpoint_check
-
+    if self.is_aborted():
+        return 'Task stopped!'
     bash_out = endpoint_check(url_link)
     return bash_out
 
@@ -78,3 +87,9 @@ def count(self):
         print(i)
         sleep(1)
     return 'DONE!' 
+
+@shared_task(bind=True, base=AbortableTask)
+def cancel(task_id):
+    task = count.AsyncResult(task_id)
+    task.abort()
+    return 'Canceled!'

@@ -493,8 +493,93 @@ def channel(request):
         form = BamForm(request.POST)
         if form.is_valid():
             LOG.error(form.cleaned_data['url_link'])
-            LOG.error(type(form.cleaned_data['url_link']))
-            if form.cleaned_data['url_link'].endswith('api'):
+            if form.cleaned_data['url_link'].endswith('info'):
+                task = sample_task_info.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out,
+                    'validation':validation
+                })
+            elif form.cleaned_data['url_link'].endswith('configuration'):
+                task = sample_task_configuration.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out,
+                    'validation':validation
+                })
+            elif form.cleaned_data['url_link'].endswith('error'):
+                task = sample_task_error.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out,
+                    'validation':validation
+                })
+            elif form.cleaned_data['url_link'].endswith('filtering_terms'):
+                task = sample_task_filtering_terms.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out,
+                    'validation':validation
+                })
+            elif form.cleaned_data['url_link'].endswith('analyses') or form.cleaned_data['url_link'].endswith('biosamples') or form.cleaned_data['url_link'].endswith('cohorts') or form.cleaned_data['url_link'].endswith('datasets') or form.cleaned_data['url_link'].endswith('g_variants') or form.cleaned_data['url_link'].endswith('individuals') or form.cleaned_data['url_link'].endswith('runs'):
+                task = sample_task_endpoints.delay(form.cleaned_data['url_link'])
+                map_out = task.get()
+                LOG.error(map_out)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
+                # return the task id so the JS can poll the state
+                return JsonResponse({
+                    'task_id': task.task_id,
+                    'map_out': map_out,
+                    'validation':validated
+                })
+            else:
+                LOG.error(type(form.cleaned_data['url_link']))
                 LOG.error('yeaaaaaah')
                 task = sample_task.delay(form.cleaned_data['url_link'])
                 map_out = task.get()
@@ -506,57 +591,21 @@ def channel(request):
                 mapstring= form.cleaned_data['url_link']+'/map'
                 for map in map_out[0]:
                     initial_list.append(map)
+                validation = map_out[1:-1]
+                validation.append('Validation finished')
+                validated=''
+                for validating in validation:
+                    if validating != []:
+                        validating=str(validating)
+                        validated=validated+'<br/>'+validating
                 # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'bash_out': initial_list,
-                    'map': mapstring
+                    'map': mapstring,
+                    'validation':validation
                 })
-            elif form.cleaned_data['url_link'].endswith('info'):
-                task = sample_task_info.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out
-                })
-            elif form.cleaned_data['url_link'].endswith('configuration'):
-                task = sample_task_configuration.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out
-                })
-            elif form.cleaned_data['url_link'].endswith('error'):
-                task = sample_task_error.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out
-                })
-            elif form.cleaned_data['url_link'].endswith('filtering_terms'):
-                task = sample_task_filtering_terms.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out
-                })
-            else:
-                task = sample_task_endpoints.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out
-                })
+
 
 
     form = BamForm()
