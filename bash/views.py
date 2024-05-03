@@ -232,13 +232,24 @@ def info_check(url: str):
         LOG.error(total_response)
     except Exception as e:
         output_validation.append(e)
+
+    try:
+        beaconId=total_response['response']['id']
+        beaconName=total_response['response']['name']
+    except Exception:
+        beaconId=''
+        beaconName=''
+    try:
+        beaconVersion=total_response['response']['apiVersion']
+    except Exception:
+        beaconVersion=''
     with open(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json', 'r') as f:
         info = json.load(f)
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, info)
     output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver))
-    return output_validation
+    return output_validation, beaconId, beaconName, beaconVersion
 
 def configuration_check(url: str):
     output_validation=[]
@@ -497,7 +508,10 @@ def channel(request):
                 task = sample_task_info.delay(form.cleaned_data['url_link'])
                 map_out = task.get()
                 LOG.error(map_out)
-                validation = map_out[1:-1]
+                validation = map_out[0][1:-1]
+                beaconId = map_out[1]
+                beaconName = map_out[2]
+                beaconVersion = map_out[3]
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
@@ -508,7 +522,10 @@ def channel(request):
                 return JsonResponse({
                     'task_id': task.task_id,
                     'map_out': map_out,
-                    'validation':validation
+                    'validation':validation,
+                    'beaconId': beaconId,
+                    'beaconName': beaconName,
+                    'beaconVersion': beaconVersion
                 })
             elif form.cleaned_data['url_link'].endswith('configuration'):
                 task = sample_task_configuration.delay(form.cleaned_data['url_link'])
@@ -603,7 +620,7 @@ def channel(request):
                     'task_id': task.task_id,
                     'bash_out': initial_list,
                     'map': mapstring,
-                    'validation':validation
+                    'validation':validated
                 })
 
 

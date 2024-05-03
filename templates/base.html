@@ -1,3 +1,4 @@
+{% load static %}
 {% load crispy_forms_tags %}
 
 <!DOCTYPE html>
@@ -18,9 +19,9 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
           <span class="navbar-text ">
-            <img src="media/logo.png" alt="EGA" height="70px">
+            <img src="{% static 'logo.png' %}" alt="EGA" height="70px">
           </span>
-          <a class="navbar-brand " href="/"><h1 class="bi bi-patch-check display-6 mx-auto p-2 fw-bold ms-5" style="color: #239B56;">Beacon RI Phenopackets demo example</h1></a>
+          <a class="navbar-brand " href="/"><h1 class="bi bi-patch-check display-6 mx-auto p-2 fw-bold ms-5" style="color: #239B56;">Beacon Verifier</h1></a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -54,7 +55,7 @@
               <div class="row">
                   <div class="col-5">
                     <div class="mb-3" id="messages"></div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-success bi bi-patch-check"> Validate</button>
                   </div>
                   
                   <div class="col-6">
@@ -73,7 +74,7 @@
 
             </div>
               <div>
-                <button value="si" onclick="functionToExecute()" id="stop-btn" class="btn btn-secondary">Stop Validation</button>
+                <button value="si" onclick="functionToExecute()" id="stop-btn" class="btn btn-danger mt-1 bi bi-sign-stop"> Stop Validation</button>
             </div>
 
               
@@ -81,289 +82,293 @@
             </div>  
             <div class="col" style="height: 1000px; overflow: scroll;">
               <div id="messages" style="display: none;">
-                <button class="btn btn-success" type="button" disabled>
-                  <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-                  Verifying your beacon ...
-                </button>
             </div>
+            <div id="beaconparams" class="card m-2">
+              <div class="card-header">
+              <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
+              <div id="bname" hidden="hidden"><b>The beacon's name you are validating is: </b><a id="beaconName"></a></div>
+              <div id="bversion" hidden="hidden"><b>The beacon's version is: </b><a id="beaconVersion"></a></div>
+            </div>
+            </div>
+
             <div id="cardinitial" hidden="hidden" class="card m-2">
               <div id="results_validation" class="card-header">
-                <a id="result_validation" style="display: block"></a>
+                <b><a id="result_validation" style="display: block"></a></b>
                 <a id="resulted_validation" style="display: block"></a>
               </div>
             </div>
             <div id="card0" hidden="hidden" class="card m-2">
               <div id="results0_validation" class="card-header">
-                <a id="result0_validation" style="display: block"></a>
+                <b><a id="result0_validation" style="display: block"></a></b>
                 <div></div>
                 <a id="resulted0_validation" style="display: block"></a>
               </div>
             </div>
               <div id="card1" hidden="hidden" class="card m-2">
               <div id="results1_validation" class="card-header">
-                <a id="result1_validation" style="display: block"></a>
+                <b><a id="result1_validation" style="display: block"></a></b>
                 <div></div>
                 <a id="resulted1_validation" style="display: block"></a>
               </div>
               </div>
               <div id="card2" hidden="hidden" class="card m-2">
                 <div id="results2_validation" class="card-header">
-                  <a id="result2_validation" style="display: block"></a>
+                  <b><a id="result2_validation" style="display: block"></a></b>
                   <div></div>
-                  <a id="resulted2_validation" style="display: block"></a>
+                  <a id="resulted2_validation" style="display: block"></a></b>
                 </div>
                 </div>
                 <div id="card3" hidden="hidden" class="card m-2">
                   <div id="results3_validation" class="card-header">
-                    <a id="result3_validation" style="display: block"></a>
+                    <b><a id="result3_validation" style="display: block"></a></b>
                     <div></div>
-                    <a id="resulted3_validation" style="display: block"></a>
+                    <a id="resulted3_validation" style="display: block"></a></b>
                   </div>
                   </div>
                   <div id="card4" hidden="hidden" class="card m-2">
                     <div id="results4_validation" class="card-header">
-                      <a id="result4_validation" style="display: block"></a>
+                      <b><a id="result4_validation" style="display: block"></a></b>
                       <div></div>
-                      <a id="resulted4_validation" style="display: block"></a>
+                      <a id="resulted4_validation" style="display: block"></a></b>
                     </div>
                     </div>
                     <div id="card5" hidden="hidden" class="card m-2">
                       <div id="results5_validation" class="card-header">
-                        <a id="result5_validation" style="display: block"></a>
+                        <b><a id="result5_validation" style="display: block"></a></b>
                         <div></div>
-                        <a id="resulted5_validation" style="display: block"></a>
+                        <a id="resulted5_validation" style="display: block"></a></b>
                       </div>
                       </div>
                       <div id="card6" hidden="hidden" class="card m-2">
                         <div id="results6_validation" class="card-header">
-                          <a id="result6_validation" style="display: block"></a>
+                          <b><a id="result6_validation" style="display: block"></a></b>
                           <div></div>
-                          <a id="resulted6_validation" style="display: block"></a>
+                          <a id="resulted6_validation" style="display: block"></a></b>
                         </div>
                         </div>
                         <div id="card7" hidden="hidden" class="card m-2">
                           <div id="results7_validation" class="card-header">
-                            <a id="result7_validation" style="display: block"></a>
+                            <b><a id="result7_validation" style="display: block"></a></b>
                             <div></div>
-                            <a id="resulted7_validation" style="display: block"></a>
+                            <a id="resulted7_validation" style="display: block"></a></b>
                           </div>
                           </div>
                           <div id="card8" hidden="hidden" class="card m-2">
                             <div id="results8_validation" class="card-header">
-                              <a id="result8_validation" style="display: block"></a>
+                              <b><a id="result8_validation" style="display: block"></a></b>
                               <div></div>
-                              <a id="resulted8_validation" style="display: block"></a>
+                              <a id="resulted8_validation" style="display: block"></a></b>
                             </div>
                             </div>
                             <div id="card9" hidden="hidden" class="card m-2">
                               <div id="results9_validation" class="card-header">
-                                <a id="result9_validation" style="display: block"></a>
+                                <b><a id="result9_validation" style="display: block"></a></b>
                                 <div></div>
-                                <a id="resulted9_validation" style="display: block"></a>
+                                <a id="resulted9_validation" style="display: block"></a></b>
                               </div>
                               </div>
                               <div id="card10" hidden="hidden" class="card m-2">
                                 <div id="results10_validation" class="card-header">
-                                  <a id="result10_validation" style="display: block"></a>
-                                  <a id="resulted10_validation" style="display: block"></a>
+                                  <b><a id="result10_validation" style="display: block"></a></b>
+                                  <a id="resulted10_validation" style="display: block"></a></b>
                                 </div>
                                 </div>
                                 <div id="card11" hidden="hidden" class="card m-2">
                                   <div id="results11_validation" class="card-header">
-                                    <a id="result11_validation" style="display: block"></a>
-                                    <a id="resulted11_validation" style="display: block"></a>
+                                    <b><a id="result11_validation" style="display: block"></a></b>
+                                    <a id="resulted11_validation" style="display: block"></a></b>
                                   </div>
                                   </div>
                                   <div id="card12" hidden="hidden" class="card m-2">
                                     <div id="results12_validation" class="card-header">
-                                      <a id="result12_validation" style="display: block"></a>
-                                      <a id="resulted12_validation" style="display: block"></a>
+                                      <b><a id="result12_validation" style="display: block"></a></b>
+                                      <a id="resulted12_validation" style="display: block"></a></b>
                                     </div>
                                     </div>
                                     <div id="card13" hidden="hidden" class="card m-2">
                                       <div id="results13_validation" class="card-header">
-                                        <a id="result13_validation" style="display: block"></a>
-                                        <a id="resulted13_validation" style="display: block"></a>
+                                        <b><a id="result13_validation" style="display: block"></a></b>
+                                        <a id="resulted13_validation" style="display: block"></a></b>
                                       </div>
                                       </div>
                                       <div id="card14" hidden="hidden" class="card m-2">
                                         <div id="results14_validation" class="card-header">
-                                          <a id="result14_validation" style="display: block"></a>
-                                          <a id="resulted14_validation" style="display: block"></a>
+                                          <b><a id="result14_validation" style="display: block"></a></b>
+                                          <a id="resulted14_validation" style="display: block"></a></b>
                                         </div>
                                         </div>
                                         <div id="card15" hidden="hidden" class="card m-2">
                                           <div id="results15_validation" class="card-header">
-                                            <a id="result15_validation" style="display: block"></a>
-                                            <a id="resulted15_validation" style="display: block"></a>
+                                            <b><a id="result15_validation" style="display: block"></a></b>
+                                            <a id="resulted15_validation" style="display: block"></a></b>
                                           </div>
                                           </div>
                                           <div id="card16" hidden="hidden" class="card m-2">
                                             <div id="results16_validation" class="card-header">
-                                              <a id="result16_validation" style="display: block"></a>
-                                              <a id="resulted16_validation" style="display: block"></a>
+                                              <b><a id="result16_validation" style="display: block"></a></b>
+                                              <a id="resulted16_validation" style="display: block"></a></b>
                                             </div>
                                             </div>
                                             <div id="card17" hidden="hidden" class="card m-2">
                                               <div id="results17_validation" class="card-header">
-                                                <a id="result17_validation" style="display: block"></a>
-                                                <a id="resulted17_validation" style="display: block"></a>
+                                                <b><a id="result17_validation" style="display: block"></a></b>
+                                                <a id="resulted17_validation" style="display: block"></a></b>
                                               </div>
                                               </div>
                                               <div id="card18" hidden="hidden" class="card m-2">
                                                 <div id="results18_validation" class="card-header">
-                                                  <a id="result18_validation" style="display: block"></a>
-                                                  <a id="resulted18_validation" style="display: block"></a>
+                                                  <b><a id="result18_validation" style="display: block"></a></b>
+                                                  <a id="resulted18_validation" style="display: block"></a></b>
                                                 </div>
                                                 </div>
                                                 <div id="card19" hidden="hidden" class="card m-2">
                                                   <div id="results19_validation" class="card-header">
-                                                    <a id="result19_validation" style="display: block"></a>
-                                                    <a id="resulted19_validation" style="display: block"></a>
+                                                    <b><a id="result19_validation" style="display: block"></a></b>
+                                                    <a id="resulted19_validation" style="display: block"></a></b>
                                                   </div>
                                                   </div>
                                                   <div id="card20" hidden="hidden" class="card m-2">
                                                     <div id="results20_validation" class="card-header">
-                                                      <a id="result20_validation" style="display: block"></a>
-                                                      <a id="resulted20_validation" style="display: block"></a>
+                                                      <b><a id="result20_validation" style="display: block"></a></b>
+                                                      <a id="resulted20_validation" style="display: block"></a></b>
                                                     </div>
                                                     </div>
                                                     <div id="card21" hidden="hidden" class="card m-2">
                                                       <div id="results21_validation" class="card-header">
-                                                        <a id="result21_validation" style="display: block"></a>
-                                                        <a id="resulted21_validation" style="display: block"></a>
+                                                        <b><a id="result21_validation" style="display: block"></a></b>
+                                                        <a id="resulted21_validation" style="display: block"></a></b>
                                                       </div>
                                                       </div>
                                                       <div id="card22" hidden="hidden" class="card m-2">
                                                         <div id="results22_validation" class="card-header">
-                                                          <a id="result22_validation" style="display: block"></a>
-                                                          <a id="resulted22_validation" style="display: block"></a>
+                                                          <b><a id="result22_validation" style="display: block"></a></b>
+                                                          <a id="resulted22_validation" style="display: block"></a></b>
                                                         </div>
                                                       </div>
                                                         <div id="card23" hidden="hidden" class="card m-2">
                                                         <div id="results23_validation" class="card-header">
-                                                          <a id="result23_validation" style="display: block"></a>
-                                                          <a id="resulted23_validation" style="display: block"></a>
+                                                          <b><a id="result23_validation" style="display: block"></a></b>
+                                                          <a id="resulted23_validation" style="display: block"></a></b>
                                                         </div>
                                                         </div>
                                                         <div id="card24" hidden="hidden" class="card m-2">
                                                           <div id="results24_validation" class="card-header">
-                                                            <a id="result24_validation" style="display: block"></a>
-                                                            <a id="resulted24_validation" style="display: block"></a>
+                                                            <b><a id="result24_validation" style="display: block"></a></b>
+                                                            <a id="resulted24_validation" style="display: block"></a></b>
                                                           </div>
                                                           </div>
                                                           <div id="card25" hidden="hidden" class="card m-2">
                                                             <div id="results25_validation" class="card-header">
-                                                              <a id="result25_validation" style="display: block"></a>
-                                                              <a id="resulted25_validation" style="display: block"></a>
+                                                              <b><a id="result25_validation" style="display: block"></a></b>
+                                                              <a id="resulted25_validation" style="display: block"></a></b>
                                                             </div>
                                                             </div>
                                                             <div id="card26" hidden="hidden" class="card m-2">
                                                               <div id="results26_validation" class="card-header">
-                                                                <a id="result26_validation" style="display: block"></a>
-                                                                <a id="resulted26_validation" style="display: block"></a>
+                                                                <b><a id="result26_validation" style="display: block"></a></b>
+                                                                <a id="resulted26_validation" style="display: block"></a></b>
                                                               </div>
                                                               </div>
                                                               <div id="card27" hidden="hidden" class="card m-2">
                                                                 <div id="results27_validation" class="card-header">
-                                                                  <a id="result27_validation" style="display: block"></a>
-                                                                  <a id="resulted27_validation" style="display: block"></a>
+                                                                  <b><a id="result27_validation" style="display: block"></a></b>
+                                                                  <a id="resulted27_validation" style="display: block"></a></b>
                                                                 </div>
                                                                 </div>
                                                                 <div id="card28" hidden="hidden" class="card m-2">
                                                                   <div id="results28_validation" class="card-header">
-                                                                    <a id="result28_validation" style="display: block"></a>
-                                                                    <a id="resulted28_validation" style="display: block"></a>
+                                                                    <b><a id="result28_validation" style="display: block"></a></b>
+                                                                    <a id="resulted28_validation" style="display: block"></a></b>
                                                                   </div>
                                                                   </div>
                                                                   <div id="card29" hidden="hidden" class="card m-2">
                                                                     <div id="results29_validation" class="card-header">
-                                                                      <a id="result29_validation" style="display: block"></a>
-                                                                      <a id="resulted29_validation" style="display: block"></a>
+                                                                      <b><a id="result29_validation" style="display: block"></a></b>
+                                                                      <a id="resulted29_validation" style="display: block"></a></b>
                                                                     </div>
                                                                     </div>
                                                                     <div id="card30" hidden="hidden" class="card m-2">
                                                                       <div id="results30_validation" class="card-header">
-                                                                        <a id="result30_validation" style="display: block"></a>
-                                                                        <a id="resulted30_validation" style="display: block"></a>
+                                                                        <b><a id="result30_validation" style="display: block"></a></b>
+                                                                        <a id="resulted30_validation" style="display: block"></a></b>
                                                                       </div>
                                                                       </div>
                                                                       <div id="card31" hidden="hidden" class="card m-2">
                                                                         <div id="results31_validation" class="card-header">
-                                                                          <a id="result31_validation" style="display: block"></a>
-                                                                          <a id="resulted31_validation" style="display: block"></a>
+                                                                          <b><a id="result31_validation" style="display: block"></a></b>
+                                                                          <a id="resulted31_validation" style="display: block"></a></b>
                                                                         </div>
                                                                         </div>
                                                                         <div id="card32" hidden="hidden" class="card m-2">
                                                                           <div id="results32_validation" class="card-header">
-                                                                            <a id="result32_validation" style="display: block"></a>
-                                                                            <a id="resulted32_validation" style="display: block"></a>
+                                                                            <b><a id="result32_validation" style="display: block"></a></b>
+                                                                            <a id="resulted32_validation" style="display: block"></a></b>
                                                                           </div>
                                                                           </div>
                                                                           <div id="card33" hidden="hidden" class="card m-2">
                                                                             <div id="results33_validation" class="card-header">
-                                                                              <a id="result33_validation" style="display: block"></a>
-                                                                              <a id="resulted33_validation" style="display: block"></a>
+                                                                              <b><a id="result33_validation" style="display: block"></a></b>
+                                                                              <a id="resulted33_validation" style="display: block"></a></b>
                                                                             </div>
                                                                             </div>
                                                                             <div id="card34" hidden="hidden" class="card m-2">
                                                                               <div id="results34_validation" class="card-header">
-                                                                                <a id="result34_validation" style="display: block"></a>
-                                                                                <a id="resulted34_validation" style="display: block"></a>
+                                                                                <b><a id="result34_validation" style="display: block"></a></b>
+                                                                                <a id="resulted34_validation" style="display: block"></a></b>
                                                                               </div>
                                                                               </div>
                                                                               <div id="card35" hidden="hidden" class="card m-2">
                                                                                 <div id="results35_validation" class="card-header">
-                                                                                  <a id="result35_validation" style="display: block"></a>
-                                                                                  <a id="resulted35_validation" style="display: block"></a>
+                                                                                  <b><a id="result35_validation" style="display: block"></a></b>
+                                                                                  <a id="resulted35_validation" style="display: block"></a></b>
                                                                                 </div>
                                                                                 </div>
                                                                                 <div id="card36" hidden="hidden" class="card m-2">
                                                                                   <div id="results36_validation" class="card-header">
-                                                                                    <a id="result36_validation" style="display: block"></a>
-                                                                                    <a id="resulted36_validation" style="display: block"></a>
+                                                                                    <b><a id="result36_validation" style="display: block"></a></b>
+                                                                                    <a id="resulted36_validation" style="display: block"></a></b>
                                                                                   </div>
                                                                                   </div>
                                                                                   <div id="card37" hidden="hidden" class="card m-2">
                                                                                     <div id="results37_validation" class="card-header">
-                                                                                      <a id="result37_validation" style="display: block"></a>
-                                                                                      <a id="resulted37_validation" style="display: block"></a>
+                                                                                      <b><a id="result37_validation" style="display: block"></a></b>
+                                                                                      <a id="resulted37_validation" style="display: block"></a></b>
                                                                                     </div>
                                                                                     </div>
                                                                                     <div id="card38" hidden="hidden" class="card m-2">
                                                                                       <div id="results38_validation" class="card-header">
-                                                                                        <a id="result38_validation" style="display: block"></a>
-                                                                                        <a id="resulted38_validation" style="display: block"></a>
+                                                                                        <b><a id="result38_validation" style="display: block"></a></b>
+                                                                                        <a id="resulted38_validation" style="display: block"></a></b>
                                                                                       </div>
                                                                                       </div>
                                                                                       <div id="card39" hidden="hidden" class="card m-2">
                                                                                         <div id="results39_validation" class="card-header">
-                                                                                          <a id="result39_validation" style="display: block"></a>
-                                                                                          <a id="resulted39_validation" style="display: block"></a>
+                                                                                          <b><a id="result39_validation" style="display: block"></a></b>
+                                                                                          <a id="resulted39_validation" style="display: block"></a></b>
                                                                                         </div>
                                                                                         </div>
                                                                                         <div id="card40" hidden="hidden" class="card m-2">
                                                                                           <div id="results40_validation" class="card-header">
-                                                                                            <a id="result40_validation" style="display: block"></a>
-                                                                                            <a id="resulted40_validation" style="display: block"></a>
+                                                                                            <b><a id="result40_validation" style="display: block"></a></b>
+                                                                                            <a id="resulted40_validation" style="display: block"></a></b>
                                                                                           </div>
                                                                                           </div>
                                                                                           <div id="card41" hidden="hidden" class="card m-2">
                                                                                             <div id="results41_validation" class="card-header">
-                                                                                              <a id="result41_validation" style="display: block"></a>
-                                                                                              <a id="resulted41_validation" style="display: block"></a>
+                                                                                              <b><a id="result41_validation" style="display: block"></a></b>
+                                                                                              <a id="resulted41_validation" style="display: block"></a></b>
                                                                                             </div>
                                                                                             </div>
                                                                                             <div id="card42" hidden="hidden" class="card m-2">
                                                                                               <div id="results42_validation" class="card-header">
-                                                                                                <a id="result42_validation" style="display: block"></a>
-                                                                                                <a id="resulted42_validation" style="display: block"></a>
+                                                                                                <b><a id="result42_validation" style="display: block"></a></b>
+                                                                                                <a id="resulted42_validation" style="display: block"></a></b>
                                                                                               </div>
                                                                                               </div>
                                                                                               <div id="card43" hidden="hidden" class="card m-2">
                                                                                                 <div id="results43_validation" class="card-header">
-                                                                                                  <a id="result43_validation" style="display: block"></a>
-                                                                                                  <a id="resulted43_validation" style="display: block"></a>
+                                                                                                  <b><a id="result43_validation" style="display: block"></a></b>
+                                                                                                  <a id="resulted43_validation" style="display: block"></a></b>
                                                                                                 </div>
                                                                                                 </div>
             
@@ -431,7 +436,7 @@
     return cookieValue;
   }
 
-  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring) {
+  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation) {
     const ws_url = `/ws/task_status/${task_id}/`;
     const WS = new WebSocket((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + window.location.host + ws_url);
 
@@ -446,17 +451,16 @@
         if (taskStatus === 'SUCCESS') {
           const yourMessage = document.getElementById("results_validation");
             const rsv = yourMessage.querySelector('#result_validation');
-            msg.innerHTML = 'successful validation';
             rsv.innerHTML = mapstring
+            const rsved = yourMessage.querySelector('#resulted_validation');
+            rsved.innerHTML = mapvalidation
 
         } else if (taskStatus === 'FAILURE') {
           msg.innerHTML = res.error;
         }
 
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = btnHtml;
 
-        // close the websocket because we do not need it now
+
         WS.close();
       }
     }
@@ -465,9 +469,16 @@
   function functionToExecute(){
     document.getElementById("stop-btn").value="no"
     console.log(document.getElementById("stop-btn").value)
+    const yourForm = document.getElementById("your-form");
+    const submitBtn = yourForm.querySelector('button[type="submit"]');
+    const spinnerHtml = 'Validate';
+    const msg = yourForm.querySelector('#messages');
+    msg.innerHTML = 'validation stopped';
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = spinnerHtml;
 
   }
-  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation) {
+  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion) {
     const ws_url = `/ws/task_status/${task_id}/`;
     const WS = new WebSocket((location.protocol === 'https:' ? 'wss' : 'ws') + '://' + window.location.host + ws_url);
 
@@ -498,26 +509,39 @@
           console.log(finalresulted)
           const yourMessage2 = document.getElementById("results_validation");
             const rsv2 = yourMessage2.querySelector('#result_validation');
-            msg.innerHTML = 'successful validation';
             console.log(mapstring)
             rsv2.innerHTML = mapstring
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
-            msg.innerHTML = 'successful validation';
             console.log(map_out[0])
             console.log(map_out[1])
             rsv.innerHTML = map_out[0]
             rsved.innerHTML = validation
+          if (iteration == '0'){
+            console.log(iteration)
+            console.log(bname)
+            const yourBeacon = document.getElementById('beaconparams');
+            const BeaconName = yourBeacon.querySelector('#beaconName')
+            const BeaconId = yourBeacon.querySelector('#beaconId')
+            const BeaconVersion = yourBeacon.querySelector('#beaconVersion')
+            BeaconName.innerHTML = bname;
+            BeaconId.innerHTML = bid;
+            BeaconVersion.innerHTML = bversion;
+            let elementbid = document.getElementById('bid');
+            elementbid.removeAttribute("hidden");
+            let elementbname = document.getElementById('bname');
+            elementbname.removeAttribute("hidden");
+            let elementbversion = document.getElementById('bversion');
+            elementbversion.removeAttribute("hidden");
+            let elementbreport = document.getElementById('breport');
+            elementbreport.removeAttribute("hidden");
+          }
 
         } else if (taskStatus === 'FAILURE') {
           msg.innerHTML = res.error;
         }
 
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = btnHtml;
-
-        // close the websocket because we do not need it now
         WS.close();
       }
     }
@@ -526,13 +550,14 @@
   const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping) => {
 
     for (let i = 0; i < mapping.length; i++) {
-            await sleep(10000)
+            await sleep(5000)
         
           
 
           if (document.getElementById("stop-btn").value=="si"){
           const formData2 =new FormData();
           formData2.set('url_link', mapping[i]);
+
     fetch('/validator/', {
                   method: 'POST',
                   headers: {
@@ -546,12 +571,26 @@
             const map_out = res.map_out;
             const iteration = i.toString();
             const validation = res.validation;
-            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation)
+            const bname = res.beaconName;
+            const bid = res.beaconId;
+            const bversion = res.beaconVersion;
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion)
             console.log(res);
           })
           .catch((error) => {
             console.error('Error:', error)
-          })};}}
+          })};
+
+        
+        }
+        const submitBtn = yourForm.querySelector('button[type="submit"]');
+        const spinnerHtml = 'Validate';
+        const msg = yourForm.querySelector('#messages');
+        msg.innerHTML = 'validation completed';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = spinnerHtml;
+      
+      }
   document.addEventListener("DOMContentLoaded", function () {
 
 
@@ -585,9 +624,10 @@
           const task_id = res.task_id;
           const bash_out = res.bash_out;
           const mapstring = res.map;
+          const mapvalidation = res.validation;
           console.log(mapstring)
           
-          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring);
+          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation);
           console.log(res);
           const mapping = bash_out
           console.log(mapping)
@@ -596,7 +636,8 @@
 
           
           repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping);
-          
+
+
           
         })
         
@@ -605,6 +646,7 @@
         });
 
     });
+
   });
 
 </script>

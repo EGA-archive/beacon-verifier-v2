@@ -3,7 +3,7 @@ from bash.models import AgeOfOnset
 
 
 class BamForm(forms.Form):
-    url_link = forms.CharField(max_length=100, required=False, help_text="<span class='hovertext' data-hover='Introduce the URI for the beacon to be verified'>Beacon URI</span>", label="")
+    url_link = forms.CharField(widget=forms.TextInput(attrs={'size':40}), max_length=100, required=False, help_text="<span class='hovertext' data-hover='Introduce the URI for the beacon to be verified'>Paste your Beacon URL:</span>", label="")
 
 class AgeOfOnsetForm(forms.Form):
     def __init__(self, *args, **kwargs):

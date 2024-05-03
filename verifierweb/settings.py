@@ -18,6 +18,7 @@ environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,8 +32,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['beacon-test.ega-archive.org', 'localhost']
 CSRF_TRUSTED_ORIGINS = ['https://beacon-test.ega-archive.org']
+
+STATICFILES_DIRS = [ os.path.join(PROJECT_DIR, "frontend/" )]
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = os.path.join(BASE_DIR, '/media')
 
 # Application definition
 
