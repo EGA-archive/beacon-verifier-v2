@@ -45,6 +45,7 @@ def list_endpoints(list_of_endpoints, endpoints):
 def endpoint_check(url: str):
     endpoint_validation=[]
     is_error = False
+    is_appended = False
     root_path = '/app/'
     if 'd}' in url:
         LOG.error('eoeoeoeo is {}'.format(url))
@@ -95,16 +96,22 @@ def endpoint_check(url: str):
 
         LOG.error('the brand new url is ... {}'.format(url))
         f = requests.get(url)
+        endpoint_validation.append(url)
+        is_appended = True
         try:
             total_response = json.loads(f.text)
             LOG.error(total_response)
         except Exception as e:
-            endpoint_validation.append(e)
+            endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            return endpoint_validation
     if endpoint == 'g_variants':
         endpoint = 'genomicVariations'
 
-        
-    endpoint_validation.append(url)
+    if is_appended:
+        pass
+    else:
+        endpoint_validation.append(url)
+    
     try:
         meta = total_response["meta"]
         granularity = meta["returnedGranularity"]
@@ -130,7 +137,14 @@ def endpoint_check(url: str):
         schema_path = 'file:///{0}/'.format(
                 os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+        LOG.error(total_response)
+        logs=JSONSchemaValidator.validate(total_response, response, resolver)
+        LOG.error(logs)
+        for log in logs:
+            if 'JSONDecodeError' not in str(log):
+                endpoint_validation.append(str(log))
+            else:
+                endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     else:
         if granularity == 'record':
             if endpoint in ['cohorts', 'datasets']:
@@ -144,33 +158,15 @@ def endpoint_check(url: str):
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
-
-            with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
-                response = json.load(f)
-            schema_path = 'file://{0}/'.format(
-                    os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
-            resolver = RefResolver(schema_path, response)
-            if endpoint in ['cohorts', 'datasets']:
-                try:
-                    resultsets = total_response["response"]["collections"]
-                except Exception:
-                    resultsets = total_response["response"]["resultSets"]
-                for resultset in resultsets:
-                    try:
-                        dataset = resultset["id"]
-                    except Exception:
-                        dataset = 'dataset unknown'
-                    endpoint_validation.append(dataset)
-                    endpoint_validation.append(JSONSchemaValidator.validate(resultset, response, resolver))
-            else:
-                resultsets=total_response["response"]["resultSets"]
-                for resultset in resultsets:
-                    dataset = resultset["id"]
-                    results = resultset["results"]
-                    endpoint_validation.append(dataset)
-                    for result in results:
-                        endpoint_validation.append(JSONSchemaValidator.validate(result, response, resolver))
+            LOG.error('oleoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeeo')
+            LOG.error(total_response)
+            logs=JSONSchemaValidator.validate(total_response, response, resolver)
+            LOG.error(logs)
+            for log in logs:
+                if 'JSONDecodeError' not in str(log):
+                    endpoint_validation.append(str(log))
+                else:
+                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
         
         elif granularity == 'count':
             with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
@@ -178,7 +174,15 @@ def endpoint_check(url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+            LOG.error(total_response)
+            logs=JSONSchemaValidator.validate(total_response, response, resolver)
+            LOG.error(logs)
+            for log in logs:
+                if 'JSONDecodeError' not in str(log):
+                    endpoint_validation.append(str(log))
+                else:
+                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+
 
         elif granularity == 'boolean':
             with open(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
@@ -186,7 +190,14 @@ def endpoint_check(url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+            LOG.error(total_response)
+            logs=JSONSchemaValidator.validate(total_response, response, resolver)
+            LOG.error(logs)
+            for log in logs:
+                if 'JSONDecodeError' not in str(log):
+                    endpoint_validation.append(str(log))
+                else:
+                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     return endpoint_validation
 
 
@@ -227,7 +238,6 @@ def info_check(url: str):
     f = requests.get(new_url)
     LOG.error(f.text)
     try:
-        LOG.error('jajajaaj')
         total_response = json.loads(f.text)
         LOG.error(total_response)
     except Exception as e:
@@ -505,117 +515,130 @@ def channel(request):
         if form.is_valid():
             LOG.error(form.cleaned_data['url_link'])
             if form.cleaned_data['url_link'].endswith('info'):
+                validation=[]
                 task = sample_task_info.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                validation = map_out[0][1:-1]
-                beaconId = map_out[1]
-                beaconName = map_out[2]
-                beaconVersion = map_out[3]
+                try:
+                    map_out = task.get()
+                    validation = map_out[0][1:]
+                    beaconId = map_out[1]
+                    beaconName = map_out[2]
+                    beaconVersion = map_out[3]
+                except Exception as e:
+                    validation=[]
+                    validation.append(e)
+                    map_out=[]
+                    map_out.append(form.cleaned_data['url_link'])
+                    beaconId=''
+                    beaconName=''
+                    beaconVersion=''
+
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'map_out': map_out,
-                    'validation':validation,
+                    'validation':validated,
                     'beaconId': beaconId,
                     'beaconName': beaconName,
                     'beaconVersion': beaconVersion
                 })
             elif form.cleaned_data['url_link'].endswith('configuration'):
+                validation=[]
                 task = sample_task_configuration.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                validation = map_out[1:-1]
+                try:
+                    map_out = task.get()
+                    validation = map_out[1:-1]
+                except Exception as e:
+                    validation=[]
+                    validation.append(e)
+                    map_out=[]
+                    map_out.append(form.cleaned_data['url_link'])
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out,
-                    'validation':validation
-                })
-            elif form.cleaned_data['url_link'].endswith('error'):
-                task = sample_task_error.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                validation = map_out[1:-1]
-                validation.append('Validation finished')
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'map_out': map_out,
                     'validation':validation
                 })
             elif form.cleaned_data['url_link'].endswith('filtering_terms'):
+                validation=[]
                 task = sample_task_filtering_terms.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                validation = map_out[1:-1]
+                try:
+                    map_out = task.get()
+                    validation = map_out[1:-1]
+                except Exception as e:
+                    validation=[]
+                    validation.append(e)
+                    map_out=[]
+                    map_out.append(form.cleaned_data['url_link'])
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'map_out': map_out,
-                    'validation':validation
+                    'validation':validated
                 })
             elif form.cleaned_data['url_link'].endswith('analyses') or form.cleaned_data['url_link'].endswith('biosamples') or form.cleaned_data['url_link'].endswith('cohorts') or form.cleaned_data['url_link'].endswith('datasets') or form.cleaned_data['url_link'].endswith('g_variants') or form.cleaned_data['url_link'].endswith('individuals') or form.cleaned_data['url_link'].endswith('runs'):
+                validation=[]
                 task = sample_task_endpoints.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                LOG.error(map_out)
-                validation = map_out[1:-1]
+                try:
+                    map_out = task.get()
+                    validation = map_out[1:]
+                except Exception as e:
+                    LOG.error('uolollolollololollollolololo')
+                    validation.append(e)
+                    map_out=[]
+                    map_out.append(form.cleaned_data['url_link'])
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'map_out': map_out,
                     'validation':validated
                 })
             else:
+                validation=[]
                 LOG.error(type(form.cleaned_data['url_link']))
                 LOG.error('yeaaaaaah')
                 task = sample_task.delay(form.cleaned_data['url_link'])
-                map_out = task.get()
-                initial_list=[]
-                initial_list.append(form.cleaned_data['url_link']+'/info')
-                initial_list.append(form.cleaned_data['url_link']+'/configuration')
-                initial_list.append(form.cleaned_data['url_link']+'/error')
-                initial_list.append(form.cleaned_data['url_link']+'/filtering_terms')
+                try:
+                    map_out = task.get()
+                    validation = map_out[1:-1]
+                    initial_list=[]
+                    initial_list.append(form.cleaned_data['url_link']+'/info')
+                    initial_list.append(form.cleaned_data['url_link']+'/configuration')
+                    initial_list.append(form.cleaned_data['url_link']+'/filtering_terms')
+                    for map in map_out[0]:
+                        initial_list.append(map)
+                except Exception as e:
+                    initial_list=[]
+                    validation=[]
+                    validation.append(e)
+
                 mapstring= form.cleaned_data['url_link']+'/map'
-                for map in map_out[0]:
-                    initial_list.append(map)
-                validation = map_out[1:-1]
+
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                # return the task id so the JS can poll the state
                 return JsonResponse({
                     'task_id': task.task_id,
                     'bash_out': initial_list,

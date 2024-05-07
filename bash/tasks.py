@@ -63,10 +63,6 @@ def sample_task_endpoints(self, url_link):
 
 @task_postrun.connect
 def task_postrun_handler(task_id, **kwargs):
-    """
-    When celery task finish, send notification to Django channel_layer, so Django channel would receive
-    the event and then send it to web client
-    """
     notify_channel_layer(task_id)
 
 @shared_task(bind=True)

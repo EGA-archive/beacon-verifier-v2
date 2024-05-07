@@ -83,7 +83,7 @@
             <div class="col" style="height: 1000px; overflow: scroll;">
               <div id="messages" style="display: none;">
             </div>
-            <div id="beaconparams" class="card m-2">
+            <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
               <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
               <div id="bname" hidden="hidden"><b>The beacon's name you are validating is: </b><a id="beaconName"></a></div>
@@ -449,6 +449,8 @@
         const submitBtn = yourForm.querySelector('button[type="submit"]');
 
         if (taskStatus === 'SUCCESS') {
+          let element0 = document.getElementById('cardinitial');
+          element0.removeAttribute("hidden");
           const yourMessage = document.getElementById("results_validation");
             const rsv = yourMessage.querySelector('#result_validation');
             rsv.innerHTML = mapstring
@@ -456,7 +458,13 @@
             rsved.innerHTML = mapvalidation
 
         } else if (taskStatus === 'FAILURE') {
-          msg.innerHTML = res.error;
+          let element0 = document.getElementById('cardinitial');
+          element0.removeAttribute("hidden");
+          const yourMessage = document.getElementById("results_validation");
+            const rsv = yourMessage.querySelector('#result_validation');
+            rsv.innerHTML = mapstring
+            const rsved = yourMessage.querySelector('#resulted_validation');
+            rsved.innerHTML = mapvalidation
         }
 
 
@@ -490,7 +498,6 @@
         const submitBtn = yourForm.querySelector('button[type="submit"]');
 
         if (taskStatus === 'SUCCESS') {
-          
           let resultsvalidationstart = 'results'
           let resultvalidationstart = '#result'
           let resultedvalidationstart = '#resulted'
@@ -500,28 +507,31 @@
           let finalresult = resultvalidationstart.concat(iteration, resultsvalidationfinish);
           let finalresulted = resultedvalidationstart.concat(iteration, resultsvalidationfinish);
           let finalcard = card.concat(iteration)
-          let element0 = document.getElementById('cardinitial');
-          element0.removeAttribute("hidden");
+
           let element = document.getElementById(finalcard);
           element.removeAttribute("hidden");
           console.log(finalresults)
           console.log(finalresult)
           console.log(finalresulted)
-          const yourMessage2 = document.getElementById("results_validation");
-            const rsv2 = yourMessage2.querySelector('#result_validation');
-            console.log(mapstring)
-            rsv2.innerHTML = mapstring
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
             console.log(map_out[0])
             console.log(map_out[1])
+            console.log(iteration)
+          if (iteration != '0'){
             rsv.innerHTML = map_out[0]
+          }
             rsved.innerHTML = validation
           if (iteration == '0'){
+            console.log(map_out[0][0])
+            const yourMessage = document.getElementById(finalresults);
+            const rsv = yourMessage.querySelector(finalresult);
+            rsv.innerHTML = map_out[0][0]
             console.log(iteration)
             console.log(bname)
             const yourBeacon = document.getElementById('beaconparams');
+            yourBeacon.removeAttribute("hidden");
             const BeaconName = yourBeacon.querySelector('#beaconName')
             const BeaconId = yourBeacon.querySelector('#beaconId')
             const BeaconVersion = yourBeacon.querySelector('#beaconVersion')
@@ -539,7 +549,55 @@
           }
 
         } else if (taskStatus === 'FAILURE') {
-          msg.innerHTML = res.error;
+          let resultsvalidationstart = 'results'
+          let resultvalidationstart = '#result'
+          let resultedvalidationstart = '#resulted'
+          let resultsvalidationfinish = '_validation'
+          let card = 'card'
+          let finalresults = resultsvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalresult = resultvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalresulted = resultedvalidationstart.concat(iteration, resultsvalidationfinish);
+          let finalcard = card.concat(iteration)
+
+          let element = document.getElementById(finalcard);
+          element.removeAttribute("hidden");
+          console.log(finalresults)
+          console.log(finalresult)
+          console.log(finalresulted)
+          const yourMessage = document.getElementById(finalresults);
+            const rsv = yourMessage.querySelector(finalresult);
+            const rsved = yourMessage.querySelector(finalresulted);
+            console.log(map_out[0])
+            console.log(map_out[1])
+            console.log(iteration)
+          if (iteration != '0'){
+            rsv.innerHTML = map_out[0]
+          }
+            rsved.innerHTML = validation
+          if (iteration == '0'){
+            console.log(map_out[0][0])
+            const yourMessage = document.getElementById(finalresults);
+            const rsv = yourMessage.querySelector(finalresult);
+            rsv.innerHTML = map_out[0][0]
+            console.log(iteration)
+            console.log(bname)
+            const yourBeacon = document.getElementById('beaconparams');
+            yourBeacon.removeAttribute("hidden");
+            const BeaconName = yourBeacon.querySelector('#beaconName')
+            const BeaconId = yourBeacon.querySelector('#beaconId')
+            const BeaconVersion = yourBeacon.querySelector('#beaconVersion')
+            BeaconName.innerHTML = bname;
+            BeaconId.innerHTML = bid;
+            BeaconVersion.innerHTML = bversion;
+            let elementbid = document.getElementById('bid');
+            elementbid.removeAttribute("hidden");
+            let elementbname = document.getElementById('bname');
+            elementbname.removeAttribute("hidden");
+            let elementbversion = document.getElementById('bversion');
+            elementbversion.removeAttribute("hidden");
+            let elementbreport = document.getElementById('breport');
+            elementbreport.removeAttribute("hidden");
+          }
         }
 
         WS.close();
