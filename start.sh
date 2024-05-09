@@ -1,4 +1,3 @@
 #!/bin/bash
 
-python3 ./manage.py migrate
-python3 ./manage.py runserver 0.0.0.0:8000
+docker compose -f docker-compose.prod.yml -p django-celery-prod up -d --build

@@ -43,3 +43,5 @@ urllib3==2.2.1
 daphne==4.0.0
 channels==4.0.0
 channels-redis==4.1.0
+gunicorn==21.2.0
+uvicorn[standard]==0.25.0
