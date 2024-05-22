@@ -34,10 +34,13 @@ def list_endpoints(list_of_endpoints, endpoints):
             if k2 == 'rootUrl':
                 list_of_endpoints.append(v2)
             elif k2 == 'endpoints':
-                for k3, v3 in v2.items():
-                    for k4, v4 in v3.items():
-                        if k4 == 'url':
-                            list_of_endpoints.append(v4)
+                try:
+                    for k3, v3 in v2.items():
+                        for k4, v4 in v3.items():
+                            if k4 == 'url':
+                                list_of_endpoints.append(v4)
+                except Exception:
+                    pass
 
     return list_of_endpoints
 
@@ -227,7 +230,13 @@ def map_check(url: str):
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, map)
-    output_validation.append(JSONSchemaValidator.validate(total_response, map, resolver))
+    logs=JSONSchemaValidator.validate(total_response, map, resolver)
+    LOG.error(logs)
+    for log in logs:
+        if 'JSONDecodeError' not in str(log):
+            output_validation.append(str(log))
+        else:
+            output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     return endpoints_to_verify, output_validation
 
 def info_check(url: str):
@@ -617,9 +626,11 @@ def channel(request):
                 LOG.error(type(form.cleaned_data['url_link']))
                 LOG.error('yeaaaaaah')
                 task = sample_task.delay(form.cleaned_data['url_link'])
+                LOG.error(task)
                 try:
                     map_out = task.get()
-                    validation = map_out[1:-1]
+                    LOG.error(map_out)
+                    validation = map_out[1][1:]
                     initial_list=[]
                     initial_list.append(form.cleaned_data['url_link']+'/info')
                     initial_list.append(form.cleaned_data['url_link']+'/configuration')
@@ -627,6 +638,8 @@ def channel(request):
                     for map in map_out[0]:
                         initial_list.append(map)
                 except Exception as e:
+                    LOG.error('whaaaat')
+                    LOG.error(e)
                     initial_list=[]
                     validation=[]
                     validation.append(e)
@@ -636,9 +649,12 @@ def channel(request):
                 validation.append('Validation finished')
                 validated=''
                 for validating in validation:
+                    LOG.error(validating)
+                    LOG.error(type(validating))
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
+                LOG.error(validated)
                 return JsonResponse({
                     'task_id': task.task_id,
                     'bash_out': initial_list,
