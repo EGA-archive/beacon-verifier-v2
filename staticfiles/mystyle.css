@@ -48,6 +48,7 @@
 .hovertext {
     position: relative;
     border-bottom: 1px dotted black;
+    display: block;
   }
   
 .hovertext:before {
@@ -231,6 +232,23 @@ table {
 
 .none > :last-child {
   margin-bottom: 0;
+}
+
+.vbut {
+  background-color: #ddd;
+  border: none;
+  color: black;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 16px;
+}
+
+.vbut:hover {
+  background-color: #f1f1f1;
 }
 
 .kcbutton {
