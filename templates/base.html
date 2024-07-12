@@ -16,7 +16,7 @@
     <script src="media/arrows.js"></script>
   </head>
 <body>
-    <nav class="navbar navbar-expand-lg" style="height: 62px; width: 1512 px; background-color: #40946C;">
+    <nav class="navbar navbar-expand-lg" style="z-index: 2; height: 62px; width: 1512 px; background-color: #40946C;">
         <div class="container-fluid">
           <span class="navbar-text ">
             <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="EGA" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
@@ -51,7 +51,7 @@
               </div>
 
                     <div class="mb-3" id="messages"></div>
-                    <button hidden="hidden" id="primerbutton2" onClick="window.location.reload();" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    <button id="primerbutton2" hidden="hidden" onClick="window.location.reload();" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
                     border: none;
                     width: 100%;
                     color: white;
@@ -61,10 +61,10 @@
                     display: inline-block;
                     margin: 4px 2px;
                     cursor: pointer;
-                    border-radius: 100px;"> Start</button>
-                    <button id="primerbutton" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    border-radius: 100px;"> New Verification</button>
+                    <button id="primerbutton" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'"" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
                     border: none;
-                    width: 48%;
+                    width: 48.5%;
                     color: white;
                     padding: 10px 20px;
                     text-align: center;
@@ -75,7 +75,7 @@
                     border-radius: 100px;"> Start</button>
                     <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
                     border: none;
-                    width: 48%;
+                    width: 48.5%;
                     color: black;
                     padding: 10px 20px;
                     text-align: center;
@@ -93,9 +93,13 @@
                       <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
                       <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
                       <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 5px; font-weight: bold;">0%</span>
-                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 5px;">Paste URL and start verification</span></div>
-                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px;">
+                    </span><span id="pdot2" class="dot" hidden="hidden">
+                      <span id="pdot21" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot22" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot23" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 15px; font-weight: bold;">0%</span>
+                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 15px;">Paste URL and start verification</span></div>
+                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
                     <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
                   </div>
                   
@@ -128,7 +132,7 @@
                   {% endif %}
                   {% endif %}
 
-                  <div style="position: absolute; top: 75vh; left: 61px; max-width: 400px;">
+                  <div style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
 
                     <p style="margin-bottom: -9px""><b style="font-weight: 12px;">In association with:</b></p>
                     <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
@@ -148,12 +152,12 @@
               
                 
             </div>  
-            <div class="col" style="height: 90vh; overflow: scroll;">
-              <div id="messages" style="display: none;">
+            <div id="theresultscol" class="col" style="height: 95vh; overflow: scroll; margin-top: -15px;">
+              <div id="messages" style="display: none; ">
             </div>
             
             <div class="m-5">
-              <div id="resultscards" hidden="hidden">Results</div>
+              <div id="resultscards" class="m-2 mt-0" >Results</div>
             <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
               <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
@@ -482,6 +486,13 @@
           border-radius: 50%;
           display: inline-block;
         }
+        .iep {
+          height: 5px;
+          width: 5px;
+          background-color: #CF7C40;
+          border-radius: 50%;
+          display: inline-block;
+        }
         #id_url_link{
           width: 100%;
         }
@@ -534,6 +545,7 @@
       .then(response => response.json())
       .then((res) => {
         const taskStatus = res.state;
+        
 
 
       if (['SUCCESS', 'FAILURE'].includes(taskStatus)) {
@@ -602,16 +614,30 @@
         console.error('Error:', error)
       });
   }
+  
+  async function functionToExecute(){
 
-  function functionToExecute(){
-    document.getElementById("stop-btn").value="no"
-    console.log(document.getElementById("stop-btn").value)
     const yourForm = document.getElementById("your-form");
     const submitBtn = yourForm.querySelector('button[type="submit"]');
+    const submitBtn2 = yourForm.querySelector('button[type="button"]');
+    const submitBtn3 = yourForm.querySelector('button[type="disabled"]');
+    submitBtn2.removeAttribute("hidden");
+    submitBtn.setAttribute("hidden", true);
+    submitBtn3.setAttribute("hidden", true);
     const msg = yourForm.querySelector('#messages');
-    msg.innerHTML = 'validation stopped';
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = spinnerHtml;
+    document.getElementById("myPercentext").innerText = "Process stopped";
+    document.getElementById("myPercentext").style.color = "#CF7C3F";
+    document.getElementById("myPercent").style.color = "#CF7C3F";
+    document.getElementById("myBar").style.backgroundColor = "#CF7C3F";
+    document.getElementById("pdot").setAttribute("hidden", true);
+    document.getElementById("pdot2").style.backgroundColor = "#CF7C3F";
+    document.getElementById("pdot21").style.backgroundColor = "#CF7C3F";
+    document.getElementById("pdot22").style.backgroundColor = "#CF7C3F";
+    document.getElementById("pdot23").style.backgroundColor = "#CF7C3F";
+    document.getElementById("pdot2").removeAttribute("hidden");
+    document.getElementById("stop-btn").value="no";
+    console.log(document.getElementById("stop-btn").value);
+    
 
   }
   async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion) {
@@ -776,14 +802,18 @@
   let warnings = 0;
   let errors = 0;
   const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, checks, warnings, errors) => {
+    
 
     for (let i = 0; i < mapping.length; i++) {
             await sleep(5000)
               var width = (i/mapping.length)*100
               console.log(width)
+
+              if (document.getElementById("stop-btn").value=="no"){
+                break} else {
               document.getElementById("myBar").style.width = width + "%";
               document.getElementById("myPercent").innerText = width + "%";
-              document.getElementById("myPercentext").innerText = "Verifying...";
+              }
               
               
 
@@ -814,19 +844,34 @@
           })
           .catch((error) => {
             console.error('Error:', error)
-          })};
+          })} else {
+            break
+          };
 
         
         }
         const submitBtn = yourForm.querySelector('button[type="submit"]');
+        const submitBtn2 = yourForm.querySelector('button[type="button"]');
+        const submitBtn3 = yourForm.querySelector('button[type="disabled"]');
+ 
         document.getElementById("myBar").style.width = "100" + "%";
         document.getElementById("myPercent").innerText = "100" + "%";
-        document.getElementById("myPercentext").innerText = "Validation completed";
-        document.getElementById("stop-btn").setAttribute("hidden") = "hidden";
-        document.getElementById("primerbutton").setAttribute("hidden") = "hidden";
-        document.getElementById("primerbutton2").removeAttribute("hidden");
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = spinnerHtml;
+        if (document.getElementById("stop-btn").value=="si"){
+        document.getElementById("myPercentext").innerText = "Validation completed"
+        document.getElementById("stop-btn").value="no";
+        submitBtn2.removeAttribute("hidden");
+        submitBtn.setAttribute("hidden", true);
+        submitBtn3.setAttribute("hidden", true);
+        document.getElementById("myPercentext").style.color = "#40946C";
+        document.getElementById("myPercent").style.color = "#40946C";
+        document.getElementById("myBar").style.backgroundColor = "#40946C";
+        document.getElementById("pdot").setAttribute("hidden", true);
+        document.getElementById("pdot2").style.backgroundColor = "#40946C";
+        document.getElementById("pdot21").style.backgroundColor = "#40946C";
+        document.getElementById("pdot22").style.backgroundColor = "#40946C";
+        document.getElementById("pdot23").style.backgroundColor = "#40946C";
+        document.getElementById("pdot2").removeAttribute("hidden");
+        }
       
       }
   document.addEventListener("DOMContentLoaded", function () {
@@ -834,7 +879,7 @@
 
     const yourForm = document.getElementById("your-form");
     yourForm.addEventListener("submit", function (event) {
-      document.getElementById("myPercentext").innerText = "Verifying...";
+      
       event.preventDefault();
       const submitBtn = yourForm.querySelector('button[type="submit"]');
       const btnHtml = submitBtn.innerHTML;
@@ -915,7 +960,8 @@
 
   document.getElementById("downl")
       .addEventListener("click", function () {
-        var nodes = document.querySelectorAll("div");
+        var nodes = document.getElementById("theresultscol").querySelectorAll("a");
+        console.log(nodes)
         var list = [].slice.call(nodes);
         var innertext = list.map(function(e) { return e.innerText; }).join("\n");
           let filename = "verifier.txt";
