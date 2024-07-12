@@ -541,7 +541,6 @@ def channel(request):
                     beaconName=''
                     beaconVersion=''
 
-                validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
@@ -566,7 +565,6 @@ def channel(request):
                     validation.append(e)
                     map_out=[]
                     map_out.append(form.cleaned_data['url_link'])
-                validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
@@ -588,7 +586,6 @@ def channel(request):
                     validation.append(e)
                     map_out=[]
                     map_out.append(form.cleaned_data['url_link'])
-                validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
@@ -610,7 +607,6 @@ def channel(request):
                     validation.append(e)
                     map_out=[]
                     map_out.append(form.cleaned_data['url_link'])
-                validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     if validating != []:
@@ -646,7 +642,6 @@ def channel(request):
 
                 mapstring= form.cleaned_data['url_link']+'/map'
 
-                validation.append('Validation finished')
                 validated=''
                 for validating in validation:
                     LOG.error(validating)

@@ -21,7 +21,7 @@
           <span class="navbar-text ">
             <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="EGA" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
           </span>
-          <a class="navbar-brand " href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">Beacon Verifier</p></a>
+          <a class="navbar-brand " href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -51,6 +51,17 @@
               </div>
 
                     <div class="mb-3" id="messages"></div>
+                    <button hidden="hidden" id="primerbutton2" onClick="window.location.reload();" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    border: none;
+                    width: 100%;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 100px;"> Start</button>
                     <button id="primerbutton" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
                     border: none;
                     width: 48%;
@@ -61,7 +72,7 @@
                     display: inline-block;
                     margin: 4px 2px;
                     cursor: pointer;
-                    border-radius: 16px;"> Start</button>
+                    border-radius: 100px;"> Start</button>
                     <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
                     border: none;
                     width: 48%;
@@ -72,9 +83,9 @@
                     display: inline-block;
                     margin: 4px 2px;
                     cursor: pointer;
-                    border-radius: 16px;"> Stop</button>
+                    border-radius: 100px;"> Stop</button>
                   <div style="margin-top: 30px;">
-
+                    
                 </div>
                 
                   <div style="padding-left: 50px; padding-right: 25px;">
@@ -87,8 +98,26 @@
                   <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px;">
                     <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
                   </div>
+                  
                 </div>
+                <div id="summarytable" hidden="hidden">
+                <div style="margin-top: 50px">Summary</div>
+                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
+                <button class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
+                border: 1 px solid #636363;
+                width: 48%;
+                color: #636363;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 100px;">&nbsp; Download Report</button>  
+              </div>
 
+                
                   
                   </form>
                   {% if success %}
@@ -99,9 +128,9 @@
                   {% endif %}
                   {% endif %}
 
-                  <div style="position: absolute; top: 800px; left: 61px; max-width: 400px;">
+                  <div style="position: absolute; top: 75vh; left: 61px; max-width: 400px;">
 
-                    <p><b style="font-weight: 12px;">In association with:</b></p>
+                    <p style="margin-bottom: -9px""><b style="font-weight: 12px;">In association with:</b></p>
                     <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
                     <img src="{% static 'bsc.webp' %}" alt="BSC" height="80px" style="padding-right: 10px;">
                     <img src="{% static 'elixir.png' %}" alt="Elixir" height="60px">
@@ -119,9 +148,12 @@
               
                 
             </div>  
-            <div class="col" style="height: 1000px; overflow: scroll;">
+            <div class="col" style="height: 90vh; overflow: scroll;">
               <div id="messages" style="display: none;">
             </div>
+            
+            <div class="m-5">
+              <div id="resultscards" hidden="hidden">Results</div>
             <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
               <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
@@ -414,7 +446,7 @@
 
             
 
-
+                                                                                              </div>
 
 
 
@@ -508,14 +540,39 @@
         const msg = yourForm.querySelector('#messages');
         const submitBtn = yourForm.querySelector('button[type="submit"]');
 
+
         if (taskStatus === 'SUCCESS') {
+          let resultscards = document.getElementById('resultscards');
+          resultscards.removeAttribute("hidden");
           let element0 = document.getElementById('cardinitial');
           element0.removeAttribute("hidden");
+          document.getElementById('summarytable').removeAttribute("hidden");
           const yourMessage = document.getElementById("results_validation");
             const rsv = yourMessage.querySelector('#result_validation');
             rsv.innerHTML = mapstring
             const rsved = yourMessage.querySelector('#resulted_validation');
             rsved.innerHTML = mapvalidation
+            if (mapvalidation == '') {
+              console.log('hoalaaa')
+              var heart = document.createElement('i')
+              heart.className = 'bi-check-circle'
+              yourMessage.append(heart)
+              yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
+              document.getElementById('cardinitial').style.borderColor = "#40946C";
+              let checks = 1;
+              const yoursummary = document.getElementById("check")
+              yoursummary.innerText = checks;
+            } else {
+              console.log('warning')
+              var heart = document.createElement('i')
+              heart.className = 'bi-exclamation-triangle'
+              yourMessage.append(heart)
+              yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
+              document.getElementById('cardinitial').style.borderColor = "#CF7C40";
+              let warnings = 1;
+              const yoursummary = document.getElementById("warning")
+              yoursummary.innerText = warnings;
+            }
 
 
         } else if (taskStatus === 'FAILURE') {
@@ -526,6 +583,14 @@
             rsv.innerHTML = mapstring
             const rsved = yourMessage.querySelector('#resulted_validation');
             rsved.innerHTML = mapvalidation
+            var heart = document.createElement('i')
+            heart.className = 'bi-x-circle'
+            yourMessage.append(heart)
+            yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
+            document.getElementById('cardinitial').style.borderColor = "#B85353";
+            let errors = 1;
+            const yoursummary = document.getElementById("error")
+            yoursummary.innerText = errors;
           } }else {
           // the task is still running
           setTimeout(function () {
@@ -543,7 +608,6 @@
     console.log(document.getElementById("stop-btn").value)
     const yourForm = document.getElementById("your-form");
     const submitBtn = yourForm.querySelector('button[type="submit"]');
-    const spinnerHtml = 'Validate';
     const msg = yourForm.querySelector('#messages');
     msg.innerHTML = 'validation stopped';
     submitBtn.disabled = false;
@@ -586,7 +650,29 @@
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
+          if (validation == '') {
+              console.log('hoalaaa')
+              var heart = document.createElement('i')
+              heart.className = 'bi-check-circle'
+              yourMessage.append(heart)
+              yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
+              document.getElementById(finalcard).style.borderColor = "#40946C";
+              checks = checks + 1;
+              const yoursummary = document.getElementById("check")
+              yoursummary.innerText = checks;
+            } else {
+              var heart = document.createElement('i')
+              heart.className = 'bi-exclamation-triangle'
+              yourMessage.append(heart)
+              console.log('warning')
+              yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
+              document.getElementById(finalcard).style.borderColor = "#CF7C40";
+              warnings = warnings + 1;
+              const yoursummary = document.getElementById("warning")
+              yoursummary.innerText = warnings;
+            }
             rsved.innerHTML = validation
+            
           if (iteration == '0'){
             console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
@@ -637,6 +723,16 @@
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
+          var heart = document.createElement('i')
+          heart.className = 'bi-x-circle'
+          yourMessage.append(heart)
+          yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
+          yourMessage.style.borderColor = "#B85353";
+          errors = errors + 1;
+          const yoursummary = document.getElementById("error")
+          yoursummary.innerText = errors;
+          //errors = errors + 1;
+          //document.getElementById(error).style.innerText = errors;
             rsved.innerHTML = validation
           if (iteration == '0'){
             console.log(map_out[0][0])
@@ -676,7 +772,10 @@
       });
   }
   const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping) => {
+  let checks = 1;
+  let warnings = 0;
+  let errors = 0;
+  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, checks, warnings, errors) => {
 
     for (let i = 0; i < mapping.length; i++) {
             await sleep(5000)
@@ -710,7 +809,7 @@
             const bname = res.beaconName;
             const bid = res.beaconId;
             const bversion = res.beaconVersion;
-            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion)
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion, checks, warnings, errors)
             console.log(res);
           })
           .catch((error) => {
@@ -720,10 +819,12 @@
         
         }
         const submitBtn = yourForm.querySelector('button[type="submit"]');
-        const spinnerHtml = 'Validate';
         document.getElementById("myBar").style.width = "100" + "%";
         document.getElementById("myPercent").innerText = "100" + "%";
         document.getElementById("myPercentext").innerText = "Validation completed";
+        document.getElementById("stop-btn").setAttribute("hidden") = "hidden";
+        document.getElementById("primerbutton").setAttribute("hidden") = "hidden";
+        document.getElementById("primerbutton2").removeAttribute("hidden");
         submitBtn.disabled = false;
         submitBtn.innerHTML = spinnerHtml;
       
@@ -737,7 +838,6 @@
       event.preventDefault();
       const submitBtn = yourForm.querySelector('button[type="submit"]');
       const btnHtml = submitBtn.innerHTML;
-      const spinnerHtml = 'Validating...';
       submitBtn.disabled = true;
       document.getElementById("primerbutton").style.backgroundColor = "#ddd";
       document.getElementById("primerbutton").style.pointerEvents = "none";
@@ -794,6 +894,34 @@
 
   });
 
+</script>
+<script>
+  function download(file, text) {
+
+      //creating an invisible element
+
+      let element = document.createElement('a');
+      element.setAttribute('href',
+          'data:text/plain;charset=utf-8, '
+          + encodeURIComponent(text));
+      element.setAttribute('download', file);
+      document.body.appendChild(element);
+      element.click();
+
+      document.body.removeChild(element);
+  }
+
+  // Start file download.
+
+  document.getElementById("downl")
+      .addEventListener("click", function () {
+        var nodes = document.querySelectorAll("div");
+        var list = [].slice.call(nodes);
+        var innertext = list.map(function(e) { return e.innerText; }).join("\n");
+          let filename = "verifier.txt";
+
+          download(filename, innertext);
+      }, false);
 </script>
 </body>
 </html>
