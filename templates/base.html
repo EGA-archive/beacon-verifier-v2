@@ -16,12 +16,12 @@
     <script src="media/arrows.js"></script>
   </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg" style="height: 62px; width: 1512 px; background-color: #40946C;">
         <div class="container-fluid">
           <span class="navbar-text ">
-            <img src="{% static 'logo.png' %}" alt="EGA" height="70px">
+            <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="EGA" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
           </span>
-          <a class="navbar-brand " href="/"><h1 class="bi bi-patch-check display-6 mx-auto p-2 fw-bold ms-5" style="color: #239B56;">Beacon Verifier</h1></a>
+          <a class="navbar-brand " href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">Beacon Verifier</p></a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -33,35 +33,63 @@
 
       </nav>
       
-      <div class="container pt-3 " style="font-size: 14px; "> 
-        <div class="col">
-          <div class="containerfirst">
             <div class="row">
 
-            <div class="col-3" style="display: inline">
+            <div class="col-4" style="background-color: #EEEEEE;">
           
 
               <div class="row">
                 <div class="col">
-                  <form id="your-form" method="post">
+                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
                     {% csrf_token %}
                     <div class="row"><div>
                     {% for f in form %}
-                    <p>{{f.help_text|safe}} {{f}} </p>   
+                    <b>{{f.help_text|safe}} {{f}} </b>   
                     {% endfor %}
                 </div>
 
               </div>
-              <div class="row">
-                  <div class="col-5">
+
                     <div class="mb-3" id="messages"></div>
-                    <button type="submit" class="btn btn-success bi bi-patch-check"> Validate</button>
+                    <button id="primerbutton" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    border: none;
+                    width: 48%;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 16px;"> Start</button>
+                    <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
+                    border: none;
+                    width: 48%;
+                    color: black;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 16px;"> Stop</button>
+                  <div style="margin-top: 30px;">
+
+                </div>
+                
+                  <div style="padding-left: 50px; padding-right: 25px;">
+                    <div style="position: relative; right: 50px; top: 10px;"><span id="pdot" class="dot">
+                      <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 5px; font-weight: bold;">0%</span>
+                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 5px;">Paste URL and start verification</span></div>
+                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px;">
+                    <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
                   </div>
+                </div>
+
                   
-                  <div class="col-6">
-                    
-                  </div>
-              </div>
                   </form>
                   {% if success %}
                   {% if 'CONGRATULATIONS' in success %}
@@ -70,13 +98,24 @@
                   <div class="red"><b>{{success}}</b></div>
                   {% endif %}
                   {% endif %}
+
+                  <div style="position: absolute; top: 800px; left: 61px; max-width: 400px;">
+
+                    <p><b style="font-weight: 12px;">In association with:</b></p>
+                    <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
+                    <img src="{% static 'bsc.webp' %}" alt="BSC" height="80px" style="padding-right: 10px;">
+                    <img src="{% static 'elixir.png' %}" alt="Elixir" height="60px">
+                    <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
+                    <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
+                    
+                  </div>
+
+
+                  
             </div>
 
             </div>
-              <div>
-                <button value="si" onclick="functionToExecute()" id="stop-btn" class="btn btn-danger mt-1 bi bi-sign-stop"> Stop Validation</button>
-            </div>
-
+                
               
                 
             </div>  
@@ -386,7 +425,7 @@
         
             
 
-        </div>
+
 
         
           </div>
@@ -395,9 +434,29 @@
 
             
         </div>
-      </div>
-      </div>
       {% include "footer.html" %}
+      <style>
+        .dot {
+          height: 45px;
+          width: 45px;
+          background-color: #E0E0E0;
+          border-radius: 50%;
+          display: inline-block;
+        }
+        .dot2 {
+          height: 5px;
+          width: 5px;
+          background-color: #E0E0E0;
+          border-radius: 50%;
+          display: inline-block;
+        }
+        #id_url_link{
+          width: 100%;
+        }
+        #stop-btn {
+          pointer-events: none;
+        }
+        </style>
 <script>
   function myFunction() {
   var x = document.getElementById("myDIV");
@@ -444,6 +503,7 @@
       .then((res) => {
         const taskStatus = res.state;
 
+
       if (['SUCCESS', 'FAILURE'].includes(taskStatus)) {
         const msg = yourForm.querySelector('#messages');
         const submitBtn = yourForm.querySelector('button[type="submit"]');
@@ -456,6 +516,7 @@
             rsv.innerHTML = mapstring
             const rsved = yourMessage.querySelector('#resulted_validation');
             rsved.innerHTML = mapvalidation
+
 
         } else if (taskStatus === 'FAILURE') {
           let element0 = document.getElementById('cardinitial');
@@ -619,7 +680,14 @@
 
     for (let i = 0; i < mapping.length; i++) {
             await sleep(5000)
-        
+              var width = (i/mapping.length)*100
+              console.log(width)
+              document.getElementById("myBar").style.width = width + "%";
+              document.getElementById("myPercent").innerText = width + "%";
+              document.getElementById("myPercentext").innerText = "Verifying...";
+              
+              
+
           
 
           if (document.getElementById("stop-btn").value=="si"){
@@ -653,8 +721,9 @@
         }
         const submitBtn = yourForm.querySelector('button[type="submit"]');
         const spinnerHtml = 'Validate';
-        const msg = yourForm.querySelector('#messages');
-        msg.innerHTML = 'validation completed';
+        document.getElementById("myBar").style.width = "100" + "%";
+        document.getElementById("myPercent").innerText = "100" + "%";
+        document.getElementById("myPercentext").innerText = "Validation completed";
         submitBtn.disabled = false;
         submitBtn.innerHTML = spinnerHtml;
       
@@ -664,12 +733,20 @@
 
     const yourForm = document.getElementById("your-form");
     yourForm.addEventListener("submit", function (event) {
+      document.getElementById("myPercentext").innerText = "Verifying...";
       event.preventDefault();
       const submitBtn = yourForm.querySelector('button[type="submit"]');
       const btnHtml = submitBtn.innerHTML;
       const spinnerHtml = 'Validating...';
       submitBtn.disabled = true;
-      submitBtn.innerHTML = spinnerHtml;
+      document.getElementById("primerbutton").style.backgroundColor = "#ddd";
+      document.getElementById("primerbutton").style.pointerEvents = "none";
+      document.getElementById("stop-btn").style.backgroundColor = "#CF7C3F";
+      document.getElementById("stop-btn").style.pointerEvents = "all";
+      document.getElementById("pdot").style.backgroundColor = "#636363";
+      document.getElementById("dot21").style.backgroundColor = "white";
+      document.getElementById("dot22").style.backgroundColor = "white";
+      document.getElementById("dot23").style.backgroundColor = "white";
 
 
       const msg = yourForm.querySelector('#messages');
