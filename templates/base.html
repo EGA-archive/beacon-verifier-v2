@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="media/mystyle.css">
+    <link rel="stylesheet" href="staticfiles/mystyle.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link href="https://unpkg.com/@popperjs/core@2" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
@@ -18,13 +18,10 @@
 <body>
     <nav class="navbar navbar-expand-lg" style="z-index: 2; height: 62px; width: 1512 px; background-color: #40946C;">
         <div class="container-fluid">
-          <span class="navbar-text ">
-            <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="EGA" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
+          <span class="navbar-text titulo">
+            <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="CRG" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
           </span>
-          <a class="navbar-brand " href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+          <a class="navbar-brand titulo fadex" href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
           <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
@@ -35,11 +32,11 @@
       
             <div class="row">
 
-            <div class="col-4" style="background-color: #EEEEEE;">
+            <div class="col-4 reduce" style="background-color: #EEEEEE;">
           
 
               <div class="row">
-                <div class="col">
+                <div class="col reduce">
                   <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
                     {% csrf_token %}
                     <div class="row"><div>
@@ -132,7 +129,7 @@
                   {% endif %}
                   {% endif %}
 
-                  <div style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
+                  <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
 
                     <p style="margin-bottom: -9px""><b style="font-weight: 12px;">In association with:</b></p>
                     <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
@@ -157,7 +154,7 @@
             </div>
             
             <div class="m-5">
-              <div id="resultscards" class="m-2 mt-0" >Results</div>
+              <div id="resultscards" class="m-2 mt-0" hidden="hidden">Results</div>
             <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
               <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
@@ -499,6 +496,28 @@
         #stop-btn {
           pointer-events: none;
         }
+        @media only screen and (max-width: 1100px) {
+
+  .reduce{
+    width: 500px;
+    max-width: 1000px;
+    background-color: white;
+  }
+
+  .titulo {
+    width: 1%;
+  }
+
+  .association {
+    opacity: 0%
+  }
+}
+
+@media only screen and (max-width: 1300px) {
+  .association {
+    opacity: 0%;
+  }
+}
         </style>
 <script>
   function myFunction() {
@@ -811,8 +830,8 @@
 
               if (document.getElementById("stop-btn").value=="no"){
                 break} else {
-              document.getElementById("myBar").style.width = width + "%";
-              document.getElementById("myPercent").innerText = width + "%";
+              document.getElementById("myBar").style.width = Math.floor(width) + "%";
+              document.getElementById("myPercent").innerText = Math.floor(width) + "%";
               }
               
               

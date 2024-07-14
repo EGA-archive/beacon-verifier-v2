@@ -1,5 +1,5 @@
 {% load static %}
-<div class="container-fluid text-lg-start text-white mt-5" style="background-color: #273847; position: absolute; top: 95vh; height: 50px;">
+<div class="container-fluid text-lg-start text-white mt-5 association" style="background-color: #273847; position: absolute; top: 95vh; height: 50px;">
           <div style="position: absolute; top: 10px; width: 98vw">
             EGA Consortium
             <a href="https://ega-archive.org/about" class="text-white" style="position:absolute; left: 650px;">EGA</a>
@@ -17,4 +17,26 @@
           a:link {
             text-decoration: none;
         }
+        @media only screen and (max-width: 1100px) {
+
+.reduce{
+  width: 500px;
+  max-width: 1000px;
+  background-color: white;
+}
+
+.titulo {
+  width: 1%;
+}
+
+.association {
+  opacity: 0%
+}
+}
+
+@media only screen and (max-width: 1300px) {
+.association {
+  opacity: 0%;
+}
+}
 </style>
