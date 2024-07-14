@@ -16,12 +16,12 @@
     <script src="media/arrows.js"></script>
   </head>
 <body>
-    <nav class="navbar navbar-expand-lg" style="z-index: 2; height: 62px; width: 1512 px; background-color: #40946C;">
+    <nav class="navbar navbar-expand-lg barrav" style="z-index: 2; height: 62px; width: 1512 px; background-color: #40946C;">
         <div class="container-fluid">
           <span class="navbar-text titulo">
             <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="CRG" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
           </span>
-          <a class="navbar-brand titulo fadex" href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
+          <a class="navbar-brand" href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
           <div class="collapse navbar-collapse" id="navbarText">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
@@ -499,13 +499,17 @@
         @media only screen and (max-width: 1100px) {
 
   .reduce{
-    width: 500px;
+    width: 100vw;
     max-width: 1000px;
     background-color: white;
   }
 
   .titulo {
-    width: 1%;
+    opacity: 0%;
+  }
+
+  .barrav {
+    width: 100vw;
   }
 
   .association {
