@@ -61,7 +61,7 @@
                     border-radius: 100px;"> New Verification</button>
                     <button id="primerbutton" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'"" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
                     border: none;
-                    width: 48.5%;
+                    width: 48%;
                     color: white;
                     padding: 10px 20px;
                     text-align: center;
@@ -72,7 +72,7 @@
                     border-radius: 100px;"> Start</button>
                     <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
                     border: none;
-                    width: 48.5%;
+                    width: 48%;
                     color: black;
                     padding: 10px 20px;
                     text-align: center;
@@ -102,13 +102,13 @@
                   
                 </div>
                 <div id="summarytable" hidden="hidden">
-                <div style="margin-top: 50px">Summary</div>
+                <div style="margin-top: 40px">Summary</div>
                 <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
                 <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
                 <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
-                <button class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
+                <button hidden="hidden" class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
                 border: 1 px solid #636363;
-                width: 48%;
+                width: 75%;
                 color: #636363;
                 padding: 10px 20px;
                 text-align: center;
@@ -116,29 +116,26 @@
                 margin: 4px 2px;
                 cursor: pointer;
                 border-radius: 100px;">&nbsp; Download Report</button>  
-              </div>
+              
 
-                
+              
+                </div>
+
+                <div class="association" style="position: absolute; top: 80vh; left: 65px; max-width: 400px;">
+
+                  <p style="margin-bottom: 0px""><b style="font-weight: 12px;">In association with:</b></p>
+                  <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
+                  <img src="{% static 'bsc.webp' %}" alt="BSC" height="60px" style="padding-right: 10px;">
+                  <img src="{% static 'elixir.png' %}" alt="Elixir" height="50px" style="padding-right: 10px;">
+                  <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
+                  <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
+                  
+                </div>
                   
                   </form>
-                  {% if success %}
-                  {% if 'CONGRATULATIONS' in success %}
-                  <div class="green"><b>{{success}}</b></div>
-                  {% else %}
-                  <div class="red"><b>{{success}}</b></div>
-                  {% endif %}
-                  {% endif %}
 
-                  <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
 
-                    <p style="margin-bottom: -9px""><b style="font-weight: 12px;">In association with:</b></p>
-                    <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
-                    <img src="{% static 'bsc.webp' %}" alt="BSC" height="80px" style="padding-right: 10px;">
-                    <img src="{% static 'elixir.png' %}" alt="Elixir" height="60px">
-                    <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
-                    <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
-                    
-                  </div>
+
 
 
                   
@@ -155,6 +152,7 @@
             
             <div class="m-5">
               <div id="resultscards" class="m-2 mt-0" hidden="hidden">Results</div>
+              <a id="date" class="m-2 mt-0"></a>
             <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
               <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
@@ -583,6 +581,11 @@ body {
 
 
         if (taskStatus === 'SUCCESS') {
+          const now = new Date();
+
+          // get the current date and time as a string
+          const currentDateTime = now.toLocaleString();
+          document.getElementById('date').innerText=now;
           let resultscards = document.getElementById('resultscards');
           resultscards.removeAttribute("hidden");
           let element0 = document.getElementById('cardinitial');
@@ -664,6 +667,7 @@ body {
     document.getElementById("pdot22").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot23").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot2").removeAttribute("hidden");
+    document.getElementById("downl").removeAttribute("hidden");
     document.getElementById("stop-btn").value="no";
     console.log(document.getElementById("stop-btn").value);
     
@@ -886,7 +890,8 @@ body {
         document.getElementById("myBar").style.width = "100" + "%";
         document.getElementById("myPercent").innerText = "100" + "%";
         if (document.getElementById("stop-btn").value=="si"){
-        document.getElementById("myPercentext").innerText = "Validation completed"
+        document.getElementById("myPercentext").innerText = "Validation completed";
+        document.getElementById("downl").removeAttribute("hidden");
         document.getElementById("stop-btn").value="no";
         submitBtn2.removeAttribute("hidden");
         submitBtn.setAttribute("hidden", true);
@@ -915,6 +920,7 @@ body {
       submitBtn.disabled = true;
       document.getElementById("primerbutton").style.backgroundColor = "#ddd";
       document.getElementById("primerbutton").style.pointerEvents = "none";
+      document.getElementById("primerbutton").style.color = "#999999";
       document.getElementById("stop-btn").style.backgroundColor = "#CF7C3F";
       document.getElementById("stop-btn").style.pointerEvents = "all";
       document.getElementById("pdot").style.backgroundColor = "#636363";
