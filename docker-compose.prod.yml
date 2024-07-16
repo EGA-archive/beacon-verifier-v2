@@ -8,7 +8,7 @@ services:
       - staticfiles:/app/staticfiles
       - mediafiles:/app/mediafiles
     ports:
-      - 80:80
+      - 3015:80
       - 5555:5555
       - 15672:15672
     depends_on:

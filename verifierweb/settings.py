@@ -32,7 +32,7 @@ DEBUG = int(os.environ.get("DEBUG", default=1))
 
 #ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
 ALLOWED_HOSTS = ['localhost']
-CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org']
+CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org']
 
 STATICFILES_DIRS = [ os.path.join(PROJECT_DIR, "frontend/" )]
 
