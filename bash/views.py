@@ -161,11 +161,31 @@ def endpoint_check(url: str):
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            LOG.error('oleoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeoeeo')
-            LOG.error(total_response)
+
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
             LOG.error(logs)
             for log in logs:
+                if 'JSONDecodeError' not in str(log):
+                    endpoint_validation.append(str(log))
+                else:
+                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+
+            with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
+                response = json.load(f)
+            schema_path = 'file://{0}/'.format(
+                    os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
+            resolver = RefResolver(schema_path, response)
+            if endpoint in ['cohorts', 'datasets']:
+                resultsets=total_response["response"]["collections"]
+                for resultset in resultsets:
+                    logs_2=JSONSchemaValidator.validate(resultset, response, resolver)
+            else:
+                resultsets=total_response["response"]["resultSets"]
+                for resultset in resultsets:
+                    results = resultset["results"]
+                    for result in results:
+                        logs_2=JSONSchemaValidator.validate(result, response, resolver)
+            for log in logs_2:
                 if 'JSONDecodeError' not in str(log):
                     endpoint_validation.append(str(log))
                 else:
