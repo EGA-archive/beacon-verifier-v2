@@ -138,7 +138,7 @@ def endpoint_check(url: str):
         with open(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
-                os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json').replace("\\", "/"))
+                os.path.dirname(os.path.abspath("."+root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json')).replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
         LOG.error(total_response)
         logs=JSONSchemaValidator.validate(total_response, response, resolver)
