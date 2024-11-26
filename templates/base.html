@@ -121,7 +121,7 @@
               
                 </div>
 
-                <div class="association" style="position: absolute; top: 80vh; left: 65px; max-width: 400px;">
+                <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
 
                   <p style="margin-bottom: 0px""><b style="font-weight: 12px;">In association with:</b></p>
                   <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
@@ -146,7 +146,7 @@
               
                 
             </div>  
-            <div id="theresultscol" class="col" style="height: 95vh; overflow: scroll; margin-top: -15px;">
+            <div id="theresultscol" class="col" style="height: 93vh; overflow: scroll; margin-top: -15px;">
               <div id="messages" style="display: none; ">
             </div>
             
@@ -514,17 +514,26 @@
     display: none;
   }
 }
-
+html, body {
+    overflow: auto;
+}
 body {
   width: 100vw;
   max-width: 100%;
   overflow-x: hidden;
+  min-height: 100% !important;
 }
 
 @media only screen and (max-width: 1300px) {
   .association {
     display: none;
   }
+}
+
+@media only screen and (max-height: 800px) {
+.association {
+  display: none;
+}
 }
         </style>
 <script>
