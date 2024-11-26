@@ -100,7 +100,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
         schema_path = 'file:///{0}/'.format(
                 os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json').replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver, endpoint))
+        endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
     else:
         if granularity == 'record':
             if endpoint in ['cohorts', 'datasets']:
@@ -114,7 +114,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver, endpoint))
+            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
 
             
 
@@ -128,7 +128,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                 for resultset in resultsets:
                     dataset = resultset["id"]
                     endpoint_validation.append(dataset)
-                    endpoint_validation.append(JSONSchemaValidator.validate(resultset, response, resolver, endpoint))
+                    endpoint_validation.append(JSONSchemaValidator.validate(resultset, response, resolver))
             else:
                 resultsets=total_response["response"]["resultSets"]
                 for resultset in resultsets:
@@ -138,7 +138,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                     #print(results[0])
                     for result in results:
                         #print(result)
-                        endpoint_validation.append(JSONSchemaValidator.validate(result, response, resolver, endpoint))
+                        endpoint_validation.append(JSONSchemaValidator.validate(result, response, resolver))
         
         elif granularity == 'count':
             with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
@@ -146,7 +146,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver, endpoint))
+            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
 
         elif granularity == 'boolean':
             with open(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
@@ -154,7 +154,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver, endpoint))
+            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
     return endpoint_validation
 
 
@@ -163,6 +163,7 @@ def general_checks(url: str):
     output_validation=[]
     root_path = '/app/'
     new_url = url + '/map'
+    endpoint = '/map'
     f = requests.get(new_url)
     total_response = json.loads(f.text)
     resultsets = total_response["response"]
@@ -178,7 +179,7 @@ def general_checks(url: str):
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, map)
-    output_validation.append(JSONSchemaValidator.validate(total_response, map, resolver, endpoint))
+    output_validation.append(JSONSchemaValidator.validate(total_response, map, resolver))
 
     new_url = url + '/info'
     output_validation.append(new_url)
@@ -189,7 +190,7 @@ def general_checks(url: str):
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconInfoResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, info)
-    output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver, endpoint))
+    output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver))
 
     new_url = url + '/configuration'
     output_validation.append(new_url)
@@ -200,7 +201,7 @@ def general_checks(url: str):
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconConfigurationResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, configuration)
-    output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver, endpoint))
+    output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver))
 
     new_url = url + '/filtering_terms'
     output_validation.append(new_url)
@@ -211,7 +212,7 @@ def general_checks(url: str):
     schema_path = 'file:///{0}/'.format(
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconFilteringTermsResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, filtering_terms)
-    output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver, endpoint))
+    output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver))
 
     for endpoint in endpoints_to_verify:
         if endpoint.endswith('analyses') and 'd}' not in endpoint:
