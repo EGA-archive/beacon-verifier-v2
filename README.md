@@ -23,9 +23,14 @@ from django.core.management.utils import get_random_secret_key
 get_random_secret_key()
 ```
 
-To light up the container with beacon verifier v2, execute the next command inside the root folder (where docker-compose is located at):
+To light up the containers with beacon verifier v2, execute the next command inside the root folder (where docker-compose is located at):
 ```bash
 docker-compose up -d --build
+```
+
+To light up the containers for production, execute the next command:
+```bash
+docker compose -f docker-compose.prod.yml -p django-celery-prod up -d --build
 ```
 
 Once the container is up and running you can start using beacon verifier v2, congratulations!
