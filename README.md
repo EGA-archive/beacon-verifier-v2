@@ -45,7 +45,7 @@ docker exec verifier python verifier.py -url http://beacon:5050/api
 
 ## Excute verifier using the UI
 
-Please, open the verifier UI in your browser goint to http://localhost:8003.
+Please, open the verifier UI in your browser going to http://localhost:80 or http://localhost:3015 for production deployment.
 
 Introduce yor URL in the text form and click at Search:
 ![Beacon verifier v2 UI](https://github.com/EGA-archive/beacon-verifier-v2/blob/main/ui_image.png)
