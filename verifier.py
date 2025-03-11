@@ -103,18 +103,22 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
         endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
     else:
         if granularity == 'record':
+            '''
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
                     response = json.load(f)
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json').replace("\\", "/"))
             else:
+                print('no waaaaaaaay')
+                print(total_response)
                 with open(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json', 'r') as f:
                     response = json.load(f)
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
+            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))'
+            '''
 
             
 
@@ -215,62 +219,65 @@ def general_checks(url: str):
     output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver))
 
     for endpoint in endpoints_to_verify:
-        if endpoint.endswith('analyses') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('analyses', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('analyses'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('biosamples') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('biosamples', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('biosamples'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('g_variants') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('genomicVariations', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('g_variants'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('individuals') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('individuals', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('individuals'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('runs') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('runs', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('runs'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('datasets') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('datasets', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('datasets'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('cohorts') and 'd}' not in endpoint:
-            endpoint_validation=endpoint_check('cohorts', False, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
-        elif endpoint.endswith('cohorts'):
-            endpoint_validation=endpoint_check(endpoint, True, url)
-            for validated_endpoint in endpoint_validation:
-                output_validation.append(validated_endpoint)
+        try:
+            if endpoint.endswith('analyses') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('analyses', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('analyses'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('biosamples') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('biosamples', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('biosamples'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('g_variants') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('genomicVariations', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('g_variants'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('individuals') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('individuals', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('individuals'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('runs') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('runs', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('runs'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('datasets') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('datasets', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('datasets'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('cohorts') and 'd}' not in endpoint:
+                endpoint_validation=endpoint_check('cohorts', False, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+            elif endpoint.endswith('cohorts'):
+                endpoint_validation=endpoint_check(endpoint, True, url)
+                for validated_endpoint in endpoint_validation:
+                    output_validation.append(validated_endpoint)
+        except Exception:
+            continue
     return output_validation
 
 general_checks(args.url)

@@ -1,7 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "additionalProperties": true,
-    "definitions": {
+    "$defs": {
         "ResultsetInstance": {
             "additionalProperties": true,
             "properties": {
@@ -29,9 +27,10 @@
                     "type": "integer"
                 },
                 "resultsHandovers": {
-                    "$ref": "../../common/beaconCommonComponents.json#/definitions/ListOfHandovers",
+                    "$ref": "../../common/beaconCommonComponents.json#/$defs/ListOfHandovers",
                     "description": "List of handovers that apply to this resultset, not to the whole Beacon or to a result in particular."
                 },
+                "returnedGranularity": { "const": "record" },
                 "setType": {
                     "default": "dataset",
                     "description": "Entry type of resultSet. It SHOULD MATCH an entry type declared as collection in the Beacon configuration.",
@@ -43,18 +42,22 @@
                 "setType",
                 "exists",
                 "resultsCount",
-                "results"
-            ]
+                "results",
+                "returnedGranularity"
+            ],
+            "type": "object"
         }
     },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": true,
     "description": "Sets of results to be returned as query response.",
     "properties": {
         "$schema": {
-            "$ref": "../../common/beaconCommonComponents.json#/definitions/$schema"
+            "$ref": "../../common/beaconCommonComponents.json#/$defs/$schema"
         },
         "resultSets": {
             "items": {
-                "$ref": "#/definitions/ResultsetInstance"
+                "$ref": "#/$defs/ResultsetInstance"
             },
             "minItems": 0,
             "type": "array"
