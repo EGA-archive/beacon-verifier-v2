@@ -895,7 +895,7 @@ body {
         const submitBtn = yourForm.querySelector('button[type="submit"]');
         const submitBtn2 = yourForm.querySelector('button[type="button"]');
         const submitBtn3 = yourForm.querySelector('button[type="disabled"]');
- 
+        await sleep(15000)
         document.getElementById("myBar").style.width = "100" + "%";
         document.getElementById("myPercent").innerText = "100" + "%";
         if (document.getElementById("stop-btn").value=="si"){
