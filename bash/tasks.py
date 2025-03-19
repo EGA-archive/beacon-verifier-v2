@@ -55,6 +55,8 @@ def sample_task_filtering_terms(self, url_link):
 
 @shared_task(bind=True, base=AbortableTask)
 def sample_task_endpoints(self, url_link):
+    if '}/g_variants' in url_link:
+        return [url_link, []]
     from bash.views import endpoint_check
     if self.is_aborted():
         return 'Task stopped!'
