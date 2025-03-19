@@ -140,5 +140,4 @@ conf/__pycache__/*
 __pycache__/*
 test
 
-ref_schemas
 test.py
