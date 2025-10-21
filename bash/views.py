@@ -159,7 +159,6 @@ def endpoint_check(url: str):
                 endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     else:
         if granularity == 'record':
-            '''
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
                     response = json.load(f)
@@ -170,7 +169,7 @@ def endpoint_check(url: str):
                     response = json.load(f)
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
-            resolver = RefResolver(schema_path, response)'
+            resolver = RefResolver(schema_path, response)
             
 
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
@@ -180,7 +179,6 @@ def endpoint_check(url: str):
                     endpoint_validation.append(str(log))
                 else:
                     endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-            '''
             LOG.warning('validating model')
             with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
                 response = json.load(f)

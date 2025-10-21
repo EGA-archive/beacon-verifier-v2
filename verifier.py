@@ -103,7 +103,6 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
         endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
     else:
         if granularity == 'record':
-            '''
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
                     response = json.load(f)
@@ -117,11 +116,7 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))'
-            '''
-
-            
-
+            endpoint_validation.append(JSONSchemaValidator.validate(total_response, response, resolver))
             with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file://{0}/'.format(
