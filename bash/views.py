@@ -25,9 +25,6 @@ from django.views.decorators.csrf import csrf_exempt                 # new
 logger = logging.getLogger(__name__)
 
 
-
-
-
 def list_endpoints(list_of_endpoints, endpoints):
     for k, v in endpoints.items():
         for k2, v2 in v.items():
@@ -46,6 +43,7 @@ def list_endpoints(list_of_endpoints, endpoints):
 
 
 def endpoint_check(url: str):
+    LOG.error(url)
     endpoint_validation=[]
     is_error = False
     is_appended = False
@@ -75,11 +73,12 @@ def endpoint_check(url: str):
         except Exception as e:
             LOG.error('what happened to ... {}'.format(new_url))
             endpoint_validation.append(e)
+            return endpoint_validation
         try:
             if url_part[-3] == 'g_variants':
                 id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
                 LOG.error('the urlis {} and the id is.... {}'.format(url,id))
-                url = url.replace('{variantInternalId}', id)
+                url = url.replace('{id}', id)
             elif url_part[-3] == 'cohorts':
                 LOG.error('cohorts response is...')
                 LOG.error(total_response)
@@ -95,7 +94,13 @@ def endpoint_check(url: str):
                 LOG.error('the urlis {} and the id is.... {}'.format(url,id))
                 url = url.replace('{id}', id)
         except Exception as e:
-            LOG.error('what happened 2 to ... {}'.format(new_url))
+            LOG.error('what happened 2 to ... {}'.format(url))
+            if is_appended:
+                pass
+            else:
+                endpoint_validation.append(url)
+            endpoint_validation.append('Could not find any record id to validate this endpoint')
+            return endpoint_validation
 
         LOG.error('the brand new url is ... {}'.format(url))
         f = requests.get(url)
@@ -105,6 +110,10 @@ def endpoint_check(url: str):
             total_response = json.loads(f.text)
             LOG.error(total_response)
         except Exception as e:
+            if is_appended:
+                pass
+            else:
+                endpoint_validation.append(url)
             endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
             return endpoint_validation
     if endpoint == 'g_variants':
@@ -172,6 +181,7 @@ def endpoint_check(url: str):
                 else:
                     endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
             '''
+            LOG.warning('validating model')
             with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file://{0}/'.format(
@@ -184,14 +194,18 @@ def endpoint_check(url: str):
             else:
                 resultsets=total_response["response"]["resultSets"]
                 for resultset in resultsets:
+                    LOG.warning('validating model record for {}'.format(url))
                     results = resultset["results"]
                     for result in results:
                         logs_2=JSONSchemaValidator.validate(result, response, resolver)
-            for log in logs_2:
-                if 'JSONDecodeError' not in str(log):
-                    endpoint_validation.append(str(log))
-                else:
-                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            try:
+                for log in logs_2:
+                    if 'JSONDecodeError' not in str(log):
+                        endpoint_validation.append(str(log))
+                    else:
+                        endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            except Exception:
+                pass
         
         elif granularity == 'count':
             with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
@@ -202,11 +216,14 @@ def endpoint_check(url: str):
             LOG.error(total_response)
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
             LOG.error(logs)
-            for log in logs:
-                if 'JSONDecodeError' not in str(log):
-                    endpoint_validation.append(str(log))
-                else:
-                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            try:
+                for log in logs:
+                    if 'JSONDecodeError' not in str(log):
+                        endpoint_validation.append(str(log))
+                    else:
+                        endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            except Exception:
+                pass
 
 
         elif granularity == 'boolean':
@@ -223,6 +240,7 @@ def endpoint_check(url: str):
                     endpoint_validation.append(str(log))
                 else:
                     endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+    LOG.error('{} endpoint validation is: {}'.format(url, endpoint_validation))
     return endpoint_validation
 
 
@@ -361,30 +379,6 @@ def verify_command(value):
 
     return bash
 
-def validate_beacon(url_link):
-    
-    count=0
-    bash_out = general_checks(url_link)
-    new_bash_out=[]
-    for bashed in bash_out:
-        if bashed != []:
-            if isinstance(bashed, list):
-                count+=1
-                for basheditem in bashed:
-                    new_bash_out.append(basheditem)
-            else:
-                new_bash_out.append(bashed)
-
-
-    
-
-    if count ==0:
-        success = 'CONGRATULATIONS! The review finished and your beacon has successfully passed the tests.'
-    else:
-        success = 'ERRORS FOUND! Your beacon has some errors, please review them and verify it back.'
-    return new_bash_out, success
-
-
 def bash_view(request):
     template = "home.html"
     form =BamForm()
@@ -436,96 +430,6 @@ def task_status(request):
                 'state': state,
             }
         return JsonResponse(response)
-
-def phenopackets_view(request):
-    template = "phenopackets.html"
-    form =AgeOfOnsetForm()
-    file = 'not loaded'
-    context = {'form': form, 'file': file}
-    view = 'YES'
-    if request.method == 'POST':
-        view = 'YES'
-        file = 'loaded'
-        form = NewForm()
-        context = {
-            'file':file,
-            'form': form,
-            'view': view
-
-        }
-        view='YES'
-        if request.method == 'POST':
-            form = NewForm(request.POST)
-            
-            
-            if form.is_valid():
-
-                form = NewForm(request.POST)
-                if form.is_valid():
-                    
-                    filters=[]
-                    if form.cleaned_data['biosampleId'] == True:
-                        biosampleId={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P0Y","scope":"individual"}
-                        filters.append(biosampleId)
-                    if form.cleaned_data['individualId'] == True:
-                        individualId={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P0Y","scope":"individual"}
-                        filters.append(individualId)
-                    if form.cleaned_data['sampledTissue'] == True:
-                        sampledTissue={"id":"ICD10:C18.7", "scope":"biosample"}
-                        filters.append(sampledTissue)
-                    if form.cleaned_data['timeOfCollection'] == True:
-                        timeOfCollection={"id":"diseases.ageOfOnset.iso8601duration","operator": "=", "value": "P77Y","scope":"individual"}
-                        filters.append(timeOfCollection)
-                    if form.cleaned_data['histologicalDiagnosis'] == True:
-                        histologicalDiagnosis={"id":"ICDO3:8480/3", "scope":"biosample"}
-                        filters.append(histologicalDiagnosis)
-                    if form.cleaned_data['tumorProgression'] == True:
-                        tumorProgression={"id":"NCIT:C27979", "scope":"biosample"}
-                        filters.append(tumorProgression)
-                    if form.cleaned_data['tumorGrade'] == True:
-                        tumorGrade={"id":"NCIT:C27979", "scope":"individual"}
-                        filters.append(tumorGrade)
-
-
-                    post_data = {"meta": {"apiVersion": "2.0"},
-            "query":{ "requestParameters": {        },
-                "filters": filters,
-                "includeResultsetResponses": "HIT",
-                "pagination": {
-                    "skip": 0,
-                    "limit": 10
-                },
-                "requestedGranularity": "record"
-            }
-
-
-
-                    }
-                    response = requests.post('https://beacon-apis-demo.ega-archive.org/api/individuals', json=post_data)
-                    content = response.content
-                    content = json.loads(content)
-                    try:
-                        count = content['responseSummary']['numTotalResults']
-                    except Exception:
-                        count = '0'
-
-
-
-        
-                    context = {
-                        'file':file,
-                        'prequest': post_data,
-                        'bash_out': count,
-                        'view': view,
-                        'form': form
-
-                    }
-                    
-
-                    return render(request, 'phenopackets.html', context)
-            
-        return render(request, 'phenopackets.html', context)
-    return render(request, template, context)
 
 @csrf_exempt
 def web(request):
