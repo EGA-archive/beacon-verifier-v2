@@ -133,17 +133,20 @@ def endpoint_check(url: str):
             granularity = meta["receivedRequestSummary"]["requestedGranularity"]
         except Exception:
             granularity = 'record'
+    LOG.error(granularity)
     if endpoint in ['cohorts', 'datasets']:
         try:
             resultsets = total_response["response"]["collections"]
         except Exception:
             resultsets = total_response["response"]["resultSets"]
-    else:
+    elif granularity == 'record':
         try:
             resultsets=total_response["response"]["resultSets"][0]["results"]
         except Exception:
-            granularity = 'boolean'
+            endpoint_validation.append('No results found')
+            return endpoint_validation
     if is_error == True:
+        LOG.error("I'm an error")
         with open(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
@@ -158,6 +161,7 @@ def endpoint_check(url: str):
             else:
                 endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     else:
+        LOG.error("I am the {}".format(granularity))
         if granularity == 'record':
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
@@ -206,6 +210,7 @@ def endpoint_check(url: str):
                 pass
         
         elif granularity == 'count':
+            LOG.warning(granularity)
             with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file:///{0}/'.format(
