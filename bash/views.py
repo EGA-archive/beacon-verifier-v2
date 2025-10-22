@@ -141,9 +141,11 @@ def endpoint_check(url: str):
             resultsets = total_response["response"]["resultSets"]
     elif granularity == 'record':
         try:
-            resultsets=total_response["response"]["resultSets"][0]["results"]
+            resultsets=total_response["response"]["resultSets"]
+            if resultsets != []:
+                resultsets=total_response["response"]["resultSets"][0]["results"]
         except Exception:
-            endpoint_validation.append('No results found')
+            endpoint_validation.append('No results found for a record granularity returned response')
             return endpoint_validation
     if is_error == True:
         LOG.error("I'm an error")
