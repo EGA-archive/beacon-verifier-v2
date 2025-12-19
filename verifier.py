@@ -109,8 +109,6 @@ def endpoint_check(endpoint:str, id_parameter: bool, url: str):
                 schema_path = 'file:///{0}/'.format(
                         os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json').replace("\\", "/"))
             else:
-                print('no waaaaaaaay')
-                print(total_response)
                 with open(root_path+'ref_schemas/framework/json/responses/beaconResultsetsResponse.json', 'r') as f:
                     response = json.load(f)
                 schema_path = 'file:///{0}/'.format(

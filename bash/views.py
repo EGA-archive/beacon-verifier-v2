@@ -49,7 +49,6 @@ def endpoint_check(url: str):
     is_appended = False
     root_path = '/app/'
     if 'd}' in url:
-        LOG.error('eoeoeoeo is {}'.format(url))
         id_parameter = True
     else:
         id_parameter = False
@@ -66,49 +65,140 @@ def endpoint_check(url: str):
 
         last_part = url.split('{')
         new_url = last_part[0][0:-1]
-        LOG.error('the endpoint is {} and the url is.... {}'.format(endpoint,new_url))
         try:
             f = requests.get(new_url)
             total_response = json.loads(f.text)
         except Exception as e:
-            LOG.error('what happened to ... {}'.format(new_url))
             endpoint_validation.append(e)
             return endpoint_validation
-        try:
+        try:                
+            
             if url_part[-3] == 'g_variants':
-                id = total_response["response"]["resultSets"][0]["results"][0]["variantInternalId"]
-                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
-                url = url.replace('{id}', id)
+                for resultSetsarray in total_response["response"]["resultSets"]:
+                    try:
+                        id = resultSetsarray["results"][0]["variantInternalId"]
+                        url = url.replace('{id}', id)
+                        break
+                    except Exception:
+                        continue
             elif url_part[-3] == 'cohorts':
-                LOG.error('cohorts response is...')
-                LOG.error(total_response)
-                id = total_response["response"]["collections"][0]["id"]
-                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
-                url = url.replace('{id}', id)
+                for collectionsarray in total_response["response"]["collections"]:
+                    try:
+                        id = collectionsarray["id"]
+                        url = url.replace('{id}', id)
+                        break
+                    except Exception:
+                        continue
             elif url_part[-3] == 'datasets':
-                id = total_response["response"]["collections"][0]["id"]
-                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
-                url = url.replace('{id}', id)
+                for collectionsarray in total_response["response"]["collections"]:
+                    try:
+                        id = collectionsarray["id"]
+                        url = url.replace('{id}', id)
+                        break
+                    except Exception:
+                        continue
             else:
-                id = total_response["response"]["resultSets"][0]["results"][0]["id"]
-                LOG.error('the urlis {} and the id is.... {}'.format(url,id))
-                url = url.replace('{id}', id)
+                for resultSetsarray in total_response["response"]["resultSets"]:
+                    try:
+                        id = resultSetsarray["results"][0]["id"]
+                        url = url.replace('{id}', id)
+                        break
+                    except Exception:
+                        continue
         except Exception as e:
-            LOG.error('what happened 2 to ... {}'.format(url))
             if is_appended:
                 pass
             else:
                 endpoint_validation.append(url)
-            endpoint_validation.append('Could not find any record id to validate this endpoint')
+            endpoint_validation.append({
+                                    "errorMessage": 'Internal Server Error (500)',
+                                    "schema": {
+                                        "path": ["response", "resultSets", 0, "results", 0],
+                                        "definition": {
+                                            "$defs": {
+                                                "ResultsetInstance": {
+                                                    "additionalProperties": True,
+                                                    "properties": {
+                                                        "countAdjustedTo": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/CountAdjustedTo"
+                                                        },
+                                                        "countPrecision": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/CountPrecision"
+                                                        },
+                                                        "exists": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "id": {
+                                                            "description": "id of the resultset",
+                                                            "example": "datasetA",
+                                                            "type": "string"
+                                                        },
+                                                        "info": {
+                                                            "$ref": "../../common/info.json"
+                                                        },
+                                                        "results": {
+                                                            "items": {
+                                                                "type": "object"
+                                                            },
+                                                            "minItems": 0,
+                                                            "type": "array"
+                                                        },
+                                                        "resultsCount": {
+                                                            "description": "Precise or approximate number of results in this Resultset.",
+                                                            "type": "integer"
+                                                        },
+                                                        "resultsHandovers": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/ListOfHandovers",
+                                                            "description": "List of handover objects that apply to this resultset, not to the whole Beacon or to a result in particular."
+                                                        },
+                                                        "setType": {
+                                                            "default": "dataset",
+                                                            "description": "Entry type of resultSet. It SHOULD MATCH an entry type declared as collection in the Beacon configuration.",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "setType",
+                                                        "exists"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                                            "additionalProperties": True,
+                                            "description": "Sets of results to be returned as query response.",
+                                            "properties": {
+                                                "$schema": {
+                                                    "$ref": "../../common/beaconCommonComponents.json#/$defs/$schema"
+                                                },
+                                                "resultSets": {
+                                                    "items": {
+                                                        "$ref": "#/$defs/ResultsetInstance"
+                                                    },
+                                                    "minItems": 0,
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "required": [
+                                                "resultSets"
+                                            ],
+                                            "title": "Beacon ResultSet",
+                                            "type": "object"
+                                        }
+                                                                            },
+                                    "received": {
+                                        "path": ["response", "resultSets", 0, "results", 0],
+                                        "value": total_response,
+                                    }
+                                })
             return endpoint_validation
 
-        LOG.error('the brand new url is ... {}'.format(url))
         f = requests.get(url)
         endpoint_validation.append(url)
         is_appended = True
         try:
             total_response = json.loads(f.text)
-            LOG.error(total_response)
         except Exception as e:
             if is_appended:
                 pass
@@ -133,37 +223,58 @@ def endpoint_check(url: str):
             granularity = meta["receivedRequestSummary"]["requestedGranularity"]
         except Exception:
             granularity = 'record'
-    LOG.error(granularity)
     if endpoint in ['cohorts', 'datasets']:
         try:
             resultsets = total_response["response"]["collections"]
         except Exception:
-            resultsets = total_response["response"]["resultSets"]
-    elif granularity == 'record':
-        try:
-            resultsets=total_response["response"]["resultSets"]
-            if resultsets != []:
-                resultsets=total_response["response"]["resultSets"][0]["results"]
-        except Exception:
-            endpoint_validation.append('No results found for a record granularity returned response')
-            return endpoint_validation
+            endpoint_validation.append({
+                                        "errorMessage": 'Internal Server Error (500)',
+                                        "schema": {
+                                            "path": ["response", "collections"],
+                                            "definition": {
+                                                    "additionalProperties": True,
+                                                    "description": "Returning the Beacon Collections list, filtered or unfiltered.",
+                                                    "properties": {
+                                                        "collections": {
+                                                            "items": {
+                                                                "type": "object"
+                                                            },
+                                                            "minItems": 0,
+                                                            "type": "array"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "collections"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                                                                },
+                                        "received": {
+                                            "path": ["response", "collections"],
+                                            "value": total_response,
+                                        }
+                                    })
+        return endpoint_validation
     if is_error == True:
-        LOG.error("I'm an error")
         with open(root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json', 'r') as f:
             response = json.load(f)
         schema_path = 'file:///{0}/'.format(
                 os.path.dirname(os.path.abspath("."+root_path+'ref_schemas/framework/json/responses/beaconErrorResponse.json')).replace("\\", "/"))
         resolver = RefResolver(schema_path, response)
-        LOG.error(total_response)
         logs=JSONSchemaValidator.validate(total_response, response, resolver)
-        LOG.error(logs)
         for log in logs:
-            if 'JSONDecodeError' not in str(log):
-                endpoint_validation.append(str(log))
-            else:
-                endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+            endpoint_validation.append({
+                "errorMessage": log["message"],
+                "schema": {
+                    "path": log["schema_path"],
+                    "definition": log["schema"],
+                },
+                "received": {
+                    "path": log["instance_path"],
+                    "value": log["instance"],
+                }
+            })
     else:
-        LOG.error("I am the {}".format(granularity))
         if granularity == 'record':
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
@@ -179,37 +290,167 @@ def endpoint_check(url: str):
             
 
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
-            LOG.error(logs)
             for log in logs:
-                if 'JSONDecodeError' not in str(log):
-                    endpoint_validation.append(str(log))
-                else:
-                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-            LOG.warning('validating model')
+                endpoint_validation.append({
+                    "errorMessage": log["message"],
+                    "schema": {
+                        "path": log["schema_path"],
+                        "definition": log["schema"],
+                    },
+                    "received": {
+                        "path": log["instance_path"],
+                        "value": log["instance"],
+                    }
+                })
             with open(root_path+'ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file://{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/models/json/beacon-v2-default-model/'+endpoint+'/defaultSchema.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
             if endpoint in ['cohorts', 'datasets']:
-                resultsets=total_response["response"]["collections"]
-                for resultset in resultsets:
-                    logs_2=JSONSchemaValidator.validate(resultset, response, resolver)
+                try:
+                    resultsets=total_response["response"]["collections"]
+                    for resultset in resultsets:
+                        logs_2=JSONSchemaValidator.validate(resultset, response, resolver)
+                except Exception:
+                    endpoint_validation.append({
+                                            "errorMessage": 'Internal Server Error (500)',
+                                            "schema": {
+                                                "path": ["response", "collections"],
+                                                "definition": {
+                                                        "additionalProperties": True,
+                                                        "description": "Returning the Beacon Collections list, filtered or unfiltered.",
+                                                        "properties": {
+                                                            "collections": {
+                                                                "items": {
+                                                                    "type": "object"
+                                                                },
+                                                                "minItems": 0,
+                                                                "type": "array"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "collections"
+                                                        ],
+                                                        "type": "object"
+                                                    }
+                                                                                    },
+                                            "received": {
+                                                "path": ["response", "collections"],
+                                                "value": total_response,
+                                            }
+                                        })
+                    return endpoint_validation
             else:
-                resultsets=total_response["response"]["resultSets"]
+                try:
+                    resultsets=total_response["response"]["resultSets"]
+                except Exception:
+                    endpoint_validation.append({
+                                    "errorMessage": 'Internal Server Error (500)',
+                                    "schema": {
+                                        "path": ["response", "resultSets"],
+                                        "definition": {
+                                            "$defs": {
+                                                "ResultsetInstance": {
+                                                    "additionalProperties": True,
+                                                    "properties": {
+                                                        "countAdjustedTo": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/CountAdjustedTo"
+                                                        },
+                                                        "countPrecision": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/CountPrecision"
+                                                        },
+                                                        "exists": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "id": {
+                                                            "description": "id of the resultset",
+                                                            "example": "datasetA",
+                                                            "type": "string"
+                                                        },
+                                                        "info": {
+                                                            "$ref": "../../common/info.json"
+                                                        },
+                                                        "results": {
+                                                            "items": {
+                                                                "type": "object"
+                                                            },
+                                                            "minItems": 0,
+                                                            "type": "array"
+                                                        },
+                                                        "resultsCount": {
+                                                            "description": "Precise or approximate number of results in this Resultset.",
+                                                            "type": "integer"
+                                                        },
+                                                        "resultsHandovers": {
+                                                            "$ref": "../../common/beaconCommonComponents.json#/$defs/ListOfHandovers",
+                                                            "description": "List of handover objects that apply to this resultset, not to the whole Beacon or to a result in particular."
+                                                        },
+                                                        "setType": {
+                                                            "default": "dataset",
+                                                            "description": "Entry type of resultSet. It SHOULD MATCH an entry type declared as collection in the Beacon configuration.",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "setType",
+                                                        "exists"
+                                                    ],
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                                            "additionalProperties": True,
+                                            "description": "Sets of results to be returned as query response.",
+                                            "properties": {
+                                                "$schema": {
+                                                    "$ref": "../../common/beaconCommonComponents.json#/$defs/$schema"
+                                                },
+                                                "resultSets": {
+                                                    "items": {
+                                                        "$ref": "#/$defs/ResultsetInstance"
+                                                    },
+                                                    "minItems": 0,
+                                                    "type": "array"
+                                                }
+                                            },
+                                            "required": [
+                                                "resultSets"
+                                            ],
+                                            "title": "Beacon ResultSet",
+                                            "type": "object"
+                                        }
+                                                                            },
+                                    "received": {
+                                        "path": ["response", "resultSets"],
+                                        "value": total_response,
+                                    }
+                                })
+                    return endpoint_validation
                 for resultset in resultsets:
                     LOG.warning('validating model record for {}'.format(url))
-                    results = resultset["results"]
+                    try:
+                        results = resultset["results"]
+                    except Exception:
+                        continue
                     for result in results:
                         logs_2=JSONSchemaValidator.validate(result, response, resolver)
-            try:
-                for log in logs_2:
-                    if 'JSONDecodeError' not in str(log):
-                        endpoint_validation.append(str(log))
-                    else:
-                        endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-            except Exception:
-                pass
+                    try:
+                        for log in logs_2:
+                            endpoint_validation.append({
+                                "errorMessage": log["message"],
+                                "schema": {
+                                    "path": log["schema_path"],
+                                    "definition": log["schema"],
+                                },
+                                "received": {
+                                    "path": log["instance_path"],
+                                    "value": log["instance"],
+                                }
+                            })
+                    except Exception:
+                        pass
         
         elif granularity == 'count':
             LOG.warning(granularity)
@@ -218,17 +459,19 @@ def endpoint_check(url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            LOG.error(total_response)
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
-            LOG.error(logs)
-            try:
-                for log in logs:
-                    if 'JSONDecodeError' not in str(log):
-                        endpoint_validation.append(str(log))
-                    else:
-                        endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-            except Exception:
-                pass
+            for log in logs:
+                endpoint_validation.append({
+                    "errorMessage": log["message"],
+                    "schema": {
+                        "path": log["schema_path"],
+                        "definition": log["schema"],
+                    },
+                    "received": {
+                        "path": log["instance_path"],
+                        "value": log["instance"],
+                    }
+                })
 
 
         elif granularity == 'boolean':
@@ -237,15 +480,20 @@ def endpoint_check(url: str):
             schema_path = 'file:///{0}/'.format(
                     os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json').replace("\\", "/"))
             resolver = RefResolver(schema_path, response)
-            LOG.error(total_response)
             logs=JSONSchemaValidator.validate(total_response, response, resolver)
-            LOG.error(logs)
             for log in logs:
-                if 'JSONDecodeError' not in str(log):
-                    endpoint_validation.append(str(log))
-                else:
-                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-    LOG.error('{} endpoint validation is: {}'.format(url, endpoint_validation))
+                endpoint_validation.append({
+                    "errorMessage": log["message"],
+                    "schema": {
+                        "path": log["schema_path"],
+                        "definition": log["schema"],
+                    },
+                    "received": {
+                        "path": log["instance_path"],
+                        "value": log["instance"],
+                    }
+                })
+    LOG.error(endpoint_validation)
     return endpoint_validation
 
 
@@ -276,7 +524,6 @@ def map_check(url: str):
             os.path.dirname(root_path+'ref_schemas/framework/json/responses/beaconMapResponse.json').replace("\\", "/"))
     resolver = RefResolver(schema_path, map)
     logs=JSONSchemaValidator.validate(total_response, map, resolver)
-    LOG.error(logs)
     for log in logs:
         if 'JSONDecodeError' not in str(log):
             output_validation.append(str(log))
@@ -290,10 +537,8 @@ def info_check(url: str):
     new_url = url
     output_validation.append(new_url)
     f = requests.get(new_url)
-    LOG.error(f.text)
     try:
         total_response = json.loads(f.text)
-        LOG.error(total_response)
     except Exception as e:
         output_validation.append(e)
 
@@ -453,7 +698,6 @@ def channel(request):
     if request.method == 'POST':
         form = BamForm(request.POST)
         if form.is_valid():
-            LOG.error(form.cleaned_data['url_link'])
             if form.cleaned_data['url_link'].endswith('info'):
                 validation=[]
                 task = sample_task_info.delay(form.cleaned_data['url_link'])
@@ -534,7 +778,6 @@ def channel(request):
                     map_out = task.get()
                     validation = map_out[1:]
                 except Exception as e:
-                    LOG.error('uolollolollololollollolololo')
                     validation.append(e)
                     map_out=[]
                     map_out.append(form.cleaned_data['url_link'])
@@ -550,13 +793,9 @@ def channel(request):
                 })
             else:
                 validation=[]
-                LOG.error(type(form.cleaned_data['url_link']))
-                LOG.error('yeaaaaaah')
                 task = sample_task.delay(form.cleaned_data['url_link'])
-                LOG.error(task)
                 try:
                     map_out = task.get()
-                    LOG.error(map_out)
                     validation = map_out[1][1:]
                     initial_list=[]
                     initial_list.append(form.cleaned_data['url_link']+'/info')
@@ -565,8 +804,6 @@ def channel(request):
                     for map in map_out[0]:
                         initial_list.append(map)
                 except Exception as e:
-                    LOG.error('whaaaat')
-                    LOG.error(e)
                     initial_list=[]
                     validation=[]
                     validation.append(e)
@@ -575,12 +812,9 @@ def channel(request):
 
                 validated=''
                 for validating in validation:
-                    LOG.error(validating)
-                    LOG.error(type(validating))
                     if validating != []:
                         validating=str(validating)
                         validated=validated+'<br/>'+validating
-                LOG.error(validated)
                 return JsonResponse({
                     'task_id': task.task_id,
                     'bash_out': initial_list,

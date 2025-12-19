@@ -665,6 +665,42 @@ body {
     return cookieValue;
   }
 
+function groupErrorsByUrl(map_out) {
+    const results = [];
+    let currentUrl = null;
+
+    map_out.forEach(item => {
+        if (typeof item === 'string') {
+            currentUrl = item;
+            results.push({
+                title: currentUrl,
+                errors: []
+            });
+        } else if (item && item.errorMessage) {
+            if (!currentUrl) {
+                currentUrl = "No URL available";
+                results.push({
+                    title: currentUrl,
+                    errors: []
+                });
+            }
+
+            const path = item.received?.path || [];
+            const value = item.received?.value;
+            const formattedMessage = `${item.errorMessage} at path: ${path.join(' -> ')} (received value: ${JSON.stringify(value)})`;
+
+            // **Store both message and raw error**
+            const lastGroup = results[results.length - 1];
+            lastGroup.errors.push({
+                message: formattedMessage,
+                raw: item
+            });
+        }
+    });
+
+    return results;
+}
+
   function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
@@ -697,7 +733,6 @@ body {
             const rsved = yourMessage.querySelector('#resulted_validation');
             rsved.innerHTML = mapvalidation
             if (mapvalidation == '') {
-              console.log('hoalaaa')
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
               yourMessage.append(heart)
@@ -810,7 +845,6 @@ body {
             rsv.innerHTML = map_out[0]
           }
           if (validation == '') {
-              console.log('hoalaaa')
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
               yourMessage.append(heart)
@@ -819,7 +853,19 @@ body {
               checks = checks + 1;
               const yoursummary = document.getElementById("check")
               yoursummary.innerText = checks;
-            } else {
+            } else if(map_out[1].errorMessage?.includes("Internal Server Error")){
+              var heart = document.createElement('i')
+              heart.className = 'bi-x-circle'
+              yourMessage.append(heart)
+              yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
+              yourMessage.style.borderColor = "#B85353";
+              errors = errors + 1;
+              const yoursummary = document.getElementById("error")
+              yoursummary.innerText = errors;
+
+            }
+            
+            else {
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
               yourMessage.append(heart)
@@ -830,7 +876,32 @@ body {
               const yoursummary = document.getElementById("warning")
               yoursummary.innerText = warnings;
             }
-            rsved.innerHTML = validation
+          const groupedData = groupErrorsByUrl(map_out);
+
+          const errorsHTML = groupedData.flatMap(group => {
+              return group.errors.map((errorObj, index) => {
+                  const raw = errorObj.raw;
+                  const path = raw.received?.path || [];
+                  const value = raw.received?.value;
+                  const schema = raw.schema?.definition || {};
+
+                  return `
+                  <details>
+                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
+                      <details>
+                          <summary>Expected schema</summary>
+                          <pre>${JSON.stringify(schema, null, 2)}</pre>
+                      </details>
+                      <details>
+                          <summary>Received response & path</summary>
+                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
+                      </details>
+                  </details>
+                  <br>`;
+              });
+          }).join('<hr>'); // separate each error visually
+
+          rsved.innerHTML = errorsHTML;
             
           if (iteration == '0'){
             console.log(map_out[0][0])
@@ -892,7 +963,32 @@ body {
           yoursummary.innerText = errors;
           //errors = errors + 1;
           //document.getElementById(error).style.innerText = errors;
-            rsved.innerHTML = validation
+          const groupedData = groupErrorsByUrl(map_out);
+
+          const errorsHTML = groupedData.flatMap(group => {
+              return group.errors.map((errorObj, index) => {
+                  const raw = errorObj.raw;
+                  const path = raw.received?.path || [];
+                  const value = raw.received?.value;
+                  const schema = raw.schema?.definition || {};
+
+                  return `
+                  <details>
+                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
+                      <details>
+                          <summary>Expected schema</summary>
+                          <pre>${JSON.stringify(schema, null, 2)}</pre>
+                      </details>
+                      <details>
+                          <summary>Received response & path</summary>
+                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
+                      </details>
+                  </details>
+                  <br>`;
+              });
+          }).join('<hr>'); // separate each error visually
+
+          rsved.innerHTML = errorsHTML;
           if (iteration == '0'){
             console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
