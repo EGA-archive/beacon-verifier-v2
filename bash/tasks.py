@@ -10,56 +10,24 @@ from celery.result import AsyncResult
 
 logger = get_task_logger(__name__)
 
-
 @shared_task(bind=True, base=AbortableTask)
-def sample_task(self, url_link):
-    from bash.views import map_check
+def verification(self, url_link, function_name):
+    from bash.views import info_check, endpoint_check, filtering_terms_check, error_check, configuration_check, map_check
+
+    functions = {
+        "info_check": info_check,
+        "endpoint_check": endpoint_check,
+        "filtering_terms_check": filtering_terms_check,
+        "error_check": error_check,
+        "configuration_check": configuration_check,
+        "map_check": map_check
+    }
+
     if self.is_aborted():
         return 'Task stopped!'
-
-    endpoints, bash_out = map_check(url_link)
-    return endpoints, bash_out
-
-@shared_task(bind=True, base=AbortableTask)
-def sample_task_info(self, url_link):
-    from bash.views import info_check
-    if self.is_aborted():
-        return 'Task stopped!'
-
-    bash_out = info_check(url_link)
-    return bash_out
-
-@shared_task(bind=True, base=AbortableTask)
-def sample_task_configuration(self, url_link):
-    from bash.views import configuration_check
-    if self.is_aborted():
-        return 'Task stopped!'
-    bash_out = configuration_check(url_link)
-    return bash_out
-
-@shared_task(bind=True, base=AbortableTask)
-def sample_task_error(self, url_link):
-    from bash.views import error_check
-    if self.is_aborted():
-        return 'Task stopped!'
-    bash_out = error_check(url_link)
-    return bash_out
-
-@shared_task(bind=True, base=AbortableTask)
-def sample_task_filtering_terms(self, url_link):
-    from bash.views import filtering_terms_check
-    if self.is_aborted():
-        return 'Task stopped!'
-    bash_out = filtering_terms_check(url_link)
-    return bash_out
-
-@shared_task(bind=True, base=AbortableTask)
-def sample_task_endpoints(self, url_link):
-    from bash.views import endpoint_check
-    if self.is_aborted():
-        return 'Task stopped!'
-    bash_out = endpoint_check(url_link)
-    return bash_out
+    function = functions[function_name]
+    bash_out = function(url_link)
+    return bash_out 
 
 @task_postrun.connect
 def task_postrun_handler(task_id, **kwargs):

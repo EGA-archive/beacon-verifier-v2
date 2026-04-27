@@ -12,7 +12,7 @@ import requests
 import json
 from jsonschema import validate, RefResolver, Draft202012Validator
 import os
-from bash.tasks import sample_task, task_retry, sample_task_info, sample_task_endpoints, sample_task_configuration, sample_task_error, sample_task_filtering_terms
+from bash.tasks import task_retry, verification
 import json
 import random
 
@@ -638,7 +638,7 @@ def bash_view(request):
         
         if form.is_valid():
             if form.cleaned_data['url_link'] == '':
-                task = sample_task.delay(request['url_link'])
+                task = verification.delay(request['url_link'], "map_check")
                 map_out = task.get()
                 
 
@@ -649,7 +649,7 @@ def bash_view(request):
                 }
                 return render(request, template, context)
             else:
-                task = sample_task.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "map_check")
                 map_out = task.get()
                 
 
@@ -700,7 +700,7 @@ def channel(request):
         if form.is_valid():
             if form.cleaned_data['url_link'].endswith('info'):
                 validation=[]
-                task = sample_task_info.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "info_check")
                 try:
                     map_out = task.get()
                     validation = map_out[0][1:]
@@ -731,7 +731,7 @@ def channel(request):
                 })
             elif form.cleaned_data['url_link'].endswith('configuration'):
                 validation=[]
-                task = sample_task_configuration.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "configuration_check")
                 try:
                     map_out = task.get()
                     validation = map_out[1:-1]
@@ -752,7 +752,7 @@ def channel(request):
                 })
             elif form.cleaned_data['url_link'].endswith('filtering_terms'):
                 validation=[]
-                task = sample_task_filtering_terms.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "filtering_terms_check")
                 try:
                     map_out = task.get()
                     validation = map_out[1:-1]
@@ -773,7 +773,7 @@ def channel(request):
                 })
             elif form.cleaned_data['url_link'].endswith('analyses') or form.cleaned_data['url_link'].endswith('biosamples') or form.cleaned_data['url_link'].endswith('cohorts') or form.cleaned_data['url_link'].endswith('datasets') or form.cleaned_data['url_link'].endswith('g_variants') or form.cleaned_data['url_link'].endswith('individuals') or form.cleaned_data['url_link'].endswith('runs'):
                 validation=[]
-                task = sample_task_endpoints.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "endpoint_check")
                 try:
                     map_out = task.get()
                     validation = map_out[1:]
@@ -793,7 +793,7 @@ def channel(request):
                 })
             else:
                 validation=[]
-                task = sample_task.delay(form.cleaned_data['url_link'])
+                task = verification.delay(form.cleaned_data['url_link'], "map_check")
                 try:
                     map_out = task.get()
                     validation = map_out[1][1:]
