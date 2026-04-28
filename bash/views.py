@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, View
 from .models import AgeOfOnset
 import subprocess
-from verifierweb.forms import BamForm, AgeOfOnsetForm, NewForm
+from verifierweb.forms import BamForm
 import time
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import logging
@@ -12,7 +12,7 @@ import requests
 import json
 from jsonschema import validate, RefResolver, Draft202012Validator
 import os
-from bash.tasks import task_retry, verification
+from bash.tasks import verification
 import json
 import random
 
@@ -42,8 +42,12 @@ def list_endpoints(list_of_endpoints, endpoints):
     return list_of_endpoints
 
 
-def endpoint_check(url: str):
+def endpoint_check(url, include, requestedgranularity, test_mode):
     LOG.error(url)
+    if test_mode == 0:
+        test_mode = True
+    else:
+        test_mode = False
     endpoint_validation=[]
     is_error = False
     is_appended = False
@@ -54,25 +58,37 @@ def endpoint_check(url: str):
         id_parameter = False
     url_part = url.split('/')
     endpoint = url_part[-1]
+    myobj = {
+        "meta": {
+            "apiVersion": "2.2"
+        },
+        "query": {
+            "includeResultsetResponses": include,
+            "pagination": {
+                "skip": 0,
+                "limit": 10
+            },
+            "testMode": test_mode,
+            "requestedGranularity": requestedgranularity
+        }
+    }
     
     if id_parameter == False:
-        f = requests.get(url)
+        f = requests.post(url, json = myobj)
         try:
             total_response = json.loads(f.text)
         except Exception as e:
             endpoint_validation.append(e)
     else:
-
         last_part = url.split('{')
         new_url = last_part[0][0:-1]
         try:
-            f = requests.get(new_url)
+            f = requests.post(new_url, json = myobj)
             total_response = json.loads(f.text)
         except Exception as e:
             endpoint_validation.append(e)
             return endpoint_validation
         try:                
-            
             if url_part[-3] == 'g_variants':
                 for resultSetsarray in total_response["response"]["resultSets"]:
                     try:
@@ -194,7 +210,7 @@ def endpoint_check(url: str):
                                 })
             return endpoint_validation
 
-        f = requests.get(url)
+        f = requests.post(url, json = myobj)
         endpoint_validation.append(url)
         is_appended = True
         try:
@@ -217,10 +233,12 @@ def endpoint_check(url: str):
     try:
         meta = total_response["meta"]
         granularity = meta["returnedGranularity"]
+        include_resultset = meta["receivedRequestSummary"]["includeResultsetResponses"]
     except Exception:
         try:
             meta = total_response["meta"]
-            granularity = meta["receivedRequestSummary"]["requestedGranularity"]
+            granularity = meta["returnedGranularity"]
+            include_resultset = meta["receivedRequestSummary"]["includeResultsetResponses"]
         except Exception:
             granularity = 'record'
     if endpoint in ['cohorts', 'datasets']:
@@ -275,7 +293,7 @@ def endpoint_check(url: str):
                 }
             })
     else:
-        if granularity == 'record':
+        if granularity == 'record' and include_resultset != 'NONE':
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
                     response = json.load(f)
@@ -428,31 +446,34 @@ def endpoint_check(url: str):
                                     }
                                 })
                     return endpoint_validation
-                for resultset in resultsets:
-                    LOG.warning('validating model record for {}'.format(url))
-                    try:
-                        results = resultset["results"]
-                    except Exception:
-                        continue
-                    for result in results:
-                        logs_2=JSONSchemaValidator.validate(result, response, resolver)
-                    try:
-                        for log in logs_2:
-                            endpoint_validation.append({
-                                "errorMessage": log["message"],
-                                "schema": {
-                                    "path": log["schema_path"],
-                                    "definition": log["schema"],
-                                },
-                                "received": {
-                                    "path": log["instance_path"],
-                                    "value": log["instance"],
-                                }
-                            })
-                    except Exception:
-                        pass
+                if granularity == 'record':
+                    for resultset in resultsets:
+                        datasetId=resultset["id"]
+                        LOG.warning('validating model record for {} and dataset {}'.format(url, datasetId))
+                        try:
+                            results = resultset["results"]
+                        except Exception:
+                            continue
+                        for result in results:
+                            logs_2=JSONSchemaValidator.validate(result, response, resolver)
+                        try:
+                            for log in logs_2:
+                                endpoint_validation.append({
+                                    "datasetId": datasetId,
+                                    "errorMessage": log["message"],
+                                    "schema": {
+                                        "path": log["schema_path"],
+                                        "definition": log["schema"],
+                                    },
+                                    "received": {
+                                        "path": log["instance_path"],
+                                        "value": log["instance"],
+                                    }
+                                })
+                        except Exception:
+                            pass
         
-        elif granularity == 'count':
+        elif granularity == 'count' and include_resultset == 'NONE':
             LOG.warning(granularity)
             with open(root_path+'ref_schemas/framework/json/responses/beaconCountResponse.json', 'r') as f:
                 response = json.load(f)
@@ -474,7 +495,7 @@ def endpoint_check(url: str):
                 })
 
 
-        elif granularity == 'boolean':
+        elif granularity == 'boolean' and include_resultset == 'NONE':
             with open(root_path+'ref_schemas/framework/json/responses/beaconBooleanResponse.json', 'r') as f:
                 response = json.load(f)
             schema_path = 'file:///{0}/'.format(
@@ -497,7 +518,7 @@ def endpoint_check(url: str):
     return endpoint_validation
 
 
-def map_check(url: str):
+def map_check(url, include, granularity, test_mode):
     output_validation=[]
     LOG.error(url)
     root_path = '/app/'
@@ -531,7 +552,7 @@ def map_check(url: str):
             output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     return endpoints_to_verify, output_validation
 
-def info_check(url: str):
+def info_check(url, include, granularity, test_mode):
     output_validation=[]
     root_path = '/app/'
     new_url = url
@@ -560,7 +581,7 @@ def info_check(url: str):
     output_validation.append(JSONSchemaValidator.validate(total_response, info, resolver))
     return output_validation, beaconId, beaconName, beaconVersion
 
-def configuration_check(url: str):
+def configuration_check(url, include, granularity, test_mode):
     output_validation=[]
     root_path = '/app/'
     new_url = url
@@ -578,7 +599,7 @@ def configuration_check(url: str):
     output_validation.append(JSONSchemaValidator.validate(total_response, configuration, resolver))
     return output_validation
 
-def error_check(url: str):
+def error_check(url, include, granularity, test_mode):
     output_validation=[]
     root_path = '/app/'
     new_url = url
@@ -596,7 +617,7 @@ def error_check(url: str):
     output_validation.append(JSONSchemaValidator.validate(total_response, error, resolver))
     return output_validation
 
-def filtering_terms_check(url: str):
+def filtering_terms_check(url, include, granularity, test_mode):
     output_validation=[]
     root_path = '/app/'
     new_url = url
@@ -614,6 +635,7 @@ def filtering_terms_check(url: str):
     output_validation.append(JSONSchemaValidator.validate(total_response, filtering_terms, resolver))
     return output_validation
 
+
 LOG = logging.getLogger(__name__)
 
 def verify_command(value):
@@ -629,38 +651,36 @@ def verify_command(value):
 
     return bash
 
-def bash_view(request):
-    template = "home.html"
-    form =BamForm()
-    context = {'form': form}
-    if request.method == 'POST':
+class LandingPage(View):
+    template_name = "home.html"
+
+    def get(self, request):
+        form = BamForm()
+        context = {"form": form}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
         form = BamForm(request.POST)
-        
+
         if form.is_valid():
-            if form.cleaned_data['url_link'] == '':
-                task = verification.delay(request['url_link'], "map_check")
-                map_out = task.get()
-                
+            url = form.cleaned_data["url_link"]
+            include = form.cleaned_data["include_resultset_responses"]
+            granularity = form.cleaned_data["granularity"]
+            test_mode = form.cleaned_data["test_mode"]
 
-                # return the task id so the JS can poll the state
-                context={
-                    'task_id': task.task_id,
-                    'bash_out': map_out
-                }
-                return render(request, template, context)
-            else:
-                task = verification.delay(form.cleaned_data['url_link'], "map_check")
-                map_out = task.get()
-                
+            task = verification.delay(url, include, granularity, test_mode, "map_check")
+            map_out = task.get()
+            context = {
+                "task_id": task.task_id,
+                "bash_out": map_out,
+                "include": include,
+                "granularity": granularity,
+                "test_mode": test_mode
+            }
+            LOG.warning(context)
+            return render(request, self.template_name, context)
 
-                # return the task id so the JS can poll the state
-                context={
-                    'task_id': task.task_id,
-                    'bash_out': map_out
-                }
-                return render(request, template, context)
-
-    return render(request, template, context)
+        return render(request, self.template_name, {"form": form})
 
 def task_status(request):
     task_id = request.GET.get('task_id')
@@ -681,150 +701,166 @@ def task_status(request):
             }
         return JsonResponse(response)
 
-@csrf_exempt
-def web(request):
-    print('ok')
+class ChannelView(View):
 
-    #requests.post('https://...')
-    return HttpResponse('ok')
+    template_name = "home.html"
 
-@csrf_exempt
-def async_web(request):
-    task = task_retry.delay()
-    logger.info(task.id)
-    return HttpResponse('ok')
+    def get(self, request):
+        form = BamForm()
+        return render(request, self.template_name, {"form": form})
 
-def channel(request):
-    if request.method == 'POST':
+    def post(self, request):
         form = BamForm(request.POST)
-        if form.is_valid():
-            if form.cleaned_data['url_link'].endswith('info'):
-                validation=[]
-                task = verification.delay(form.cleaned_data['url_link'], "info_check")
-                try:
-                    map_out = task.get()
-                    validation = map_out[0][1:]
-                    beaconId = map_out[1]
-                    beaconName = map_out[2]
-                    beaconVersion = map_out[3]
-                except Exception as e:
-                    validation=[]
-                    validation.append(e)
-                    map_out=[]
-                    map_out.append(form.cleaned_data['url_link'])
-                    beaconId=''
-                    beaconName=''
-                    beaconVersion=''
 
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out,
-                    'validation':validated,
-                    'beaconId': beaconId,
-                    'beaconName': beaconName,
-                    'beaconVersion': beaconVersion
-                })
-            elif form.cleaned_data['url_link'].endswith('configuration'):
-                validation=[]
-                task = verification.delay(form.cleaned_data['url_link'], "configuration_check")
-                try:
-                    map_out = task.get()
-                    validation = map_out[1:-1]
-                except Exception as e:
-                    validation=[]
-                    validation.append(e)
-                    map_out=[]
-                    map_out.append(form.cleaned_data['url_link'])
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out,
-                    'validation':validation
-                })
-            elif form.cleaned_data['url_link'].endswith('filtering_terms'):
-                validation=[]
-                task = verification.delay(form.cleaned_data['url_link'], "filtering_terms_check")
-                try:
-                    map_out = task.get()
-                    validation = map_out[1:-1]
-                except Exception as e:
-                    validation=[]
-                    validation.append(e)
-                    map_out=[]
-                    map_out.append(form.cleaned_data['url_link'])
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out,
-                    'validation':validated
-                })
-            elif form.cleaned_data['url_link'].endswith('analyses') or form.cleaned_data['url_link'].endswith('biosamples') or form.cleaned_data['url_link'].endswith('cohorts') or form.cleaned_data['url_link'].endswith('datasets') or form.cleaned_data['url_link'].endswith('g_variants') or form.cleaned_data['url_link'].endswith('individuals') or form.cleaned_data['url_link'].endswith('runs'):
-                validation=[]
-                task = verification.delay(form.cleaned_data['url_link'], "endpoint_check")
-                try:
-                    map_out = task.get()
-                    validation = map_out[1:]
-                except Exception as e:
-                    validation.append(e)
-                    map_out=[]
-                    map_out.append(form.cleaned_data['url_link'])
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'map_out': map_out,
-                    'validation':validated
-                })
-            else:
-                validation=[]
-                task = verification.delay(form.cleaned_data['url_link'], "map_check")
-                try:
-                    map_out = task.get()
-                    validation = map_out[1][1:]
-                    initial_list=[]
-                    initial_list.append(form.cleaned_data['url_link']+'/info')
-                    initial_list.append(form.cleaned_data['url_link']+'/configuration')
-                    initial_list.append(form.cleaned_data['url_link']+'/filtering_terms')
-                    for map in map_out[0]:
-                        initial_list.append(map)
-                except Exception as e:
-                    initial_list=[]
-                    validation=[]
-                    validation.append(e)
+        if not form.is_valid():
+            return JsonResponse({"errors": form.errors}, status=400)
 
-                mapstring= form.cleaned_data['url_link']+'/map'
+        url = form.cleaned_data["url_link"]
+        include = form.cleaned_data["include_resultset_responses"]
+        granularity = form.cleaned_data["granularity"]
+        test_mode = form.cleaned_data["test_mode"]
 
-                validated=''
-                for validating in validation:
-                    if validating != []:
-                        validating=str(validating)
-                        validated=validated+'<br/>'+validating
-                return JsonResponse({
-                    'task_id': task.task_id,
-                    'bash_out': initial_list,
-                    'map': mapstring,
-                    'validation':validated
-                })
+        if url.endswith("info"):
+            return self.handle_info(url, include, granularity, test_mode)
 
+        elif url.endswith("configuration"):
+            return self.handle_configuration(url, include, granularity, test_mode)
 
+        elif url.endswith("filtering_terms"):
+            return self.handle_filtering_terms(url, include, granularity, test_mode)
 
-    form = BamForm()
-    return render(request, 'home.html', {'form': form})
+        elif url.endswith((
+            "analyses", "biosamples", "cohorts",
+            "datasets", "g_variants", "individuals", "runs"
+        )):
+            return self.handle_endpoint(url, include, granularity, test_mode)
+
+        else:
+            return self.handle_map(url, include, granularity, test_mode)
+
+    def format_validation(self, validation):
+        validated = ""
+        for v in validation:
+            if v:
+                validated += "<br/>" + str(v)
+        return validated
+
+    def handle_info(self, url, include, granularity, test_mode):
+        validation = []
+        task = verification.delay(url, include, granularity, test_mode, "info_check")
+
+        try:
+            map_out = task.get()
+            validation = map_out[0][1:]
+            beaconId = map_out[1]
+            beaconName = map_out[2]
+            beaconVersion = map_out[3]
+        except Exception as e:
+            validation = [e]
+            map_out = [url]
+            beaconId = beaconName = beaconVersion = ""
+
+        return JsonResponse({
+            "task_id": task.task_id,
+            "map_out": map_out,
+            "validation": self.format_validation(validation),
+            "beaconId": beaconId,
+            "beaconName": beaconName,
+            "beaconVersion": beaconVersion,
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode
+        })
+
+    def handle_configuration(self, url, include, granularity, test_mode):
+        validation = []
+        task = verification.delay(url, include, granularity, test_mode, "configuration_check")
+
+        try:
+            map_out = task.get()
+            validation = map_out[1:-1]
+        except Exception as e:
+            validation = [e]
+            map_out = [url]
+
+        return JsonResponse({
+            "task_id": task.task_id,
+            "map_out": map_out,
+            "validation": self.format_validation(validation),
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode
+        })
+
+    def handle_filtering_terms(self, url, include, granularity, test_mode):
+        validation = []
+        task = verification.delay(url, include, granularity, test_mode, "filtering_terms_check")
+
+        try:
+            map_out = task.get()
+            validation = map_out[1:-1]
+        except Exception as e:
+            validation = [e]
+            map_out = [url]
+
+        return JsonResponse({
+            "task_id": task.task_id,
+            "map_out": map_out,
+            "validation": self.format_validation(validation),
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode
+        })
+
+    def handle_endpoint(self, url, include, granularity, test_mode):
+        validation = []
+        task = verification.delay(url, include, granularity, test_mode, "endpoint_check")
+
+        try:
+            map_out = task.get()
+            validation = map_out[1:]
+        except Exception as e:
+            validation = [e]
+            map_out = [url]
+
+        return JsonResponse({
+            "task_id": task.task_id,
+            "map_out": map_out,
+            "validation": self.format_validation(validation),
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode
+        })
+
+    def handle_map(self, url, include, granularity, test_mode):
+        validation = []
+        task = verification.delay(url, include, granularity, test_mode, "map_check")
+
+        try:
+            map_out = task.get()
+            validation = map_out[1][1:]
+
+            initial_list = [
+                f"{url}/info",
+                f"{url}/configuration",
+                f"{url}/filtering_terms",
+            ]
+
+            for m in map_out[0]:
+                initial_list.append(m)
+
+        except Exception as e:
+            validation = [e]
+            initial_list = []
+
+        return JsonResponse({
+            "task_id": task.task_id,
+            "bash_out": initial_list,
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode,
+            "map": f"{url}/map",
+            "validation": self.format_validation(validation),
+        })
 
 

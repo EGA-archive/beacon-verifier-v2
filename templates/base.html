@@ -701,13 +701,16 @@ function groupErrorsByUrl(map_out) {
     return results;
 }
 
-  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation) {
+  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
       .then(response => response.json())
       .then((res) => {
         const taskStatus = res.state;
+        console.log(bash_out)
+        console.log(include)
+        console.log(granularity)
         
 
 
@@ -808,7 +811,7 @@ function groupErrorsByUrl(map_out) {
     
 
   }
-  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion) {
+  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, bname, bid, bversion) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
@@ -887,6 +890,7 @@ function groupErrorsByUrl(map_out) {
 
                   return `
                   <details>
+                      <summary>Error in dataset: ${errorObj.datasetId}</summary
                       <summary>Error ${index + 1}: ${errorObj.message}</summary>
                       <details>
                           <summary>Expected schema</summary>
@@ -1030,7 +1034,7 @@ function groupErrorsByUrl(map_out) {
   let checks = 1;
   let warnings = 0;
   let errors = 0;
-  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, checks, warnings, errors) => {
+  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, checks, warnings, errors) => {
     
 
     for (let i = 0; i < mapping.length; i++) {
@@ -1051,6 +1055,13 @@ function groupErrorsByUrl(map_out) {
           if (document.getElementById("stop-btn").value=="si"){
           const formData2 =new FormData();
           formData2.set('url_link', mapping[i]);
+          console.log(mapping)
+          console.log(include)
+          console.log(granularity)
+          console.log(test_mode)
+          formData2.set('include_resultset_responses', include);
+          formData2.set('granularity', granularity);
+          formData2.set('test_mode', test_mode);
 
     fetch('/validator/', {
                   method: 'POST',
@@ -1068,7 +1079,10 @@ function groupErrorsByUrl(map_out) {
             const bname = res.beaconName;
             const bid = res.beaconId;
             const bversion = res.beaconVersion;
-            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion, checks, warnings, errors)
+            const include = res.include;
+            const granularity = res.granularity;
+            const test_mode = res.test_mode;
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, bname, bid, bversion, checks, warnings, errors)
             console.log(res);
           })
           .catch((error) => {
@@ -1142,13 +1156,17 @@ function groupErrorsByUrl(map_out) {
         .then(response => response.json())
         .then((res) => {
           // after we get Celery task id, we start polling
+          console.log('response is')
           const task_id = res.task_id;
           const bash_out = res.bash_out;
           const mapstring = res.map;
           const mapvalidation = res.validation;
+          const include = res.include;
+          const granularity = res.granularity;
+          const test_mode = res.test_mode;
           console.log(mapstring)
           
-          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation);
+          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode);
           console.log(res);
           const mapping = bash_out
           console.log(mapping)
@@ -1156,7 +1174,7 @@ function groupErrorsByUrl(map_out) {
           
 
           
-          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping);
+          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode);
 
 
           
