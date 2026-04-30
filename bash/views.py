@@ -238,7 +238,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode):
         try:
             meta = total_response["meta"]
             granularity = meta["returnedGranularity"]
-            include_resultset = meta["receivedRequestSummary"]["includeResultsetResponses"]
+            include_resultset = 'ALL'
         except Exception:
             granularity = 'record'
     if endpoint in ['cohorts', 'datasets']:
@@ -293,6 +293,24 @@ def endpoint_check(url, include, requestedgranularity, test_mode):
                 }
             })
     else:
+        with open(root_path+'ref_schemas/framework/json/responses/sections/beaconResponseMeta.json', 'r') as f:
+            response = json.load(f)
+        schema_path = 'file:///{0}/'.format(
+                os.path.dirname(root_path+'ref_schemas/framework/json/responses/sections/beaconResponseMeta.json').replace("\\", "/"))
+        resolver = RefResolver(schema_path, response)
+        logs=JSONSchemaValidator.validate(meta, response, resolver)
+        for log in logs:
+            endpoint_validation.append({
+                "errorMessage": log["message"],
+                "schema": {
+                    "path": log["schema_path"],
+                    "definition": log["schema"],
+                },
+                "received": {
+                    "path": log["instance_path"],
+                    "value": log["instance"],
+                }
+            })
         if granularity == 'record' and include_resultset != 'NONE':
             if endpoint in ['cohorts', 'datasets']:
                 with open(root_path+'ref_schemas/framework/json/responses/beaconCollectionsResponse.json', 'r') as f:
