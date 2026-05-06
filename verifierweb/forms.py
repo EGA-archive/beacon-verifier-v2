@@ -1,6 +1,4 @@
 from django import forms
-from bash.models import AgeOfOnset
-
 
 class BamForm(forms.Form):
     choices_irr = [("HIT", "HIT"), ("MISS", "MISS"), ("ALL", "ALL"), ("NONE", "NONE")]
