@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+            <div class="col-4 reduce" style="background-color: #EEEEEE;">
+          
+
+              <div class="row">
+                Adeeeeu
+                <div class="col reduce">
+                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
+                    {% csrf_token %}
+                    <div class="row"><div>
+                    {% for f in form %}
+                    <b>{{f.help_text|safe}} {{f}} </b>   
+                    {% endfor %}
+                </div>
+
+              </div>
+
+                    <div class="mb-3" id="messages"></div>
+                    <button id="primerbutton2" hidden="hidden" onClick="window.location.reload();" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
+                    border: none;
+                    width: 100%;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 100px;"> New Verification</button>
+                    <button id="primerbutton" name="endpoints" value="{{ url }}" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'"" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    border: none;
+                    width: 48%;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 100px;"> Next</button>
+                  <div style="margin-top: 30px;">
+                    
+                </div>
+                
+                  <div style="padding-left: 50px; padding-right: 25px;">
+                    <div style="position: relative; right: 50px; top: 10px;"><span id="pdot" class="dot">
+                      <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="pdot2" class="dot" hidden="hidden">
+                      <span id="pdot21" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot22" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot23" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 15px; font-weight: bold;">0%</span>
+                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 15px;">Paste URL and start verification</span></div>
+                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
+                    <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
+                  </div>
+                  
+                </div>
+                <div id="summarytable" hidden="hidden">
+                <div style="margin-top: 40px">Summary</div>
+                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
+                <button hidden="hidden" class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
+                border: 1 px solid #636363;
+                width: 75%;
+                color: #636363;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                margin: 4px 2px;
+                cursor: pointer;
+                border-radius: 100px;">&nbsp; Download Report</button>  
+              
+
+              
+                </div>
+
+                <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
+
+                  <p style="margin-bottom: 0px"><b style="font-weight: 12px;">In association with:</b></p>
+                  <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
+                  <img src="{% static 'bsc.webp' %}" alt="BSC" height="60px" style="padding-right: 10px;">
+                  <img src="{% static 'elixir.png' %}" alt="Elixir" height="50px" style="padding-right: 10px;">
+                  <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
+                  <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
+                  
+                </div>
+                  
+                  </form>
+
+
+
+
+
+                  
+            </div>
+
+            </div>
+                
+              
+                
+            </div>  
+            
+
+         
+        
+            
+
+
+
+        
+
+{% endblock %}  

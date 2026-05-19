@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 import subprocess
-from verifierweb.forms import BamForm
+from verifierweb.forms import SettingsForm, EndpointsForm, DatasetsForm
 import logging
 from classes import JSONSchemaValidator
 import requests
@@ -14,26 +14,12 @@ import requests
 from celery.result import AsyncResult
 from django.http import JsonResponse
 from bash.errors import return_unhandled_error, error_message_to_return, error_message_with_dataset_to_return
-from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path
+from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path, list_endpoints
 
 logger = logging.getLogger(__name__)
 
 
-def list_endpoints(list_of_endpoints, endpoints):
-    for k, v in endpoints.items():
-        for k2, v2 in v.items():
-            if k2 == 'rootUrl':
-                list_of_endpoints.append(v2)
-            elif k2 == 'endpoints':
-                try:
-                    for k3, v3 in v2.items():
-                        for k4, v4 in v3.items():
-                            if k4 == 'url':
-                                list_of_endpoints.append(v4)
-                except Exception:
-                    pass
 
-    return list_of_endpoints
 
 
 def endpoint_check(url, include, requestedgranularity, test_mode):
@@ -324,33 +310,104 @@ def verify_command(value):
     return bash
 
 class LandingPage(View):
-    template_name = "home.html"
+    template_name = "settings.html"
 
     def get(self, request):
-        form = BamForm()
+        form = SettingsForm()
         context = {"form": form}
         return render(request, self.template_name, context)
+    
+
 
     def post(self, request):
-        form = BamForm(request.POST)
 
-        if form.is_valid():
-            url = form.cleaned_data["url_link"]
-            include = form.cleaned_data["include_resultset_responses"]
-            granularity = form.cleaned_data["granularity"]
-            test_mode = form.cleaned_data["test_mode"]
+        if "settings" in request.POST:
+            form = SettingsForm(request.POST)
 
-            task = verification.delay(url, include, granularity, test_mode, "map_check")
-            map_out = task.get()
+            if form.is_valid():
+                url = form.cleaned_data["url_link"]
+                include = form.cleaned_data["include_resultset_responses"]
+                granularity = form.cleaned_data["granularity"]
+                test_mode = form.cleaned_data["test_mode"]
+                endpoints_form = EndpointsForm(
+                    endpoint_url=url,
+                    initial={
+                        "endpoint_url": url,
+                        "include": include,
+                        "granularity": granularity,
+                        "test_mode": test_mode
+                    }
+                )
+                test_mode=str(test_mode)
+                granularity=str(granularity)
+                include=str(include)
+                context = {
+                    "form": endpoints_form,
+                    "url": url,
+                    "include": include,
+                    "granularity": granularity,
+                    "test_mode": test_mode
+                }
+                return render(request, "endpoints.html", context)
+        elif "endpoints" in request.POST:
+            LOG.warning("mppppp")
+
+            endpoint_url=request.POST.get("endpoint_url")
+            LOG.warning(endpoint_url)
+            LOG.warning(type(endpoint_url))
+            endpoints=request.POST.get("endpoints_collected")
+            LOG.warning(endpoints)
+            include=request.POST.get("include")
+            granularity=request.POST.get("granularity")
+            test_mode=request.POST.get("test_mode")
+            form = EndpointsForm(
+                request.POST,
+                endpoint_url=request.POST.get("endpoint_url"),
+                include=request.POST.get("include"),
+                granularity=request.POST.get("granularity"),
+                test_mode=request.POST.get("test_mode")
+            )
+            if form.is_valid():
+
+                endpoints = form.cleaned_data["endpoints_collected"]
+                endpoint_url = form.cleaned_data["endpoint_url"]
+                datasets_form = DatasetsForm(
+                    endpoint_url=endpoint_url,
+                    initial={
+                        "endpoint_url": endpoint_url,
+                        "include": include,
+                        "granularity": granularity,
+                        "test_mode": test_mode
+                    }
+                )
+
+                context = {
+                    "form": datasets_form,
+                    "endpoints": endpoints,
+                    "endpoint_url": endpoint_url,
+                    "include": include,
+                    "granularity": granularity,
+                    "test_mode": test_mode
+                }
+                return render(request, "datasets.html", context)
+        elif "datasets" in request.POST:
+            LOG.warning('yessss')
+            endpoint_url=request.POST.get("endpoint_url")
+            include=request.POST.get("include")
+            granularity=request.POST.get("granularity")
+            test_mode=request.POST.get("test_mode")
+            endpoints=request.POST.get("endpoints")
+            datasets=request.POST.get("datasets_collected")
             context = {
-                "task_id": task.task_id,
-                "bash_out": map_out,
-                "include": include,
-                "granularity": granularity,
-                "test_mode": test_mode
-            }
-            LOG.warning(context)
-            return render(request, self.template_name, context)
+                    "datasets": datasets,
+                    "endpoints": endpoints,
+                    "endpoint_url": endpoint_url,
+                    "include": include,
+                    "granularity": granularity,
+                    "test_mode": test_mode
+                }
+
+            return render(request, "summary.html", context)
 
         return render(request, self.template_name, {"form": form})
 
@@ -378,11 +435,11 @@ class ChannelView(View):
     template_name = "home.html"
 
     def get(self, request):
-        form = BamForm()
+        form = SettingsForm()
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
-        form = BamForm(request.POST)
+        form = SettingsForm(request.POST)
 
         if not form.is_valid():
             return JsonResponse({"errors": form.errors}, status=400)

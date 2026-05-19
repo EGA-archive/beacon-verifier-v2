@@ -4,6 +4,22 @@ import os
 from classes import JSONSchemaValidator
 from jsonschema import RefResolver
 
+def list_endpoints(list_of_endpoints, endpoints):
+    for k, v in endpoints.items():
+        for k2, v2 in v.items():
+            if k2 == 'rootUrl':
+                list_of_endpoints.append(v2)
+            elif k2 == 'endpoints':
+                try:
+                    for k3, v3 in v2.items():
+                        for k4, v4 in v3.items():
+                            if k4 == 'url':
+                                list_of_endpoints.append(v4)
+                except Exception:
+                    pass
+
+    return list_of_endpoints
+
 def endpoint_request(url):
     output_validation=[]
     new_url = url
