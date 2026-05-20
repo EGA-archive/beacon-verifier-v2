@@ -35,13 +35,12 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
 #ALLOWED_HOSTS = ['localhost']
 CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org']
 
-STATICFILES_DIRS = [ os.path.join(PROJECT_DIR, "frontend/" )]
-
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Application definition
 
@@ -56,7 +55,8 @@ INSTALLED_APPS = [
     'bash',
     'crispy_forms',
     'mozilla_django_oidc',
-    'channels'
+    'channels',
+    "django_browser_reload"
 ]
 
 MIDDLEWARE = [
@@ -67,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
 ]
 
 ROOT_URLCONF = 'verifierweb.urls'

@@ -13,7 +13,6 @@ def get_map_endpoints_list(url):
     endpoints = resultsets["endpointSets"]
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
-
     try:
 
         final_list=[]
@@ -29,7 +28,6 @@ def get_map_endpoints_list(url):
 
         for item in initial_list:
             final_list.append((item, item))
-
     except Exception as e:
         final_list = []
     return final_list
@@ -93,7 +91,7 @@ class EndpointsForm(forms.Form):
         widget=forms.CheckboxSelectMultiple
     )
 
-    def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, **kwargs):
+    def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None,**kwargs):
         super().__init__(*args, **kwargs)
 
         if endpoint_url:
@@ -119,7 +117,7 @@ class DatasetsForm(forms.Form):
         widget=forms.CheckboxSelectMultiple
     )
 
-    def __init__(self, *args, endpoint_url=None, **kwargs):
+    def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None, **kwargs):
         super().__init__(*args, **kwargs)
 
         if endpoint_url:

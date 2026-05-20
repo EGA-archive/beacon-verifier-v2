@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(bash_urls, namespace='bash')),
     path('oidc/', include('mozilla_django_oidc.urls')),
+    path("__reload__/", include("django_browser_reload.urls"))
 
 ]
 '''

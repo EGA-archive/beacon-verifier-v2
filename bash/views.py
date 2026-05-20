@@ -356,12 +356,14 @@ class LandingPage(View):
             LOG.warning(endpoint_url)
             LOG.warning(type(endpoint_url))
             endpoints=request.POST.get("endpoints_collected")
+            LOG.warning('endpoints collected are')
             LOG.warning(endpoints)
             include=request.POST.get("include")
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")
             form = EndpointsForm(
                 request.POST,
+                endpoints_collected=request.POST.get("endpoints_collected"),
                 endpoint_url=request.POST.get("endpoint_url"),
                 include=request.POST.get("include"),
                 granularity=request.POST.get("granularity"),
@@ -377,7 +379,8 @@ class LandingPage(View):
                         "endpoint_url": endpoint_url,
                         "include": include,
                         "granularity": granularity,
-                        "test_mode": test_mode
+                        "test_mode": test_mode,
+                        "endpoints_collected": endpoints
                     }
                 )
 
@@ -396,7 +399,9 @@ class LandingPage(View):
             include=request.POST.get("include")
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")
-            endpoints=request.POST.get("endpoints")
+            endpoints=request.POST.get("endpoints_collected")
+            LOG.warning('the endpoints collected are')
+            LOG.warning(endpoints)
             datasets=request.POST.get("datasets_collected")
             context = {
                     "datasets": datasets,
