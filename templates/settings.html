@@ -9,15 +9,39 @@
 
               <div class="row">
                 <div class="col reduce">
-                  <div style="padding: 34px 61px 34px 61px; width: 100%">
-                  <div class="circlegreen">1</div>
-                  <div class="circlegreen">2</div>
-                  <div class="circlegreen">3</div>
-                  <div class="circlegreen">4</div>
-                  </div>
                   <div class="row">
                   </div>
-                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
+                  <form id="your-form" method="post" style="padding: 0px 61px 34px 61px; width: 100%; margin-top: -30px;">
+                  <div class="circle-wrapper">
+
+                    <div class="dashed-line"></div>
+                    <div class="dashed-line2"></div>
+                    <div class="dashed-line3"></div>
+
+                    <div class="circle-container">
+
+                      <div class="circle-item">
+                        <div class="circlegreen">1</div>
+                        <span class="circle-label">Settings</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">2</div>
+                        <span class="circle-label">Endpoints</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">3</div>
+                        <span class="circle-label">Datasets</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">4</div>
+                        <span class="circle-label">Summary</span>
+                      </div>
+
+                    </div>
+                  </div>
                     {% csrf_token %}
                     <div class="row"><div>
                     {% for f in form %}

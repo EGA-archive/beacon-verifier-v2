@@ -10,7 +10,6 @@ display: inline-flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
-margin-left: 50px;
 margin-top: 20px;
 width: 50px;
 height: 50px;
@@ -22,6 +21,77 @@ border-radius: 31.5789px;
 
 }
 
-.circlecontainer{
-width:50px;
+.circlegrey{
+color: #7A7A7A;
+left: 50px;
+/* Frame 5280 */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: inline-flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+margin-top: 20px;
+width: 50px;
+height: 50px;
+left: 4px;
+top: 4px;
+
+border-radius: 31.5789px;
+border: 1px solid #7A7A7A;
+
 }
+
+.circle-wrapper {
+  position: relative;
+  width: 420px;
+  margin: 40px auto;
+}
+
+.circle-container {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.circle-label {
+  margin-top: 8px;
+}
+
+
+.dashed-line {
+    position: absolute;
+    top: 43px;
+    left: 60px;
+    right: 300px;
+    border-top: 3px dashed #999;
+    z-index: 1;
+}
+
+.dashed-line2 {
+    position: absolute;
+    top: 43px;
+    left: 175px;
+    right: 180px;
+    border-top: 3px dashed #999;
+    z-index: 1;
+}
+
+.dashed-line3 {
+    position: absolute;
+    top: 43px;
+    left: 295px;
+    right: 60px;
+    border-top: 3px dashed #999;
+    z-index: 1;
+}
+
