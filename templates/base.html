@@ -24,4 +24,38 @@
 
     {% include "footer.html" %}
 </body>
+
 </html>
+
+<script>
+const selectboxBtn = document.getElementById("selectbox");
+const clearboxBtn = document.getElementById("clearbox");
+
+function getCheckboxes() {
+    return document.querySelectorAll('input[type="checkbox"]:not(#id_test_mode)');
+}
+
+function setState(allChecked) {
+    if (allChecked) {
+        clearboxBtn.classList.remove("inactive");
+        selectboxBtn.classList.add("inactive");
+    } else {
+        selectboxBtn.classList.remove("inactive");
+        clearboxBtn.classList.add("inactive");
+    }
+}
+
+function setAll(state) {
+    getCheckboxes().forEach(cb => cb.checked = state);
+    setState(state);
+}
+
+selectboxBtn.addEventListener("click", () => setAll(true));
+clearboxBtn.addEventListener("click", () => setAll(false));
+
+document.addEventListener("DOMContentLoaded", () => {
+    const checkboxes = getCheckboxes();
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    setState(allChecked);
+});
+</script>

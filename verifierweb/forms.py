@@ -56,15 +56,18 @@ class SettingsForm(forms.Form):
     url_link = forms.CharField(widget=forms.TextInput(attrs={'size':50}), max_length=100, required=False, help_text="<div style='margin-bottom: 8px;'>Beacon URL</div>", label="")
     include_resultset_responses = forms.MultipleChoiceField(
         choices=choices_irr, 
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
+        initial=[choice[0] for choice in choices_irr]
     )
     granularity = forms.MultipleChoiceField(
         choices=choices_granularity, 
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
+        initial=[choice[0] for choice in choices_granularity]
     )
     test_mode = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(attrs={'class': 'ios-switch'},)
+        widget=forms.CheckboxInput(attrs={'class': 'ios-switch'},),
+        initial=True
     )
 
 class EndpointsForm(forms.Form):
