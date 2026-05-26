@@ -106,6 +106,18 @@ border: 1px solid #7A7A7A;
     border: 1px solid grey;
 }
 
+.settings-box-endpoints {
+    max-height:400px;
+    overflow: scroll;
+    align-items: center;
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid grey;
+    padding-top: 0px;
+}
+
 .setting-item {
     display: flex;
     align-items: center;
@@ -213,6 +225,8 @@ border: 1px solid #7A7A7A;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .granu{
@@ -228,12 +242,14 @@ border: 1px solid #7A7A7A;
 }
 
 .greyform{
-  max-width: 500px;
-  min-width: 500px;
+  max-width: 475px;
+  min-width: 475px;
+  height: calc(100vh - 62px);
 }
 
 .formsettings{
   margin-left: 30px;
+margin-right: 10px;
 }
 
 #id_granularity{
@@ -273,6 +289,8 @@ input[type="checkbox"] {
 .selectallwrapper {
     display: flex;
     justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .selectall.inactive {
@@ -280,4 +298,131 @@ input[type="checkbox"] {
     color: #777;
     border-color: #ccc;
     opacity: 1; /* better than lowering opacity */
+}
+
+.nextbutton{
+/* Validate */
+
+/* Auto layout */
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 8px;
+
+margin: 0 auto;
+width: 120px;
+height: 40px;
+
+border: 1px solid #40946C;
+border-radius: 100px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+
+font-weight: 700;
+font-size: 14px;
+line-height: 20px;
+
+letter-spacing: 0.1px;
+
+color: #40946C;
+
+
+margin-left: 345px;
+}
+
+.pagewrapper{
+    height: calc(100vh - 62px);
+}
+
+#id_endpoints_collected{
+  font-size: 12px;
+  width: 100%;
+
+
+}
+
+label {
+    display: inline-block;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+
+
+.endpointsfound{
+
+    display: inline-flex;
+
+    height: 26px;
+    position: absolute;
+    left: 30px;
+
+}
+
+#id_number_of_endpoints{
+    all: unset;
+    background-color: #EEEEEE !important;
+width: 30px;
+    color: #212529 !important; /* Bootstrap default body color */
+    opacity: 1;
+    box-shadow: none;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+.textef{
+margin-top:1px;
+
+}
+
+.buttonwrapper {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    width: 130%;
+    /* gap: 130px; */
+    margin-left: -60px;
+}
+
+.nextbuttonendpoints{
+/* Validate */
+
+/* Auto layout */
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 8px;
+
+margin: 0 auto;
+width: 120px;
+height: 40px;
+
+border: 1px solid #40946C;
+border-radius: 100px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+
+font-weight: 700;
+font-size: 14px;
+line-height: 20px;
+
+letter-spacing: 0.1px;
+
+color: #40946C;
+
+
+
 }

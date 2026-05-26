@@ -4,7 +4,7 @@
 
 
 {% block content %}
-            <div class="col-4 reduce greyform" style="background-color: #EEEEEE;">
+            <div class="greyform" style="background-color: #EEEEEE;">
           
 
               <div class="row">
@@ -51,7 +51,7 @@
                             {% endif %}
                             {% endfor %}
                               <div class="toggle-inline">
-                                  <span>Test Mode</span><span>Off</span>
+                                  <span><b>Test Mode</b></span><span>Off</span>
 
                                   {% for f in form %}
                                       {% if f.name == "test_mode" %}
@@ -63,12 +63,12 @@
                               </div>
                           <div class="selectallwrapper">
                               <button type="button" class="selectall inactive" id="selectbox">Select All</button>
-                              <button type="button" class="selectall" id="clearbox">Clear All</button>
+                              <button type="button" class="selectall" id="clearbox">Unselect All</button>
                           </div>
 
-                        <div style="margin-right:10px;">
-                          <span class="granu">Granularity</span>
-                          <span class="granu2">Response Type</span>
+                        <div>
+                          <span class="granu"><b>Granularity</b></span>
+                          <span class="granu2"><b>Response Type</b></span>
                       <div class="settings-box">
                         
                           {% for f in form %}
@@ -88,33 +88,13 @@
               </div>
 
                     <div class="mb-3" id="messages"></div>
-                    <button id="primerbutton" name="settings" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'"" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
-                    border: none;
-                    width: 48%;
-                    color: white;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    margin: 4px 2px;
-                    cursor: pointer;
-                    border-radius: 100px;"> Next</button>
+                    <button id="primerbutton" name="settings" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbutton"> <span>Next</span><span class="bi bi-arrow-right"> </span></button>
                   <div style="margin-top: 30px;">
                     
                 </div>
                 
 
 
-                <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
-
-                  <p style="margin-bottom: 0px"><b style="font-weight: 12px;">In association with:</b></p>
-                  <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
-                  <img src="{% static 'bsc.webp' %}" alt="BSC" height="60px" style="padding-right: 10px;">
-                  <img src="{% static 'elixir.png' %}" alt="Elixir" height="50px" style="padding-right: 10px;">
-                  <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
-                  <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
-                  
-                </div>
                   
                   </form>
 

@@ -350,14 +350,10 @@ class LandingPage(View):
                 }
                 return render(request, "endpoints.html", context)
         elif "endpoints" in request.POST:
-            LOG.warning("mppppp")
 
             endpoint_url=request.POST.get("endpoint_url")
-            LOG.warning(endpoint_url)
-            LOG.warning(type(endpoint_url))
             endpoints=request.POST.get("endpoints_collected")
-            LOG.warning('endpoints collected are')
-            LOG.warning(endpoints)
+
             include=request.POST.get("include")
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")

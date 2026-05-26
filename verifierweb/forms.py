@@ -27,6 +27,7 @@ def get_map_endpoints_list(url):
             initial_list.append(m)
 
         for item in initial_list:
+            item = "..." +item.split('.')[-1]
             final_list.append((item, item))
     except Exception as e:
         final_list = []
@@ -72,9 +73,11 @@ class SettingsForm(forms.Form):
 
 class EndpointsForm(forms.Form):
 
+    map_url = forms.CharField(
+        widget=forms.TextInput(attrs={'size':50}), max_length=100, help_text="<div style='margin-bottom: 8px;'>Loaded URL</div>", label=""
+    )
     endpoint_url = forms.CharField(
-        widget=forms.HiddenInput(),
-        help_text="<div style='margin-bottom: 8px;'>Endpoint Url</div>", label=""
+        widget=forms.HiddenInput()
     )
     include = forms.CharField(
         widget=forms.HiddenInput()
@@ -86,6 +89,8 @@ class EndpointsForm(forms.Form):
         widget=forms.HiddenInput()
     )
 
+    number_of_endpoints = forms.CharField(widget=forms.TextInput(attrs={'size':0}))
+
     endpoints_collected = forms.MultipleChoiceField(
         choices=[],
         widget=forms.CheckboxSelectMultiple
@@ -96,6 +101,12 @@ class EndpointsForm(forms.Form):
 
         if endpoint_url:
             self.fields["endpoints_collected"].choices = get_map_endpoints_list(endpoint_url)
+            self.fields["endpoints_collected"].initial = [choice[0] for choice in self.fields["endpoints_collected"].choices]
+            self.fields['map_url'].widget.attrs['readonly'] = True
+            self.fields['map_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
+            self.fields['map_url'].initial=endpoint_url+'/map'
+            self.fields['number_of_endpoints'].widget.attrs['readonly'] = True
+            self.fields['number_of_endpoints'].initial = len(self.fields["endpoints_collected"].choices)
         if include:
             self.fields["include"].choices = [(include[0], include[0])]
         if granularity:
