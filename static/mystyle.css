@@ -244,7 +244,7 @@ border: 1px solid #7A7A7A;
 .greyform{
   max-width: 475px;
   min-width: 475px;
-  height: calc(100vh - 62px);
+  height: 84vh;
 }
 
 .formsettings{
@@ -336,9 +336,7 @@ color: #40946C;
 margin-left: 345px;
 }
 
-.pagewrapper{
-    height: calc(100vh - 62px);
-}
+
 
 #id_endpoints_collected{
   font-size: 12px;
@@ -462,4 +460,8 @@ height: 343px;
 flex: none;
 order: 1;
 flex-grow: 0;
+}
+
+.association{
+    color: white;
 }
