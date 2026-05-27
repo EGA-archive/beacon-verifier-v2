@@ -116,12 +116,16 @@ class EndpointsForm(forms.Form):
 
 
 class DatasetsForm(forms.Form):
-
+    datasets_url = forms.CharField(
+        widget=forms.TextInput(attrs={'size':50}), max_length=100, help_text="<div style='margin-bottom: 8px;'>Loaded URL</div>", label=""
+    )
     endpoint_url = forms.CharField(widget=forms.HiddenInput())
     include = forms.CharField(widget=forms.HiddenInput())
     granularity = forms.CharField(widget=forms.HiddenInput())
     test_mode = forms.CharField(widget=forms.HiddenInput())
     endpoints_collected = forms.CharField(widget=forms.HiddenInput())
+
+    number_of_datasets = forms.CharField(widget=forms.TextInput(attrs={'size':0}))
 
     datasets_collected = forms.MultipleChoiceField(
         choices=[],
@@ -133,3 +137,8 @@ class DatasetsForm(forms.Form):
 
         if endpoint_url:
             self.fields["datasets_collected"].choices = get_datasets_list(endpoint_url)
+            self.fields['number_of_datasets'].widget.attrs['readonly'] = True
+            self.fields['number_of_datasets'].initial = len(self.fields["datasets_collected"].choices)
+            self.fields['datasets_url'].widget.attrs['readonly'] = True
+            self.fields['datasets_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
+            self.fields['datasets_url'].initial=endpoint_url+'/datasets'

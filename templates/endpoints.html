@@ -41,10 +41,11 @@
 
                     </div>
                   </div>
-                    <form method="post" class="formsettings">
+                     <form method="post" class="formsettings">
                         {% csrf_token %}
-
-                            
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
                             {% for f in form %}
                             {% if f.name == "map_url" %}
                             
@@ -85,7 +86,7 @@
 
                     <div class="mb-3" id="messages"></div>
                     <div class="buttonwrapper">
-                    <button id="primerbutton" name="back" type="submit" class="nextbuttonendpoints"> <span class="bi bi-arrow-left"></span><span>Back</span></button>
+                    <button id="primerbutton" name="backsettings" type="submit" class="nextbuttonendpoints" onclick="window.history.back()"> <span class="bi bi-arrow-left"></span><span>Back</span></button>
                     <button id="primerbutton" name="endpoints" value="{{ url }}" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbuttonendpoints"> <span>Next</span><span class="bi bi-arrow-right"> </span></button>
                     </div>
                     <div style="margin-top: 30px;">

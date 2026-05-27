@@ -349,7 +349,7 @@ margin-left: 345px;
 
 label {
     display: inline-block;
-    max-width: 200px;
+    max-width: 350px;
     white-space: nowrap;
     overflow: hidden;
 }
@@ -425,4 +425,41 @@ color: #40946C;
 
 
 
+}
+
+#id_number_of_datasets{
+    all: unset;
+    background-color: #EEEEEE !important;
+width: 20px;
+    color: #212529 !important; /* Bootstrap default body color */
+    opacity: 1;
+    box-shadow: none;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+#id_datasets_collected{
+  font-size: 12px;
+  width: 100%;
+
+
+}
+
+.verificationtable{/* Frame 5265 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 24px;
+
+width: 422px;
+height: 343px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
 }

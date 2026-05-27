@@ -396,19 +396,44 @@ class LandingPage(View):
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")
             endpoints=request.POST.get("endpoints_collected")
+            final_endpoints_list=[]
+            count_dict = {}
+            print(endpoints, flush=True)
+            endpoints=list(endpoints)
+            print('what is the ty pe')
+            print(type(endpoints), flush=True)
+            
+            for endpoint in endpoints:
+                endpoint_new = endpoint.split('/')[-1]
+
+                if endpoint_new not in count_dict:
+                    count_dict[endpoint_new] = 1
+                    final_endpoints_list.append(endpoint_new)
+                else:
+                    count_dict[endpoint_new] += 1
             LOG.warning('the endpoints collected are')
             LOG.warning(endpoints)
             datasets=request.POST.get("datasets_collected")
             context = {
                     "datasets": datasets,
-                    "endpoints": endpoints,
+                    "endpoints": count_dict,
                     "endpoint_url": endpoint_url,
                     "include": include,
                     "granularity": granularity,
-                    "test_mode": test_mode
+                    "test_mode": test_mode,
                 }
 
             return render(request, "summary.html", context)
+        elif "backsettings" in request.POST:
+            form=SettingsForm(request.POST)
+            template_name = "settings.html"
+        elif "backendpoints" in request.POST:
+            form=EndpointsForm(request.POST)
+            template_name = "endpoints.html"
+        elif "backdatasets" in request.POST:
+            form=DatasetsForm(request.POST)
+            template_name = "datasets.html"
+
 
         return render(request, self.template_name, {"form": form})
 
