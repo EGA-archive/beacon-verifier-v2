@@ -15,6 +15,8 @@ from celery.result import AsyncResult
 from django.http import JsonResponse
 from bash.errors import return_unhandled_error, error_message_to_return, error_message_with_dataset_to_return
 from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path, list_endpoints
+import ast
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -398,22 +400,34 @@ class LandingPage(View):
             endpoints=request.POST.get("endpoints_collected")
             final_endpoints_list=[]
             count_dict = {}
-            print(endpoints, flush=True)
-            endpoints=list(endpoints)
-            print('what is the ty pe')
-            print(type(endpoints), flush=True)
-            
+            endpoints=ast.literal_eval(endpoints)
+            granularity=granularity.replace('[','')
+            granularity=granularity.replace(']','')
+            granularity=granularity.replace("'",'')
+            include=include.replace('[','')
+            include=include.replace(']','')
+            include=include.replace("'",'')
             for endpoint in endpoints:
                 endpoint_new = endpoint.split('/')[-1]
 
-                if endpoint_new not in count_dict:
-                    count_dict[endpoint_new] = 1
-                    final_endpoints_list.append(endpoint_new)
+                if '/'+endpoint_new not in count_dict:
+                    count_dict['/'+endpoint_new] = 1
+                    final_endpoints_list.append('/'+endpoint_new)
                 else:
-                    count_dict[endpoint_new] += 1
-            LOG.warning('the endpoints collected are')
-            LOG.warning(endpoints)
-            datasets=request.POST.get("datasets_collected")
+                    count_dict['/'+endpoint_new] += 1
+            count_dict=str(count_dict)
+            count_dict=count_dict.replace('{','')
+            count_dict=count_dict.replace('}','')
+            count_dict=count_dict.replace("'",'')
+            count_dict=count_dict.replace(":",'')
+            count_dict=count_dict.replace("1",'')
+            count_dict=count_dict.replace(" ,",',')
+            count_dict = re.sub(r'(\d+)', lambda m: f"({m.group(1)})", count_dict)
+            datasets=request.POST.getlist("datasets_collected")
+            datasets=str(datasets)
+            datasets=datasets.replace('[','')
+            datasets=datasets.replace(']','')
+            datasets=datasets.replace("'",'')
             context = {
                     "datasets": datasets,
                     "endpoints": count_dict,

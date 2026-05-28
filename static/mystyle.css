@@ -244,7 +244,7 @@ border: 1px solid #7A7A7A;
 .greyform{
   max-width: 475px;
   min-width: 475px;
-  height: 84vh;
+  flex: 1;
 }
 
 .formsettings{
@@ -334,6 +334,7 @@ color: #40946C;
 
 
 margin-left: 345px;
+margin-top: 10px;
 }
 
 
@@ -387,6 +388,7 @@ margin-top:1px;
     width: 130%;
     /* gap: 130px; */
     margin-left: -60px;
+    margin-top: 10px;
 }
 
 .nextbuttonendpoints{
@@ -450,7 +452,7 @@ display: flex;
 flex-direction: column;
 align-items: flex-start;
 padding: 0px;
-gap: 24px;
+gap: 12px;
 
 width: 422px;
 height: 343px;
@@ -460,8 +462,85 @@ height: 343px;
 flex: none;
 order: 1;
 flex-grow: 0;
+margin-left: 30px;
+margin-bottom: 70px;
+
 }
 
 .association{
+    display: flex;
     color: white;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.pagewrapper{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+body{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.buttonwrappersummary {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    width: 130%;
+    /* gap: 130px; */
+    margin-left: -10px;
+    margin-top: 10px;
+    gap: 100px;
+}
+
+
+
+.wow {
+    display: flex;
+    gap: 10px;
+}
+
+.wow b {
+    width: 120px;   /* aligns all labels */
+    flex-shrink: 0;
+}
+
+.nextbuttonendpointsstart{
+/* Validate */
+
+/* Auto layout */
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 0px;
+gap: 8px;
+
+margin: 0 auto;
+width: 120px;
+height: 40px;
+
+border: 1px solid #40946C;
+border-radius: 100px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+
+font-weight: 700;
+font-size: 14px;
+line-height: 20px;
+
+letter-spacing: 0.1px;
+
+color: #40946C;
+
+
+
 }
