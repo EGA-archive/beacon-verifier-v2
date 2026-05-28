@@ -20,12 +20,12 @@
       
     {% block content %}
     {% endblock %}
-    {% include "footer.html" %}
+    
     </div>
 
     
 </body>
-
+{% include "footer.html" %}
 </html>
 
 <script>
@@ -205,6 +205,7 @@ function groupErrorsByUrl(map_out) {
     document.getElementById("pdot21").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot22").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot23").style.backgroundColor = "#CF7C3F";
+    document.getElementById("checkprogress").style.color = "#CF7C3F";
     document.getElementById("pdot2").removeAttribute("hidden");
     document.getElementById("downl").removeAttribute("hidden");
     document.getElementById("stop-btn").value="no";
@@ -512,6 +513,7 @@ function groupErrorsByUrl(map_out) {
         document.getElementById("myBar").style.backgroundColor = "#40946C";
         document.getElementById("pdot").setAttribute("hidden", true);
         document.getElementById("pdot2").style.backgroundColor = "#40946C";
+        document.getElementById("checkprogress").style.color = "#40946C";
         document.getElementById("pdot21").style.backgroundColor = "#40946C";
         document.getElementById("pdot22").style.backgroundColor = "#40946C";
         document.getElementById("pdot23").style.backgroundColor = "#40946C";

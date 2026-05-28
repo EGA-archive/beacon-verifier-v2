@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-
 {% load static %}
-
+{% load crispy_forms_tags %}
 
 {% block content %}
+      
             <div class="greyform" style="background-color: #EEEEEE;">
           
 
@@ -11,7 +11,7 @@
                 <div class="col reduce">
                   <div class="row">
                   </div>
-                                    <div class="circle-wrapper">
+                                    <div id="circlesfour" class="circle-wrapper">
 
                     <div class="dashed-line"></div>
                     <div class="dashed-line2"></div>
@@ -41,7 +41,22 @@
 
                     </div>
                   </div>
-                  <div class="verificationtable">
+                  <div id="verificationbar" style="padding-left: 50px; padding-right: 25px; display: none; margin-bottom: 10px; margin-top: -50px;">
+                    <span id="checkprogress" class="bi bi-check-circle-fill" style="position:relative; top:65px; right: 30px; font-size: 35px;color: #999999;"></span>
+                    <div style="position: relative; top: 10px; height: 50px;"><span id="pdot" class="dot">
+                      <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="pdot2" class="dot" hidden="hidden">
+                      <span id="pdot21" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot22" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                      <span id="pdot23" class="iep" style="position: relative; left: 11px; top: 7px"></span>
+                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 15px; font-weight: bold;">0%</span>
+                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 15px;">Paste URL and start verification</span></div>
+                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
+                    <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
+                  </div></div>
+                                    <div class="verificationtable">
                   <div><b>Verification Settings</b></div>
                   <hr style="width: 430px; margin-top: -10px;"></hr>
                                     <div class="wow"><b>API URL:</b> <span>{{endpoint_url}}</span></div>
@@ -51,6 +66,34 @@
                                     <div class="wow"><b>Endpoints:</b> {{endpoints}}</div>
                                     <div class="wow"><b>Datasets:</b> {{datasets}}</div>
                 </div>
+                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
+                    {% csrf_token %}
+                    <div class="row"><div>
+                    {% for f in form %}
+                    <b>{{f.help_text|safe}} {{f}} </b>   
+                    {% endfor %}
+                </div>
+
+              </div>
+
+                    <div class="mb-3" id="messages"></div>
+                <div id="summarytable" hidden="hidden">
+                <div style="width: 350px; margin-top: 5px;"><b>Results Summary</b></div><button hidden="hidden" class="bi bi-download" id="downl" value="Download" style="font-size: 10px; margin-left: 20px; margin-top: -25px; float: right;
+                border: 0.5px solid #636363;
+                width: 148px;
+                height: 26px;
+                color: #636363;
+                padding: 5px 20px;
+                text-align: center;
+                text-decoration: none;
+                cursor: pointer;
+                border-radius: 8px;"><b>&nbsp; Download Report</b></button> 
+                <hr style="width: 350px; margin-top: 10px;"></hr> 
+                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
+                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
+
+              
                 </div>
                     <button id="primerbutton2" hidden="hidden" onClick="window.location.reload();" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
                     border: none;
@@ -63,46 +106,37 @@
                     margin: 4px 2px;
                     cursor: pointer;
                     border-radius: 100px;"> New Verification</button>
-                    <div class="buttonwrappersummary">
-                    <button id="primerbutton" name="backendpoints" type="submit" class="nextbuttonendpoints" onclick="window.history.back()"> <span class="bi bi-arrow-left"></span><span>Back</span></button>
-                    <button id="primerbutton" name="datasets" value="{{ url }}" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbuttonendpointsstart"> <span>Start</span><span class="bi bi-arrow-right"> </span></button>
-                    </div>
+                    <button id="primerbutton" onclick="document.getElementById('myPercentext').innerText = 'Verifying...';  document.getElementById('circlesfour').style.display = 'none';
+  document.getElementById('verificationbar').style.display = 'block';" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
+                    border: none;
+                    width: 48%;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 100px;"> Start</button>
+                    <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
+                    border: none;
+                    width: 48%;
+                    color: black;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    margin: 4px 2px;
+                    cursor: pointer;
+                    border-radius: 100px;"> Stop</button>
+                  <div style="margin-top: 30px;">
+                    
+                </div>
+                
 
-                                  <div style="padding-left: 50px; padding-right: 25px;">
-                    <div style="position: relative; right: 50px; top: 10px;"><span id="pdot" class="dot">
-                      <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                    </span><span id="pdot2" class="dot" hidden="hidden">
-                      <span id="pdot21" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="pdot22" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="pdot23" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 15px; font-weight: bold;">0%</span>
-                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 15px;">Paste URL and start verification</span></div>
-                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
-                    <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
-                  </div>
                   
                 </div>
-                <div id="summarytable" hidden="hidden">
-                <div style="margin-top: 40px">Summary</div>
-                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
-                <button hidden="hidden" class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
-                border: 1 px solid #636363;
-                width: 75%;
-                color: #636363;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 100px;">&nbsp; Download Report</button>  
-              
 
-              
-                </div>
 
 
                   
@@ -116,7 +150,10 @@
             </div>
 
             </div>
-                <div id="theresultscol" class="col" style="height: 93vh; overflow: scroll; margin-top: -15px;">
+                
+              
+                
+            <div id="theresultscol" class="col" style="height: 93vh; overflow: scroll; margin-top: -15px;">
               <div id="messages" style="display: none; ">
             </div>
             
@@ -522,17 +559,10 @@
         
           </div>
           </div>
-              
-                
-            </div>  
+              </div>
+
             
-
-         
-        
-            
-
-
-
-        
+        </div>
 
 {% endblock %}  
+

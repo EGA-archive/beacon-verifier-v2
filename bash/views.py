@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 import subprocess
-from verifierweb.forms import SettingsForm, EndpointsForm, DatasetsForm
+from verifierweb.forms import SettingsForm, EndpointsForm, DatasetsForm, SummaryForm
 import logging
 from classes import JSONSchemaValidator
 import requests
@@ -398,6 +398,15 @@ class LandingPage(View):
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")
             endpoints=request.POST.get("endpoints_collected")
+            datasets_form = SummaryForm(
+                initial={
+                    "url_link": endpoint_url,
+                    "include_resultset_responses": "HIT",
+                    "granularity": "boolean",
+                    "test_mode": True,
+                    "endpoints_collected": endpoints
+                }
+            )
             final_endpoints_list=[]
             count_dict = {}
             endpoints=ast.literal_eval(endpoints)
@@ -435,6 +444,7 @@ class LandingPage(View):
                     "include": include,
                     "granularity": granularity,
                     "test_mode": test_mode,
+                    "form": datasets_form
                 }
 
             return render(request, "summary.html", context)

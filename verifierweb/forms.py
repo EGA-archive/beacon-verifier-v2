@@ -142,3 +142,20 @@ class DatasetsForm(forms.Form):
             self.fields['datasets_url'].widget.attrs['readonly'] = True
             self.fields['datasets_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
             self.fields['datasets_url'].initial=endpoint_url+'/datasets'
+
+class SummaryForm(forms.Form):
+    datasets_url = forms.CharField(
+       widget=forms.HiddenInput()
+    )
+    url_link = forms.CharField(widget=forms.HiddenInput())
+    include_resultset_responses = forms.CharField(widget=forms.HiddenInput())
+    granularity = forms.CharField(widget=forms.HiddenInput())
+    test_mode = forms.CharField(widget=forms.HiddenInput())
+    endpoints_collected = forms.CharField(widget=forms.HiddenInput())
+
+    number_of_datasets = forms.CharField(widget=forms.HiddenInput())
+
+    datasets_collected = forms.MultipleChoiceField(
+        choices=[],
+        widget=forms.HiddenInput()
+    )
