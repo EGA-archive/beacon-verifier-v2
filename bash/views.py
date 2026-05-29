@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import View
 import subprocess
-from verifierweb.forms import SettingsForm, EndpointsForm, DatasetsForm, SummaryForm
+from verifierweb.forms import SettingsForm, EndpointsForm, DatasetsForm, SummaryForm, ChannelForm
 import logging
 from classes import JSONSchemaValidator
 import requests
@@ -66,6 +66,8 @@ def endpoint_check(url, include, requestedgranularity, test_mode):
         try:
             f = requests.post(new_url, json = myobj)
             total_response = json.loads(f.text)
+            LOG.warning('oleleolala')
+            LOG.warning(total_response)
         except Exception as e:
             endpoint_validation.append(e)
             return endpoint_validation
@@ -95,7 +97,6 @@ def endpoint_check(url, include, requestedgranularity, test_mode):
                     except Exception:
                         continue
             else:
-                LOG.warning(total_response)
                 for resultSetsarray in total_response["response"]["resultSets"]:
                     try:
                         id = resultSetsarray["results"][0]["id"]
@@ -103,7 +104,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode):
                         break
                     except Exception:
                         continue
-        except Exception as e:
+        except Exception as exc:
             if is_appended:
                 pass
             else:
@@ -392,19 +393,20 @@ class LandingPage(View):
                 }
                 return render(request, "datasets.html", context)
         elif "datasets" in request.POST:
-            LOG.warning('yessss')
             endpoint_url=request.POST.get("endpoint_url")
             include=request.POST.get("include")
             granularity=request.POST.get("granularity")
             test_mode=request.POST.get("test_mode")
             endpoints=request.POST.get("endpoints_collected")
+            datasets_collected=request.POST.get("datasets_collected")
             datasets_form = SummaryForm(
                 initial={
                     "url_link": endpoint_url,
                     "include_resultset_responses": "HIT",
-                    "granularity": "boolean",
+                    "granularity": "record",
                     "test_mode": True,
-                    "endpoints_collected": endpoints
+                    "endpoints_collected": endpoints,
+                    "datasets_collected": datasets_collected
                 }
             )
             final_endpoints_list=[]
@@ -489,7 +491,7 @@ class ChannelView(View):
         return render(request, self.template_name, {"form": form})
 
     def post(self, request):
-        form = SettingsForm(request.POST)
+        form = ChannelForm(request.POST)
 
         if not form.is_valid():
             return JsonResponse({"errors": form.errors}, status=400)
@@ -498,24 +500,41 @@ class ChannelView(View):
         include = form.cleaned_data["include_resultset_responses"]
         granularity = form.cleaned_data["granularity"]
         test_mode = form.cleaned_data["test_mode"]
+        endpoints_collected = form.cleaned_data["endpoints_collected"]
+        final_endpoints_collected=[]
+        url=url.replace('[','')
+        url=url.replace(']','')
+        url=url.replace("'",'')
+        if ',' in endpoints_collected:
+            endpoints_collected=endpoints_collected.split(',')
+        else:
+            endpoints_collected=[endpoints_collected]
+        postfix=url.split('/')
+        for m in endpoints_collected:
+            suffix = m.split("/",1)[-1].split("'")[0]
+            if postfix[-1] in suffix:
+                suffix=suffix.split('/',1)[-1]
+            result = url + '/'+ suffix
+            final_endpoints_collected.append(result)
+        datasets_collected = form.cleaned_data["datasets_collected"]
 
         if url.endswith("info"):
-            return self.handle_info(url, include, granularity, test_mode)
+            return self.handle_info(url, include, granularity, test_mode, final_endpoints_collected, datasets_collected)
 
         elif url.endswith("configuration"):
-            return self.handle_configuration(url, include, granularity, test_mode)
+            return self.handle_configuration(url, include, granularity, test_mode, final_endpoints_collected, datasets_collected)
 
         elif url.endswith("filtering_terms"):
-            return self.handle_filtering_terms(url, include, granularity, test_mode)
+            return self.handle_filtering_terms(url, include, granularity, test_mode, final_endpoints_collected, datasets_collected)
 
         elif url.endswith((
             "analyses", "biosamples", "cohorts",
             "datasets", "g_variants", "individuals", "runs"
         )):
-            return self.handle_endpoint(url, include, granularity, test_mode)
+            return self.handle_endpoint(url, include, granularity, test_mode, final_endpoints_collected, datasets_collected)
 
         else:
-            return self.handle_map(url, include, granularity, test_mode)
+            return self.handle_map(url, include, granularity, test_mode, final_endpoints_collected, datasets_collected)
 
     def format_validation(self, validation):
         validated = ""
@@ -524,10 +543,9 @@ class ChannelView(View):
                 validated += "<br/>" + str(v)
         return validated
 
-    def handle_info(self, url, include, granularity, test_mode):
+    def handle_info(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):
         validation = []
         task = verification.delay(url, include, granularity, test_mode, "info_check")
-
         try:
             map_out = task.get()
             validation = map_out[0][1:]
@@ -538,7 +556,19 @@ class ChannelView(View):
             validation = [e]
             map_out = [url]
             beaconId = beaconName = beaconVersion = ""
-
+        LOG.warning({
+            "task_id": task.task_id,
+            "map_out": map_out,
+            "validation": self.format_validation(validation),
+            "beaconId": beaconId,
+            "beaconName": beaconName,
+            "beaconVersion": beaconVersion,
+            "include": include,
+            "granularity": granularity,
+            "test_mode": test_mode,
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
+        })
         return JsonResponse({
             "task_id": task.task_id,
             "map_out": map_out,
@@ -548,10 +578,12 @@ class ChannelView(View):
             "beaconVersion": beaconVersion,
             "include": include,
             "granularity": granularity,
-            "test_mode": test_mode
+            "test_mode": test_mode,
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
         })
 
-    def handle_configuration(self, url, include, granularity, test_mode):
+    def handle_configuration(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):
         validation = []
         task = verification.delay(url, include, granularity, test_mode, "configuration_check")
 
@@ -568,10 +600,12 @@ class ChannelView(View):
             "validation": self.format_validation(validation),
             "include": include,
             "granularity": granularity,
-            "test_mode": test_mode
+            "test_mode": test_mode,
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
         })
 
-    def handle_filtering_terms(self, url, include, granularity, test_mode):
+    def handle_filtering_terms(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):
         validation = []
         task = verification.delay(url, include, granularity, test_mode, "filtering_terms_check")
 
@@ -588,30 +622,44 @@ class ChannelView(View):
             "validation": self.format_validation(validation),
             "include": include,
             "granularity": granularity,
-            "test_mode": test_mode
+            "test_mode": test_mode,
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
         })
 
-    def handle_endpoint(self, url, include, granularity, test_mode):
+    def handle_endpoint(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):
+        if isinstance(datasets_collected, str):
+            datasets_collected=[datasets_collected]
         validation = []
-        task = verification.delay(url, include, granularity, test_mode, "endpoint_check")
+        global_validation=[]
+        if isinstance(include, str):
+            include = [include]
+        if isinstance(granularity, str):
+            granularity = [granularity]
+        for inc in include:
+            for gran in granularity:
+                task = verification.delay(url, inc, gran, test_mode, "endpoint_check")
+                try:
+                    map_out = task.get()
+                    validation = map_out[1:]
+                except Exception as e:
+                    validation = [e]
+                    map_out = [url]
+                global_validation+=validation
 
-        try:
-            map_out = task.get()
-            validation = map_out[1:]
-        except Exception as e:
-            validation = [e]
-            map_out = [url]
 
         return JsonResponse({
             "task_id": task.task_id,
             "map_out": map_out,
-            "validation": self.format_validation(validation),
+            "validation": self.format_validation(global_validation),
             "include": include,
             "granularity": granularity,
-            "test_mode": test_mode
+            "test_mode": test_mode,
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
         })
 
-    def handle_map(self, url, include, granularity, test_mode):
+    def handle_map(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):# TODO: include only passed list items from map
         validation = []
         task = verification.delay(url, include, granularity, test_mode, "map_check")
 
@@ -619,25 +667,17 @@ class ChannelView(View):
             map_out = task.get()
             validation = map_out[1][1:]
 
-            initial_list = [
-                f"{url}/info",
-                f"{url}/configuration",
-                f"{url}/filtering_terms",
-            ]
-
-            for m in map_out[0]:
-                initial_list.append(m)
-
         except Exception as e:
             validation = [e]
-            initial_list = []
 
         return JsonResponse({
             "task_id": task.task_id,
-            "bash_out": initial_list,
+            "bash_out": endpoints_collected,
             "include": include,
             "granularity": granularity,
             "test_mode": test_mode,
             "map": f"{url}/map",
             "validation": self.format_validation(validation),
+            "endpoints_collected": endpoints_collected,
+            "datasets_collected": datasets_collected
         })

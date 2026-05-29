@@ -102,7 +102,7 @@ function groupErrorsByUrl(map_out) {
     return results;
 }
 
-  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode) {
+  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode, endpoints_collected, datasets_collected) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
@@ -213,7 +213,7 @@ function groupErrorsByUrl(map_out) {
     
 
   }
-  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, bname, bid, bversion) {
+  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, endpoints_collected, datasets_collected, bname, bid, bversion) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
@@ -284,7 +284,13 @@ function groupErrorsByUrl(map_out) {
           const groupedData = groupErrorsByUrl(map_out);
 
           const errorsHTML = groupedData.flatMap(group => {
-              return group.errors.map((errorObj, index) => {
+              return group.errors
+              .filter(
+                errorObj =>
+                  errorObj.datasetId == null ||
+                  datasets_collected.includes(errorObj.datasetId)
+              )
+              .map((errorObj, index) => {
                   const raw = errorObj.raw;
                   const path = raw.received?.path || [];
                   const value = raw.received?.value;
@@ -292,7 +298,11 @@ function groupErrorsByUrl(map_out) {
 
                   return `
                   <details>
-                      <summary>Error in dataset: ${errorObj.datasetId}</summary
+                    ${
+                      errorObj.datasetId != null
+                        ? `<summary>Error in dataset: ${errorObj.datasetId}</summary>`
+                        : `<summary>Error</summary>`
+                    }
                       <summary>Error ${index + 1}: ${errorObj.message}</summary>
                       <details>
                           <summary>Expected schema</summary>
@@ -313,7 +323,7 @@ function groupErrorsByUrl(map_out) {
             console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
-            rsv.innerHTML = map_out[0][0]
+            rsv.innerHTML = map_out[0]
             console.log(iteration)
             console.log(bname)
             const yourBeacon = document.getElementById('beaconparams');
@@ -436,7 +446,7 @@ function groupErrorsByUrl(map_out) {
   let checks = 1;
   let warnings = 0;
   let errors = 0;
-  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, checks, warnings, errors) => {
+  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected, checks, warnings, errors) => {
     
 
     for (let i = 0; i < mapping.length; i++) {
@@ -464,6 +474,8 @@ function groupErrorsByUrl(map_out) {
           formData2.set('include_resultset_responses', include);
           formData2.set('granularity', granularity);
           formData2.set('test_mode', test_mode);
+          formData2.set('endpoints_collected', endpoints_collected);
+          formData2.set('datasets_collected', datasets_collected);
 
     fetch('/validator/', {
                   method: 'POST',
@@ -484,7 +496,9 @@ function groupErrorsByUrl(map_out) {
             const include = res.include;
             const granularity = res.granularity;
             const test_mode = res.test_mode;
-            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, bname, bid, bversion, checks, warnings, errors)
+            const endpoints_collected = res.endpoints_collected;
+            const datasets_collected = res.datasets_collected;
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, endpoints_collected, datasets_collected, bname, bid, bversion, checks, warnings, errors)
             console.log(res);
           })
           .catch((error) => {
@@ -567,9 +581,11 @@ function groupErrorsByUrl(map_out) {
           const include = res.include;
           const granularity = res.granularity;
           const test_mode = res.test_mode;
+          const endpoints_collected = res.endpoints_collected;
+          const datasets_collected = res.datasets_collected;
           console.log(mapstring)
           
-          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode);
+          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode, endpoints_collected, datasets_collected);
           console.log(res);
           const mapping = bash_out
           console.log(mapping)
@@ -577,7 +593,7 @@ function groupErrorsByUrl(map_out) {
           
 
           
-          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode);
+          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected);
 
 
           
