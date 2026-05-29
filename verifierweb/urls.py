@@ -24,7 +24,8 @@ from bash import urls as bash_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(bash_urls, namespace='bash')),
-    path('oidc/', include('mozilla_django_oidc.urls')),
+    path('', include('allauth.urls')),
+    path('', include('allauth.socialaccount.urls')),
     path("__reload__/", include("django_browser_reload.urls"))
 
 ]

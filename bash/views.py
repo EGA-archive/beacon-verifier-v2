@@ -17,6 +17,7 @@ from bash.errors import return_unhandled_error, error_message_to_return, error_m
 from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path, list_endpoints
 import ast
 import re
+from allauth.socialaccount.models import SocialAccount, SocialToken
 
 logger = logging.getLogger(__name__)
 
@@ -315,7 +316,21 @@ def verify_command(value):
 class LandingPage(View):
     template_name = "settings.html"
 
-    def get(self, request):
+    token = None
+
+    def get(self, request, *args, **kwargs):
+
+        user = request.user
+        
+        # Method 1: Using SocialToken (recommended)
+
+        account = SocialAccount.objects.filter(
+            user=request.user,
+            provider="my-server"
+        ).first()
+
+        access_token = account.extra_data.get("access_token") if account else None
+
         form = SettingsForm()
         context = {"form": form}
         return render(request, self.template_name, context)

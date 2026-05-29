@@ -545,3 +545,29 @@ color: #40946C;
 
 
 }
+
+.login{
+/* Network Members */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 6px 10px;
+gap: 8px;
+
+width: 89px;
+height: 36px;
+
+border: 1px solid #FFFFFF;
+border-radius: 6px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+}
