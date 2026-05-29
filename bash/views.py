@@ -450,18 +450,9 @@ class LandingPage(View):
                 }
 
             return render(request, "summary.html", context)
-        elif "backsettings" in request.POST:
-            form=SettingsForm(request.POST)
-            template_name = "settings.html"
-        elif "backendpoints" in request.POST:
-            form=EndpointsForm(request.POST)
-            template_name = "endpoints.html"
-        elif "backdatasets" in request.POST:
-            form=DatasetsForm(request.POST)
-            template_name = "datasets.html"
 
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {})
 
 def task_status(request):
     task_id = request.GET.get('task_id')
@@ -659,7 +650,7 @@ class ChannelView(View):
             "datasets_collected": datasets_collected
         })
 
-    def handle_map(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):# TODO: include only passed list items from map
+    def handle_map(self, url, include, granularity, test_mode, endpoints_collected, datasets_collected):
         validation = []
         task = verification.delay(url, include, granularity, test_mode, "map_check")
 

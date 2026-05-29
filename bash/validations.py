@@ -20,6 +20,18 @@ def list_endpoints(list_of_endpoints, endpoints):
 
     return list_of_endpoints
 
+def list_dataset_endpoint(endpoints):
+    print(endpoints, flush=True)
+    for k, v in endpoints["response"].items():
+        if k == 'endpointSets':
+            for k2, v2 in v.items():
+                if k2 == 'dataset':
+                    for k3, v3 in v2.items():
+                        if k3 == 'rootUrl':
+                            return v3
+
+    return ''
+
 def endpoint_request(url):
     output_validation=[]
     new_url = url

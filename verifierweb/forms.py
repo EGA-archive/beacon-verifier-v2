@@ -1,5 +1,5 @@
 from django import forms
-from bash.validations import endpoint_request, list_endpoints
+from bash.validations import endpoint_request, list_endpoints, list_dataset_endpoint
 import json
 
 def get_map_endpoints_list(url):
@@ -36,7 +36,10 @@ def get_map_endpoints_list(url):
 def get_datasets_list(url):
     initial_list=[]
     final_list=[]
-    new_url = url + '/datasets'
+    f, output_validation = endpoint_request(url+'/map')
+    total_response = json.loads(f.text)
+    new_url = list_dataset_endpoint(total_response)
+
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
@@ -137,6 +140,7 @@ class DatasetsForm(forms.Form):
 
         if endpoint_url:
             self.fields["datasets_collected"].choices = get_datasets_list(endpoint_url)
+            self.fields["datasets_collected"].initial = [choice[0] for choice in self.fields["datasets_collected"].choices]
             self.fields['number_of_datasets'].widget.attrs['readonly'] = True
             self.fields['number_of_datasets'].initial = len(self.fields["datasets_collected"].choices)
             self.fields['datasets_url'].widget.attrs['readonly'] = True

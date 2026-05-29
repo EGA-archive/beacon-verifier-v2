@@ -95,7 +95,7 @@
 
               
                 </div>
-                    <button id="primerbutton2" hidden="hidden" onClick="window.location.reload();" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
+                    <button id="primerbutton2" hidden="hidden" onClick="window.location.href='/'" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
                     border: none;
                     width: 100%;
                     color: white;
@@ -118,7 +118,7 @@
                     margin: 4px 2px;
                     cursor: pointer;
                     border-radius: 100px;"> Start</button>
-                    <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
+                    <button type="disabled" value="si" onclick="functionToExecute(); document.getElementById('primerbutton').setAttribute('hidden','hidden');" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
                     border: none;
                     width: 48%;
                     color: black;
