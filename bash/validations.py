@@ -24,7 +24,7 @@ def list_dataset_endpoint(endpoints):
     for k, v in endpoints["response"].items():
         if k == 'endpointSets':
             for k2, v2 in v.items():
-                if k2 == 'dataset':
+                if 'dataset' in k2:
                     for k3, v3 in v2.items():
                         if k3 == 'rootUrl':
                             return v3
