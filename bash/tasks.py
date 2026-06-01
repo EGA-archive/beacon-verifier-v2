@@ -11,7 +11,7 @@ from celery.result import AsyncResult
 logger = get_task_logger(__name__)
 
 @shared_task(bind=True, base=AbortableTask)
-def verification(self, url_link, include, granularity, test_mode, function_name):
+def verification(self, url_link, include, granularity, test_mode, function_name, access_token):
     from bash.views import info_check, endpoint_check, filtering_terms_check, error_check, configuration_check, map_check
 
     functions = {
@@ -26,5 +26,5 @@ def verification(self, url_link, include, granularity, test_mode, function_name)
     if self.is_aborted():
         return 'Task stopped!'
     function = functions[function_name]
-    bash_out = function(url_link, include, granularity, test_mode)
+    bash_out = function(url_link, include, granularity, test_mode, access_token)
     return bash_out 

@@ -50,7 +50,6 @@ def get_datasets_list(url):
         initial_list.append(dataset_record["id"])
     for item in initial_list:
         final_list.append((item, item))
-    print(final_list, flush=True)
     return final_list
 
 class SettingsForm(forms.Form):

@@ -232,3 +232,5 @@ CHANNEL_LAYERS = {
 }
 
 SOCIALACCOUNT_ADAPTER = "verifierweb.adapter.MyOIDCAdapter"
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
