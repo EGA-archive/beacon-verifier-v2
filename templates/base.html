@@ -20,7 +20,7 @@
       
     {% block content %}
     {% endblock %}
-    
+
     </div>
 
     
@@ -287,8 +287,8 @@ function groupErrorsByUrl(map_out) {
               return group.errors
               .filter(
                 errorObj =>
-                  errorObj.datasetId == null ||
-                  datasets_collected.includes(errorObj.datasetId)
+                  errorObj.raw.datasetId == null ||
+                  datasets_collected.includes(errorObj.raw.datasetId)
               )
               .map((errorObj, index) => {
                   const raw = errorObj.raw;
@@ -297,13 +297,14 @@ function groupErrorsByUrl(map_out) {
                   const schema = raw.schema?.definition || {};
 
                   return `
+                  <div>Query: ${granularity} + ${include}</div>
                   <details>
                     ${
-                      errorObj.datasetId != null
-                        ? `<summary>Error in dataset: ${errorObj.datasetId}</summary>`
+                      raw.datasetId != null
+                        ? `<summary>Error in dataset: ${raw.datasetId}</summary>`
                         : `<summary>Error</summary>`
                     }
-                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
+                      <summary>Error ${index + 1}: ${raw.errorMessage}</summary>
                       <details>
                           <summary>Expected schema</summary>
                           <pre>${JSON.stringify(schema, null, 2)}</pre>
@@ -389,6 +390,7 @@ function groupErrorsByUrl(map_out) {
                   const schema = raw.schema?.definition || {};
 
                   return `
+                  <div>Query: ${granularity} + ${include}</div>
                   <details>
                       <summary>Error ${index + 1}: ${errorObj.message}</summary>
                       <details>
@@ -668,5 +670,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkboxes = getCheckboxes();
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
     setState(allChecked);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("settingsForm");
+    const loading = document.getElementById("loadingContainer");
+
+    if (!form || !loading) {
+        console.error("Form or loading container not found");
+        return;
+    }
+
+    form.addEventListener("submit", function () {
+        loading.style.display = "block";
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("endpointsform");
+    const loading = document.getElementById("loadingContainer");
+
+    if (!form || !loading) {
+        console.error("Form or loading container not found");
+        return;
+    }
+
+    form.addEventListener("submit", function () {
+        loading.style.display = "block";
+    });
 });
 </script>

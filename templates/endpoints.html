@@ -41,7 +41,7 @@
 
                     </div>
                   </div>
-                     <form method="post" class="formsettings">
+                     <form id="endpointsform" method="post" class="formsettings">
                         {% csrf_token %}
 {% for hidden in form.hidden_fields %}
     {{ hidden }}
@@ -87,7 +87,12 @@
 
                     <div class="buttonwrapper">
                     <button id="primerbutton" name="endpoints" value="{{ url }}" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbuttonendpoints"> <span>Next</span><span class="bi bi-arrow-right"> </span></button>
-                    </div>
+                                      <div id="loadingContainer" style="display:none;">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading datasets...</div>
+</div>
+                  
+                  </div>
                     <div style="margin-top: 30px;">
                     
                 </div>
