@@ -1,6 +1,7 @@
 from django import forms
 from bash.validations import endpoint_request, list_endpoints, list_dataset_endpoint
 import json
+from django.core.exceptions import ValidationError
 
 def get_map_endpoints_list(url):
     new_url = url + '/map'
@@ -56,7 +57,7 @@ class SettingsForm(forms.Form):
     choices_irr = [("HIT", "HIT"), ("MISS", "MISS"), ("ALL", "ALL"), ("NONE", "NONE")]
     choices_granularity = [("record", "record"), ("count", "count"), ("boolean", "boolean")]
     choices_testmode = [("True", "True"), ("False", "False")]
-    url_link = forms.CharField(widget=forms.TextInput(attrs={'size':50}), max_length=100, required=False, help_text="<div style='margin-bottom: 8px;'>Beacon URL</div>", label="")
+    url_link = forms.CharField(widget=forms.TextInput(attrs={'size':50}), max_length=100, required=True, help_text="<div style='margin-bottom: 8px;'>Beacon URL</div>", label="")
     include_resultset_responses = forms.MultipleChoiceField(
         choices=choices_irr, 
         widget=forms.CheckboxSelectMultiple,
@@ -70,8 +71,21 @@ class SettingsForm(forms.Form):
     test_mode = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'ios-switch'},),
-        initial=True
+        initial=False
     )
+    def clean(self):
+        cleaned_data = super().clean()
+
+        include = cleaned_data.get("include_resultset_responses") or []
+        granularity = cleaned_data.get("granularity") or []
+
+        if "NONE" in include and "record" in granularity:
+            msg = "The query record + NONE is not possible, please select other options."
+
+            self.add_error("include_resultset_responses", msg)
+            self.add_error("granularity", msg)
+
+        return cleaned_data
 
 class EndpointsForm(forms.Form):
 

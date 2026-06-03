@@ -97,7 +97,7 @@ border: 1px solid #7A7A7A;
 }
 
 .settings-box {
-    display: flex;
+    display: block;
     align-items: center;
     gap: 20px;
     background: white;
@@ -119,11 +119,12 @@ border: 1px solid #7A7A7A;
 }
 
 .setting-item {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    width: 50%;
+    /* gap: 16px; */
+    /* width: 50%; */
     margin-top: 10px;
+    margin-right: 120px;
 }
 /* container */
 .ios-toggle #id_test_mode {
@@ -236,7 +237,7 @@ border: 1px solid #7A7A7A;
 }
 
 .granu2{
-    margin-left: 140px;
+    margin-left: 115px;
     position: relative;
     top: 30px;
 }
@@ -570,4 +571,9 @@ flex: none;
 order: 2;
 flex-grow: 0;
 
+}
+
+.field-error{
+    color: red;
+    
 }

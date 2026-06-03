@@ -50,17 +50,7 @@
                                 <b>{{ f.help_text|safe }} {{ f }}</b>
                             {% endif %}
                             {% endfor %}
-                              <div class="toggle-inline">
-                                  <span><b>Test Mode</b></span><span>Off</span>
 
-                                  {% for f in form %}
-                                      {% if f.name == "test_mode" %}
-                                          {{ f }}
-                                      {% endif %}
-                                  {% endfor %}
-
-                                  <span>On</span>
-                              </div>
                           <div class="selectallwrapper">
                               <button type="button" class="selectall inactive" id="selectbox">Select All</button>
                               <button type="button" class="selectall" id="clearbox">Unselect All</button>
@@ -76,10 +66,32 @@
                                   <div class="setting-item">
 
                                       {{ f }}
+
                                   </div>
                               {% endif %}
                           {% endfor %}
+                              <div class="toggle-inline">
+                                  <span><b>Test Mode</b></span><span>Off</span>
+
+                                  {% for f in form %}
+                                      {% if f.name == "test_mode" %}
+                                          {{ f }}
+                                      {% endif %}
+                                  {% endfor %}
+
+                                  <span>On</span>
+                              </div>
+                              {% for f in form %}
+                              {% if f.name == "granularity" %}
+                                                                                  {% if f.errors %}
+                  <div class="field-error">
+                      {{ f.errors }}
+                  </div>
+              {% endif %}
+              {% endif %}
+              {% endfor %}
                       </div>
+
                       </div>
 
 

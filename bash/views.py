@@ -20,6 +20,7 @@ import re
 from allauth.socialaccount.models import SocialAccount, SocialToken
 import jwt
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -384,7 +385,6 @@ class LandingPage(View):
 
         if "settings" in request.POST:
             form = SettingsForm(request.POST)
-
             if form.is_valid():
                 url = form.cleaned_data["url_link"]
                 include = form.cleaned_data["include_resultset_responses"]
@@ -411,8 +411,9 @@ class LandingPage(View):
                     "token_expired": token_expired
                 }
                 return render(request, "endpoints.html", context)
+            else:
+                return render(request, "settings.html", {"form": form})
         elif "endpoints" in request.POST:
-
             endpoint_url=request.POST.get("endpoint_url")
             endpoints=request.POST.get("endpoints_collected")
 
