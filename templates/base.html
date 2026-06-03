@@ -139,6 +139,9 @@ function groupErrorsByUrl(map_out) {
             if (mapvalidation == '') {
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
               document.getElementById('cardinitial').style.borderColor = "#40946C";
@@ -149,6 +152,9 @@ function groupErrorsByUrl(map_out) {
               console.log('warning')
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
               document.getElementById('cardinitial').style.borderColor = "#CF7C40";
@@ -168,6 +174,9 @@ function groupErrorsByUrl(map_out) {
             rsved.innerHTML = mapvalidation
             var heart = document.createElement('i')
             heart.className = 'bi-x-circle'
+            heart.style.position = 'absolute'
+            heart.style.top = '7px' 
+            heart.style.right = '10px'
             yourMessage.append(heart)
             yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
             document.getElementById('cardinitial').style.borderColor = "#B85353";
@@ -252,6 +261,9 @@ function groupErrorsByUrl(map_out) {
           if (validation == '') {
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
               document.getElementById(finalcard).style.borderColor = "#40946C";
@@ -261,6 +273,9 @@ function groupErrorsByUrl(map_out) {
             } else if(map_out[1].errorMessage?.includes("Internal Server Error")){
               var heart = document.createElement('i')
               heart.className = 'bi-x-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
               yourMessage.style.borderColor = "#B85353";
@@ -273,6 +288,9 @@ function groupErrorsByUrl(map_out) {
             else {
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               console.log('warning')
               yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
@@ -283,40 +301,70 @@ function groupErrorsByUrl(map_out) {
             }
           const groupedData = groupErrorsByUrl(map_out);
 
-          const errorsHTML = groupedData.flatMap(group => {
-              return group.errors
-              .filter(
-                errorObj =>
-                  errorObj.raw.datasetId == null ||
-                  datasets_collected.includes(errorObj.raw.datasetId)
-              )
-              .map((errorObj, index) => {
-                  const raw = errorObj.raw;
-                  const path = raw.received?.path || [];
-                  const value = raw.received?.value;
-                  const schema = raw.schema?.definition || {};
+          const filteredErrors = groupedData.flatMap(group =>
+            group.errors.filter(
+              errorObj =>
+                errorObj.raw.datasetId == null ||
+                datasets_collected.includes(errorObj.raw.datasetId)
+            )
+          );
+          const totalErrors = filteredErrors.length;
+          const totalErrorsHTML =
+            totalErrors > 0
+              ? `
+                <div style="position: absolute; top: 7px; right: 35px;">
+                  (${totalErrors})
+                </div>
+              `
+              : "";
+          const errorsHTML = `
+            ${totalErrorsHTML}
 
-                  return `
-                  <div>Query: ${granularity} + ${include}</div>
-                  <details>
-                    ${
-                      raw.datasetId != null
-                        ? `<summary>Error in dataset: ${raw.datasetId}</summary>`
-                        : `<summary>Error</summary>`
-                    }
-                      <summary>Error ${index + 1}: ${raw.errorMessage}</summary>
+            ${filteredErrors.map((errorObj, index) => {
+              const raw = errorObj.raw;
+              const path = raw.received?.path || [];
+              const value = raw.received?.value;
+              const schema = raw.schema?.definition || {};
+
+              return `
+                <div><b>Query</b>: ${granularity} + ${include}</div>
+
+                ${
+                  raw.datasetId != null
+                    ? `<div><b>Dataset</b>: ${raw.datasetId}</div>`
+                    : `<div><b>Errors</b></div>`
+                }
+
+                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
+
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6;">
                       <details>
-                          <summary>Expected schema</summary>
-                          <pre>${JSON.stringify(schema, null, 2)}</pre>
+                        <summary>Expected schema</summary>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
                       </details>
+                    </div>
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
                       <details>
-                          <summary>Received response & path</summary>
-                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
+                        <summary>Received response & path</summary>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
                       </details>
-                  </details>
-                  <br>`;
-              });
-          }).join('<hr>'); // separate each error visually
+                    </div>
+
+                  </div>
+                </details>
+
+                <br>
+              `;
+            }).join("<hr>")}
+          `;
 
           rsved.innerHTML = errorsHTML;
             
@@ -372,6 +420,9 @@ function groupErrorsByUrl(map_out) {
           }
           var heart = document.createElement('i')
           heart.className = 'bi-x-circle'
+          heart.style.position = 'absolute'
+          heart.style.top = '7px' 
+          heart.style.right = '10px'
           yourMessage.append(heart)
           yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
           yourMessage.style.borderColor = "#B85353";
@@ -390,7 +441,9 @@ function groupErrorsByUrl(map_out) {
                   const schema = raw.schema?.definition || {};
 
                   return `
-                  <div>Query: ${granularity} + ${include}</div>
+                  <div style="position: absolute; top: 7px; right: 30px;">
+                    (1)
+                  </div>
                   <details>
                       <summary>Error ${index + 1}: ${errorObj.message}</summary>
                       <details>
