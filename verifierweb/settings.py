@@ -34,7 +34,7 @@ DEBUG = True
 #ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
-CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org']
+CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org', 'https://beacon-images-api-test.ega-archive.org/']
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
