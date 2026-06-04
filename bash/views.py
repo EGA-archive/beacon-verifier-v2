@@ -323,9 +323,14 @@ def get_token_data(self, request):
         provider="my-server"
     ).first()
 
-    access_token = account.extra_data.get("access_token") if account else None
+    access_token = None
 
-    if not access_token:
+    social_token = account.socialtoken_set.first()
+
+    if social_token:
+        access_token = social_token.token
+
+    if access_token == None:
         return account, None, True
 
     try:
@@ -368,6 +373,8 @@ class LandingPage(View):
     def get(self, request, *args, **kwargs):
 
         account, access_token, token_expired = get_token_data(self, request)
+        LOG.warning('I am')
+        LOG.warning(access_token)
 
         form = SettingsForm()
         context = {"form": form, "token_expired": token_expired,

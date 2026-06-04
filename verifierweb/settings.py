@@ -34,7 +34,7 @@ DEBUG = int(os.environ.get("DEBUG", default=1))
 #ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
-CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org', 'https://beacon-images-api-test.ega-archive.org/']
+CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org', 'https://beacon-images-api-test.ega-archive.org', 'http://localhost:8000']
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
@@ -67,10 +67,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.openid_connect'
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
 ]
 
 MIDDLEWARE = [
@@ -235,3 +231,8 @@ CHANNEL_LAYERS = {
 SOCIALACCOUNT_ADAPTER = "verifierweb.adapter.MyOIDCAdapter"
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+SOCIALACCOUNT_STORE_TOKENS = True
