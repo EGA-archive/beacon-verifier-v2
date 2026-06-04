@@ -29,11 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
-    LOG.warning('global areeee')
-    LOG.warning(requestedgranularity)
-    LOG.warning(type(requestedgranularity))
-    LOG.warning(include)
-    LOG.warning(type(include))
+    endpoint_validation=[]
 
     for gran in requestedgranularity:
         for inc in include:
@@ -41,7 +37,6 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 test_mode = True
             else:
                 test_mode = False
-            endpoint_validation=[]
             is_error = False
             is_appended = False
             if 'd}' in url:
@@ -182,18 +177,15 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 resolver, response = resolve_validation_path(path)
                 logs=JSONSchemaValidator.validate(total_response, response, resolver)
                 for log in logs:
-                    json_object_with_the_log_of_the_error_to_return = error_message_to_return(log)
+                    json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                     endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
             else:
                 path='ref_schemas/framework/json/responses/sections/beaconResponseMeta.json'
                 resolver, response = resolve_validation_path(path)
                 logs=JSONSchemaValidator.validate(meta, response, resolver)
                 for log in logs:
-                    json_object_with_the_log_of_the_error_to_return = error_message_to_return(log)
+                    json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                     endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
-                LOG.warning('which is the')
-                LOG.warning(gran)
-                LOG.warning(inc)
                 if gran == 'record' and inc != 'NONE':
                     if endpoint in ['cohorts', 'datasets']:
                         path='ref_schemas/framework/json/responses/beaconCollectionsResponse.json'
@@ -203,7 +195,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                         resolver, response = resolve_validation_path(path)
                     logs=JSONSchemaValidator.validate(total_response, response, resolver)
                     for log in logs:
-                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log)
+                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                         endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                     path='ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json'
                     resolver, response = resolve_validation_path(path)
@@ -238,17 +230,21 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                                     logs_2=JSONSchemaValidator.validate(result, response, resolver)
                                 try:
                                     for log in logs_2:
-                                        json_object_with_the_log_of_the_error_to_return = error_message_with_dataset_to_return(log, datasetId)
+                                        json_object_with_the_log_of_the_error_to_return = error_message_with_dataset_to_return(log, datasetId, inc, gran)
                                         endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                                 except Exception:
                                     pass
+                    LOG.warning('which is the')
+                    LOG.warning(gran)
+                    LOG.warning(inc)
+                    LOG.warning(endpoint_validation)
                 
                 elif gran == 'count' and inc == 'NONE':
                     path='ref_schemas/framework/json/responses/beaconCountResponse.json'
                     resolver, response = resolve_validation_path(path)
                     logs=JSONSchemaValidator.validate(total_response, response, resolver)
                     for log in logs:
-                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log)
+                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                         endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
 
 
@@ -257,7 +253,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     resolver, response = resolve_validation_path(path)
                     logs=JSONSchemaValidator.validate(total_response, response, resolver)
                     for log in logs:
-                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log)
+                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                         endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
     return endpoint_validation
 

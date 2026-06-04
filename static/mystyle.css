@@ -615,3 +615,8 @@ flex-grow: 0;
     left: 5%;
     font-size: 12px;
 }
+
+#date{
+    color: black; 
+    text-decoration: none;
+}

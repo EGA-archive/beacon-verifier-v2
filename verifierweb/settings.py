@@ -31,8 +31,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "&nl8s430j^j8l*je+m&ys5dv#zoy)0a2+x1!m
 DEBUG = True
 #DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-#ALLOWED_HOSTS = ['localhost']
+#ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
 CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org']
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -108,7 +109,7 @@ SOCIALACCOUNT_PROVIDERS = {
                     # May be one of "client_secret_basic", "client_secret_post"
                     # If omitted, a method from the the server's
                     # token auth methods list is used,
-                    'redirect_uri': "http://localhost:8000/oidc/my-server/login/callback/",
+                    'redirect_uri': os.getenv("REDIRECT_URI"),
                     "token_auth_method": "client_secret_basic"
                 },
             }

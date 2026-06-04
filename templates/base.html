@@ -327,16 +327,14 @@ function groupErrorsByUrl(map_out) {
               const schema = raw.schema?.definition || {};
 
               return `
-                <div><b>Query</b>: ${granularity} + ${include}</div>
+                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
+                <div><b>Query</b>: ${raw.granularity} + ${raw.include}</div>
 
                 ${
                   raw.datasetId != null
                     ? `<div><b>Dataset</b>: ${raw.datasetId}</div>`
                     : `<div><b>Errors</b></div>`
                 }
-
-                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
-
                 <details>
                   <summary>Received response & path vs. Expected schema</summary>
 

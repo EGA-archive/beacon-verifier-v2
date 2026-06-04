@@ -41,7 +41,7 @@
 
                     </div>
                   </div>
-                  <div id="verificationbar" style="padding-left: 50px; padding-right: 25px; display: none; margin-bottom: 10px; margin-top: -50px;">
+                  <div id="verificationbar" style="padding-left: 50px; padding-right: 25px; display: none; margin-bottom: 20px; margin-top: -50px;">
                     <span id="checkprogress" class="bi bi-check-circle-fill" style="position:relative; top:65px; right: 30px; font-size: 35px;color: #999999;"></span>
                     <div style="position: relative; top: 10px; height: 50px;"><span id="pdot" class="dot">
                       <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
@@ -66,7 +66,7 @@
                                     <div class="wow"><b>Endpoints:</b> {{endpoints}}</div>
                                     <div class="wow"><b>Datasets:</b> {{datasets}}</div>
                 </div>
-                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
+                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%; margin-left: -30px; margin-top: -100px;">
                     {% csrf_token %}
                     <div class="row"><div>
                     {% for f in form %}
