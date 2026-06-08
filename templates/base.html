@@ -753,3 +753,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+<script>
+function hideMessage(isNONEChecked, isrecordChecked, isHITChecked, iscountChecked, isMISSChecked, isbooleanChecked, isALLChecked) {
+  const nonerecordmsg = document.getElementById("nonerecordmsg");
+  const onlynonerecordmsg = document.getElementById("onlynonerecordmsg");
+  if (isNONEChecked && isrecordChecked) {
+    if (!isALLChecked && !isbooleanChecked && !isMISSChecked && !iscountChecked && !isHITChecked) {
+      document.getElementById("settings-box").classList.add('settings-box-red');
+      document.getElementById("settings-box").classList.remove('settings-box');
+      onlynonerecordmsg.removeAttribute("hidden");
+      nonerecordmsg.setAttribute("hidden", true);
+      document.getElementById("primerbutton").disabled = true;
+      document.getElementById("primerbutton").classList.remove('nextbutton');
+      document.getElementById("primerbutton").classList.add('nextbuttongrey');
+    }
+    else {
+      onlynonerecordmsg.setAttribute("hidden", true);
+      nonerecordmsg.removeAttribute("hidden");
+      document.getElementById("settings-box").classList.remove('settings-box-red');
+      document.getElementById("settings-box").classList.add('settings-box');
+      document.getElementById("primerbutton").disabled = false;
+      document.getElementById("primerbutton").classList.remove('nextbuttongrey');
+      document.getElementById("primerbutton").classList.add('nextbutton');
+      
+
+    }
+  } else {
+    nonerecordmsg.setAttribute("hidden", true);
+    onlynonerecordmsg.setAttribute("hidden", true);
+    document.getElementById("settings-box").classList.remove('settings-box-red');
+    document.getElementById("settings-box").classList.add('settings-box');
+    document.getElementById("primerbutton").disabled = false;
+    document.getElementById("primerbutton").classList.remove('nextbuttongrey');
+    document.getElementById("primerbutton").classList.add('nextbutton');
+  }
+}
+const nonecheckbox = document.getElementById('id_include_resultset_responses_3');
+const recordcheckbox = document.getElementById('id_granularity_0');
+const hitcheckbox = document.getElementById('id_include_resultset_responses_0');
+const countcheckbox = document.getElementById('id_granularity_1');
+const misscheckbox = document.getElementById('id_include_resultset_responses_1');
+const booleancheckbox = document.getElementById('id_granularity_2');
+const allcheckbox = document.getElementById('id_include_resultset_responses_2');
+nonecheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+recordcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+hitcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+countcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+misscheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+booleancheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+allcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+
+</script>

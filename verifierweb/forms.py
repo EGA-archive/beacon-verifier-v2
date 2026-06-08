@@ -75,15 +75,19 @@ class SettingsForm(forms.Form):
     )
     def clean(self):
         cleaned_data = super().clean()
-
+        msg=None
         include = cleaned_data.get("include_resultset_responses") or []
         granularity = cleaned_data.get("granularity") or []
-
-        if "NONE" in include and "record" in granularity:
+        if include==["NONE"] and granularity==["record"]:
             msg = "The query record + NONE is not possible, please select other options."
 
             self.add_error("include_resultset_responses", msg)
             self.add_error("granularity", msg)
+            cleaned_data["msg"]=msg
+
+        elif "NONE" in include and "record" in granularity:
+            msg = "The query record + NONE is not possible. It will be excluded, while all other selected queries will be performed."
+
 
         return cleaned_data
 

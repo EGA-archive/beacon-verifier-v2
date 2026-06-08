@@ -33,6 +33,8 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
 
     for gran in requestedgranularity:
         for inc in include:
+            if gran == 'record' and inc == 'NONE':
+                continue
             if test_mode == 0:
                 test_mode = True
             else:
@@ -388,11 +390,18 @@ class LandingPage(View):
 
         if "settings" in request.POST:
             form = SettingsForm(request.POST)
+            msg = None
             if form.is_valid():
                 url = form.cleaned_data["url_link"]
                 include = form.cleaned_data["include_resultset_responses"]
                 granularity = form.cleaned_data["granularity"]
                 test_mode = form.cleaned_data["test_mode"]
+                try:
+                    msg = form.cleaned_data["msg"]
+                    if msg is not None:
+                        return render(request, "settings.html", {"form": form, "msg": msg})
+                except Exception as e:
+                    msg = None
                 endpoints_form = EndpointsForm(
                     endpoint_url=url,
                     initial={

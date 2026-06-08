@@ -56,10 +56,11 @@
                               <button type="button" class="selectall" id="clearbox">Unselect All</button>
                           </div>
 
-                        <div>
-                          <span class="granu"><b>Granularity</b></span>
-                          <span class="granu2"><b>Response Type</b></span>
-                      <div class="settings-box">
+                        <div style="margin-top: -30px;">
+                          <span class="granu"><b>Response Type</b></span>
+                          <span class="granu2"><b>Granularity</b></span>
+                          
+                      <div id="settings-box" class="settings-box">
                         
                           {% for f in form %}
                               {% if f.name != "test_mode" and f.name != "url_link" %}
@@ -81,6 +82,8 @@
 
                                   <span>On</span>
                               </div>
+                              <div id="nonerecordmsg">The query record + NONE is not possible. It will be excluded, while all other selected queries will be performed.</div>
+                              <div id="onlynonerecordmsg" hidden="hidden">The query record + NONE is not possible, please select other options.</div>
                               {% for f in form %}
                               {% if f.name == "granularity" %}
                                                                                   {% if f.errors %}
