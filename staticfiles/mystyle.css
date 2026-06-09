@@ -285,6 +285,8 @@ input[type="checkbox"] {
 
     cursor: pointer;
     transition: 0.2s ease;
+
+    z-index: 10;
 }
 
 .selectallwrapper {
@@ -458,7 +460,7 @@ padding: 0px;
 gap: 12px;
 
 width: 422px;
-height: 343px;
+min-height: 250px;
 
 
 /* Inside auto layout */
@@ -466,7 +468,6 @@ flex: none;
 order: 1;
 flex-grow: 0;
 margin-left: 30px;
-margin-bottom: 70px;
 
 }
 

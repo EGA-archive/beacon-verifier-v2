@@ -339,21 +339,18 @@ function groupErrorsByUrl(map_out) {
                   <summary>Received response & path vs. Expected schema</summary>
 
                   <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
-                    
-                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6;">
-                      <details>
-                        <summary>Expected schema</summary>
-                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; overflow-y:auto; margin:0;">
-          ${JSON.stringify(schema, null, 2)}</pre>
-                      </details>
-                    </div>
 
                     <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
-                      <details>
-                        <summary>Received response & path</summary>
-                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; overflow-y:auto; margin:0;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
           ${JSON.stringify({ path, value }, null, 2)}</pre>
-                      </details>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
                     </div>
 
                   </div>
@@ -442,17 +439,27 @@ function groupErrorsByUrl(map_out) {
                   <div style="position: absolute; top: 7px; right: 30px;">
                     (1)
                   </div>
-                  <details>
-                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
-                      <details>
-                          <summary>Expected schema</summary>
-                          <pre>${JSON.stringify(schema, null, 2)}</pre>
-                      </details>
-                      <details>
-                          <summary>Received response & path</summary>
-                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
-                      </details>
-                  </details>
+                  <div>Error ${index + 1}: ${errorObj.message}</div>
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
+                    </div>
+
+                  </div>
+                </details>
                   <br>`;
               });
           }).join('<hr>'); // separate each error visually
@@ -700,18 +707,23 @@ function getCheckboxes() {
 }
 
 function setState(allChecked) {
+    const nonerecordmsg = document.getElementById("nonerecordmsg");
     if (allChecked) {
         clearboxBtn.classList.remove("inactive");
         selectboxBtn.classList.add("inactive");
+        nonerecordmsg.removeAttribute("hidden", true);
+
     } else {
         selectboxBtn.classList.remove("inactive");
         clearboxBtn.classList.add("inactive");
+        nonerecordmsg.setAttribute("hidden", true);
     }
 }
 
 function setAll(state) {
     getCheckboxes().forEach(cb => cb.checked = state);
     setState(state);
+
 }
 
 selectboxBtn.addEventListener("click", () => setAll(true));
@@ -803,4 +815,13 @@ misscheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, r
 booleancheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
 allcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
 
+</script>
+<script>
+function copySchema() {
+    const text = document.getElementById('expected-schema').innerText;
+
+    navigator.clipboard.writeText(text)
+        .then(() => console.log('Copied'))
+        .catch(err => console.error('Copy failed:', err));
+}
 </script>
