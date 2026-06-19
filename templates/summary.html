@@ -28,12 +28,17 @@
                         <div class="circlegreen">2</div>
                         <span class="circle-label">Endpoints</span>
                       </div>
-
+                      {% if datasets == 'Dataset selection is not applicable when only NONE is selected, as responses are returned per beacon.' %}
+                      <div class="circle-item">
+                        <div class="circlegrey">3</div>
+                        <span class="circle-label">Datasets</span>
+                      </div>
+                      {% else %}
                       <div class="circle-item">
                         <div class="circlegreen">3</div>
                         <span class="circle-label">Datasets</span>
                       </div>
-
+                      {% endif %}
                       <div class="circle-item">
                         <div class="circlegreen">4</div>
                         <span class="circle-label">Summary</span>
@@ -64,7 +69,11 @@
                                     <div class="wow"><b>Granularity:</b> {{granularity}}</div>
                                     <div class="wow"><b>Response Type:</b> {{include}}</div>
                                     <div class="wow"><b>Endpoints:</b> {{endpoints}}</div>
+                                    {% if datasets == 'Dataset selection is not applicable when only NONE is selected, as responses are returned per beacon.' %}
+                                    <div class="wow" style="color: grey"><b>Datasets:</b> {{datasets}}</div>
+                                    {% else %}
                                     <div class="wow"><b>Datasets:</b> {{datasets}}</div>
+                                    {% endif %}
                 </div>
                   <form id="your-form" method="post" style="padding: 0px 61px 34px 61px; width: 100%; margin-left: -30px;">
                     {% csrf_token %}

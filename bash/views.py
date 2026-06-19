@@ -236,10 +236,6 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                                         endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                                 except Exception:
                                     pass
-                    LOG.warning('which is the')
-                    LOG.warning(gran)
-                    LOG.warning(inc)
-                    LOG.warning(endpoint_validation)
                 
                 elif gran == 'count' and inc == 'NONE':
                     path='ref_schemas/framework/json/responses/beaconCountResponse.json'
@@ -375,8 +371,6 @@ class LandingPage(View):
     def get(self, request, *args, **kwargs):
 
         account, access_token, token_expired = get_token_data(self, request)
-        LOG.warning('I am')
-        LOG.warning(access_token)
 
         form = SettingsForm()
         context = {"form": form, "token_expired": token_expired,
@@ -425,6 +419,72 @@ class LandingPage(View):
                 return render(request, "endpoints.html", context)
             else:
                 return render(request, "settings.html", {"form": form})
+        elif "endpoints" in request.POST and ast.literal_eval(request.POST.get("include")) == ['NONE']:
+            endpoint_url=request.POST.get("endpoint_url")
+            endpoints=request.POST.get("endpoints_collected")
+
+            include=request.POST.get("include")
+            granularity=request.POST.get("granularity")
+            test_mode=request.POST.get("test_mode")
+
+            datasets='Dataset selection is not applicable when only NONE is selected, as responses are returned per beacon.'
+            form = EndpointsForm(
+                request.POST,
+                endpoints_collected=request.POST.get("endpoints_collected"),
+                endpoint_url=request.POST.get("endpoint_url"),
+                include=request.POST.get("include"),
+                granularity=request.POST.get("granularity"),
+                test_mode=request.POST.get("test_mode")
+            )
+            if form.is_valid():
+                endpoints = form.cleaned_data["endpoints_collected"]
+                endpoint_url = form.cleaned_data["endpoint_url"]
+                datasets_form = SummaryForm(
+                    initial={
+                        "url_link": endpoint_url,
+                        "include_resultset_responses": include,
+                        "granularity": granularity,
+                        "test_mode": test_mode,
+                        "endpoints_collected": endpoints,
+                        "datasets_collected": datasets
+                    }
+                )
+                final_endpoints_list=[]
+                count_dict = {}
+                granularity=granularity.replace('[','')
+                granularity=granularity.replace(']','')
+                granularity=granularity.replace("'",'')
+                include=include.replace('[','')
+                include=include.replace(']','')
+                include=include.replace("'",'')
+                for endpoint in endpoints:
+                    endpoint_new = endpoint.split('/')[-1]
+
+                    if '/'+endpoint_new not in count_dict:
+                        count_dict['/'+endpoint_new] = 1
+                        final_endpoints_list.append('/'+endpoint_new)
+                    else:
+                        count_dict['/'+endpoint_new] += 1
+                count_dict=str(count_dict)
+                count_dict=count_dict.replace('{','')
+                count_dict=count_dict.replace('}','')
+                count_dict=count_dict.replace("'",'')
+                count_dict=count_dict.replace(":",'')
+                count_dict=count_dict.replace("1",'')
+                count_dict=count_dict.replace(" ,",',')
+                count_dict = re.sub(r'(\d+)', lambda m: f"({m.group(1)})", count_dict)
+                context = {
+                        "datasets": datasets,
+                        "endpoints": count_dict,
+                        "endpoint_url": endpoint_url,
+                        "include": include,
+                        "granularity": granularity,
+                        "test_mode": test_mode,
+                        "form": datasets_form,
+                        "token_expired": token_expired
+                    }
+
+                return render(request, "summary.html", context)
         elif "endpoints" in request.POST:
             endpoint_url=request.POST.get("endpoint_url")
             endpoints=request.POST.get("endpoints_collected")
