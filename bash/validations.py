@@ -6,14 +6,16 @@ from jsonschema import RefResolver
 
 def list_endpoints(list_of_endpoints, endpoints):
     for k, v in endpoints.items():
+        if v['entryType'] not in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
+            continue
         for k2, v2 in v.items():
-            if k2 == 'rootUrl':
+            if k2 == 'rootUrl' and v['entryType'] in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
                 list_of_endpoints.append(v2)
             elif k2 == 'endpoints':
                 try:
                     for k3, v3 in v2.items():
                         for k4, v4 in v3.items():
-                            if k4 == 'url':
+                            if k4 == 'url' and v3['returnedEntryType'] in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
                                 list_of_endpoints.append(v4)
                 except Exception:
                     pass
