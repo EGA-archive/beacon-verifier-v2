@@ -1,5 +1,7 @@
-def return_unhandled_error(path, value, definition, error):
+def return_unhandled_error(path, value, definition, error, inc, gran):
     schema_to_return={
+                    "granularity": gran,
+                "include": inc,
                         "errorMessage": str(error),
                         "schema": {
                             "path": path,

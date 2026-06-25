@@ -126,7 +126,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                         endpoint_validation.append(url)
                     with open("ref_schemas/framework/json/responses/sections/beaconResultsets.json", 'r') as f:
                         definition = json.load(f)
-                    error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets", 0, "results", 0], total_response, definition, exc)
+                    error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets", 0, "results", 0], total_response, definition, exc, inc, gran)
                     endpoint_validation.append(error_validation_to_return_in_json)
                     return endpoint_validation
                 if access_token != None:
@@ -172,7 +172,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 except Exception as exc:
                     with open("ref_schemas/framework/json/responses/beaconCollectionsResponse.json", 'r') as f:
                         definition = json.load(f)
-                    error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc)
+                    error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc, inc, gran)
                     endpoint_validation.append(error_validation_to_return_in_json)
             if is_error == True:
                 path='ref_schemas/framework/json/responses/beaconErrorResponse.json'
@@ -209,7 +209,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                         except Exception as exc:
                             with open("ref_schemas/framework/json/responses/beaconCollectionsResponse.json", 'r') as f:
                                 definition = json.load(f)
-                            error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc)
+                            error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc, inc, gran)
                             endpoint_validation.append(error_validation_to_return_in_json)
                     else:
                         try:
@@ -217,7 +217,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                         except Exception as exc:
                             with open("ref_schemas/framework/json/responses/sections/beaconResultsets.json", 'r') as f:
                                 definition = json.load(f)
-                            error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets"], total_response, definition, exc)
+                            error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets"], total_response, definition, exc, inc, gran)
                             endpoint_validation.append(error_validation_to_return_in_json)
                             return endpoint_validation
                         if gran == 'record':
