@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
     endpoint_validation=[]
-
     for gran in requestedgranularity:
         for inc in include:
             if gran == 'record' and inc == 'NONE':
@@ -85,8 +84,8 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     total_response = json.loads(f.text)
                 except Exception as e:
                     endpoint_validation.append(e)
-                    return endpoint_validation
-                try:                
+                    continue
+                try:               
                     if url_part[-3] == 'g_variants':
                         for resultSetsarray in total_response["response"]["resultSets"]:
                             try:
@@ -123,19 +122,21 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     if is_appended:
                         pass
                     else:
-                        endpoint_validation.append(url)
+                        if url not in endpoint_validation:
+                            endpoint_validation.append(url)
                     with open("ref_schemas/framework/json/responses/sections/beaconResultsets.json", 'r') as f:
                         definition = json.load(f)
                     error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets", 0, "results", 0], total_response, definition, exc, inc, gran)
                     endpoint_validation.append(error_validation_to_return_in_json)
-                    return endpoint_validation
+                    continue
                 if access_token != None:
                     f = requests.post(url, json = myobj, headers={
                 "Authorization": f"Bearer {access_token}"
             })
                 else:
                     f = requests.post(url, json = myobj)
-                endpoint_validation.append(url)
+                if url not in endpoint_validation:
+                    endpoint_validation.append(url)
                 is_appended = True
                 try:
                     total_response = json.loads(f.text)
@@ -143,16 +144,18 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     if is_appended:
                         pass
                     else:
-                        endpoint_validation.append(url)
+                        if url not in endpoint_validation:
+                            endpoint_validation.append(url)
                     endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
-                    return endpoint_validation
+                    continue
             if endpoint == 'g_variants':
                 endpoint = 'genomicVariations'
 
             if is_appended:
                 pass
             else:
-                endpoint_validation.append(url)
+                if url not in endpoint_validation:
+                    endpoint_validation.append(url)
             
             try:
                 meta = total_response["meta"]
@@ -219,7 +222,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                                 definition = json.load(f)
                             error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets"], total_response, definition, exc, inc, gran)
                             endpoint_validation.append(error_validation_to_return_in_json)
-                            return endpoint_validation
+                            continue
                         if gran == 'record':
                             for resultset in resultsets:
                                 datasetId=resultset["id"]
