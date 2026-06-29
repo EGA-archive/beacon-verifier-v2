@@ -14,13 +14,15 @@ import requests
 from celery.result import AsyncResult
 from django.http import JsonResponse
 from bash.errors import return_unhandled_error, error_message_to_return, error_message_with_dataset_to_return
-from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path, list_endpoints
+from bash.validations import verifier_check, endpoint_request, verify_response, resolve_validation_path, list_endpoints, get_url_entry_type
 import ast
 import re
 from allauth.socialaccount.models import SocialAccount, SocialToken
 import jwt
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from datetime import datetime
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,34 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 id_parameter = False
             url_part = url.split('/')
             endpoint = url_part[-1]
+            if endpoint not in ['analyses', 'biosamples', 'cohorts', 'datasets', 'g_variants', 'individuals', 'runs']:
+                url_map = url_part[0]+url_part[1]+'/map'
+                map_dict = requests.get(url_map)
+                if 'response' in map_dict:
+                    entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                else:
+                    url_map = url_part[0]+'/map'
+                    map_dict = requests.get(url_map)
+                    if 'response' in map_dict:
+                        entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                    else:
+                        url_map = url_part[0]+url_part[1]+url_part[2]+'/map'
+                        map_dict = requests.get(url_map)
+                        entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                if entry_type == 'analysis':
+                    endpoint = 'analyses'
+                elif entry_type == 'biosample':
+                    endpoint = 'biosamples'
+                elif entry_type == 'cohort':
+                    endpoint = 'cohorts'
+                elif entry_type == 'dataset':
+                    endpoint = 'datasets'
+                elif entry_type == 'genomicVariant':
+                    endpoint = 'g_variants'
+                elif entry_type == 'individual':
+                    endpoint = 'individuals'
+                elif entry_type == 'run':
+                    endpoint = 'runs'
             myobj = {
                 "meta": {
                     "apiVersion": "2.2"
@@ -85,7 +115,35 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 except Exception as e:
                     endpoint_validation.append(e)
                     continue
-                try:               
+                try:
+                    if url_part[-3] not in ['analyses', 'biosamples', 'cohorts', 'datasets', 'g_variants', 'individuals', 'runs']:
+                        url_map = url_part[0]+url_part[1]+'/map'
+                        map_dict = requests.get(url_map)
+                        if 'response' in map_dict:
+                            entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                        else:
+                            url_map = url_part[0]+'/map'
+                            map_dict = requests.get(url_map)
+                            if 'response' in map_dict:
+                                entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                            else:
+                                url_map = url_part[0]+url_part[1]+url_part[2]+'/map'
+                                map_dict = requests.get(url_map)
+                                entry_type=get_url_entry_type(map_dict['response']['endpointSets'], url)
+                        if entry_type == 'analysis':
+                            url_part[-3] = 'analyses'
+                        elif entry_type == 'biosample':
+                            url_part[-3] = 'biosamples'
+                        elif entry_type == 'cohort':
+                            url_part[-3] = 'cohorts'
+                        elif entry_type == 'dataset':
+                            url_part[-3] = 'datasets'
+                        elif entry_type == 'genomicVariant':
+                            url_part[-3] = 'g_variants'
+                        elif entry_type == 'individual':
+                            url_part[-3] = 'individuals'
+                        elif entry_type == 'run':
+                            url_part[-3] = 'runs'               
                     if url_part[-3] == 'g_variants':
                         for resultSetsarray in total_response["response"]["resultSets"]:
                             try:
@@ -168,15 +226,6 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     inc = 'ALL'
                 except Exception:
                     gran = 'record'
-            if endpoint in ['cohorts', 'datasets']:
-                LOG.warning('validating collections')
-                try:
-                    resultsets = total_response["response"]["collections"]
-                except Exception as exc:
-                    with open("ref_schemas/framework/json/responses/beaconCollectionsResponse.json", 'r') as f:
-                        definition = json.load(f)
-                    error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc, inc, gran)
-                    endpoint_validation.append(error_validation_to_return_in_json)
             if is_error == True:
                 path='ref_schemas/framework/json/responses/beaconErrorResponse.json'
                 resolver, response = resolve_validation_path(path)
@@ -191,29 +240,52 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                 for log in logs:
                     json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                     endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
-                if gran == 'record' and inc != 'NONE':
+                if inc != 'NONE':
                     if endpoint in ['cohorts', 'datasets']:
-                        path='ref_schemas/framework/json/responses/beaconCollectionsResponse.json'
-                        resolver, response = resolve_validation_path(path)
+                        if gran == 'record':
+                            LOG.warning('again this is my endpoint: {}'.format(endpoint))
+                            path='ref_schemas/framework/json/responses/beaconCollectionsResponse.json'
+                            resolver, response = resolve_validation_path(path)
                     else:
                         path='ref_schemas/framework/json/responses/beaconResultsetsResponse.json'
                         resolver, response = resolve_validation_path(path)
-                    logs=JSONSchemaValidator.validate(total_response, response, resolver)
-                    for log in logs:
-                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
-                        endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
+                        logs=JSONSchemaValidator.validate(total_response, response, resolver)
+                        for log in logs:
+                            json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
+                            endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                     path='ref_schemas/models/json/beacon-v2-default-model/' +endpoint+'/defaultSchema.json'
                     resolver, response = resolve_validation_path(path)
                     if endpoint in ['cohorts', 'datasets']:
-                        try:
-                            resultsets=total_response["response"]["collections"]
-                            for resultset in resultsets:
-                                logs_2=JSONSchemaValidator.validate(resultset, response, resolver)
-                        except Exception as exc:
-                            with open("ref_schemas/framework/json/responses/beaconCollectionsResponse.json", 'r') as f:
-                                definition = json.load(f)
-                            error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc, inc, gran)
-                            endpoint_validation.append(error_validation_to_return_in_json)
+                        if gran == 'record':
+                            try:
+                                resultsets=total_response["response"]["collections"]
+                                for resultset in resultsets:
+                                    logs_2=JSONSchemaValidator.validate(resultset, response, resolver)
+                                try:
+                                    for log in logs_2:
+                                        json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
+                                        endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
+                                except Exception:
+                                    pass
+                            except Exception as exc:
+                                with open("ref_schemas/framework/json/responses/beaconCollectionsResponse.json", 'r') as f:
+                                    definition = json.load(f)
+                                error_validation_to_return_in_json = return_unhandled_error(["response", "collections"], total_response, definition, exc, inc, gran)
+                                endpoint_validation.append(error_validation_to_return_in_json)
+                        elif gran == 'count':
+                            path='ref_schemas/framework/json/responses/beaconCountResponse.json'
+                            resolver, response = resolve_validation_path(path)
+                            logs=JSONSchemaValidator.validate(total_response, response, resolver)
+                            for log in logs:
+                                json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
+                                endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
+                        elif gran == 'boolean':
+                            path='ref_schemas/framework/json/responses/beaconBooleanResponse.json'
+                            resolver, response = resolve_validation_path(path)
+                            logs=JSONSchemaValidator.validate(total_response, response, resolver)
+                            for log in logs:
+                                json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
+                                endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                     else:
                         try:
                             resultsets=total_response["response"]["resultSets"]

@@ -22,6 +22,25 @@ def list_endpoints(list_of_endpoints, endpoints):
 
     return list_of_endpoints
 
+def get_url_entry_type(endpoints, url):
+    entry_type_dict={}
+    for k, v in endpoints.items():
+        if v['entryType'] not in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
+            continue
+        for k2, v2 in v.items():
+            if v['rootUrl'] == url and v['entryType'] in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
+                return v['entryType']
+            elif k2 == 'endpoints':
+                try:
+                    for k3, v3 in v2.items():
+                        for k4, v4 in v3.items():
+                            if v3['url'] == url and v3['returnedEntryType'] in ['analysis', 'biosample', 'cohort', 'dataset', 'individual', 'genomicVariant', 'run']:
+                                return v3['returnedEntryType']
+                except Exception:
+                    pass
+
+    return entry_type_dict
+
 def list_dataset_endpoint(endpoints):
     for k, v in endpoints["response"].items():
         if k == 'endpointSets':
