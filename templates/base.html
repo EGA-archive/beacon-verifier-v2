@@ -510,7 +510,30 @@ function groupErrorsByUrl(map_out) {
     
 
     for (let i = 0; i < mapping.length; i++) {
-            await sleep(5000)
+              let delay = 5000; // Default
+
+              if (include.length > 2 && granularity.length > 2) {
+                  delay = 30000;
+              }
+              else if (include.length < 2 && granularity.length < 2) {
+                  delay = 7000;
+              }
+              else if (include.length < 3 && granularity.length < 3) {
+                  delay = 12000;
+              } else if (include.length < 5 && granularity.length < 5) {
+                  delay = 25000;
+              }
+
+              if (
+                  mapping[i].includes("info") ||
+                  mapping[i].includes("map") ||
+                  mapping[i].includes("filtering_terms") ||
+                  mapping[i].includes("configuration")
+              ) {
+                  delay = 5000;
+              }
+
+              await sleep(delay);
               var width = (i/mapping.length)*100
               console.log(width)
 
@@ -723,6 +746,8 @@ function setState(allChecked) {
 function setAll(state) {
     getCheckboxes().forEach(cb => cb.checked = state);
     setState(state);
+    oala.style.display = 'none'
+    reserror.style.display = 'none'
 
 }
 
@@ -824,4 +849,47 @@ function copySchema() {
         .then(() => console.log('Copied'))
         .catch(err => console.error('Copy failed:', err));
 }
+</script>
+<script>
+  const checkboxes1 = [
+    document.getElementById('id_include_resultset_responses_3'),
+    document.getElementById('id_include_resultset_responses_0'),
+    document.getElementById('id_include_resultset_responses_1'),
+    document.getElementById('id_include_resultset_responses_2')
+];
+
+const reserror = document.getElementById('response-type-error');
+
+function toggleReserror() {
+    const anyChecked = checkboxes1.some(cb => cb.checked);
+    reserror.style.display = anyChecked ? 'none' : '';
+}
+
+toggleReserror();
+
+checkboxes1.forEach(cb => {
+    cb.addEventListener('change', toggleReserror);
+});
+</script>
+<script>
+  const checkboxes2 = [
+    document.getElementById('id_granularity_0'),
+    document.getElementById('id_granularity_1'),
+    document.getElementById('id_granularity_2')
+];
+
+const oala = document.getElementById('granularity-error');
+
+function toggleOala() {
+    const anyChecked = checkboxes2.some(cb => cb.checked);
+    oala.style.display = anyChecked ? 'none' : '';
+}
+
+// Run once on page load
+toggleOala();
+
+// Listen for changes
+checkboxes2.forEach(cb => {
+    cb.addEventListener('change', toggleOala);
+});
 </script>

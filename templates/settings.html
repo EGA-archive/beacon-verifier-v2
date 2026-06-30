@@ -84,14 +84,23 @@
                               </div>
                               <div id="nonerecordmsg">The query record + NONE is not possible. It will be excluded, while all other selected queries will be performed.</div>
                               <div id="onlynonerecordmsg" hidden="hidden">The query record + NONE is not possible, please select other options.</div>
+                              
                               {% for f in form %}
                               {% if f.name == "granularity" %}
                                                                                   {% if f.errors %}
-                  <div class="field-error">
-                      {{ f.errors }}
+                  <div class="field-error" id="granularity-error">
+                      Please select at least one option for Granularity
                   </div>
               {% endif %}
               {% endif %}
+                              {% if f.name == "include_resultset_responses" %}
+                                                                                  {% if f.errors %}
+                  <div class="field-error" id="response-type-error">
+                      Please select at least one option for Response Type
+                  </div>
+                  {% endif %}
+              {% endif %}
+
               {% endfor %}
                       </div>
 
