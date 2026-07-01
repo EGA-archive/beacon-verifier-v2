@@ -109,9 +109,6 @@ function groupErrorsByUrl(map_out) {
       .then(response => response.json())
       .then((res) => {
         const taskStatus = res.state;
-        console.log(bash_out)
-        console.log(include)
-        console.log(granularity)
         
 
 
@@ -210,7 +207,6 @@ function groupErrorsByUrl(map_out) {
               const yoursummary = document.getElementById("check")
               yoursummary.innerText = checks;
             } else {
-              console.log('warning')
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
               heart.style.position = 'absolute'
@@ -279,7 +275,6 @@ function groupErrorsByUrl(map_out) {
     document.getElementById("pdot2").removeAttribute("hidden");
     document.getElementById("downl").removeAttribute("hidden");
     document.getElementById("stop-btn").value="no";
-    console.log(document.getElementById("stop-btn").value);
     
 
   }
@@ -307,15 +302,9 @@ function groupErrorsByUrl(map_out) {
 
           let element = document.getElementById(finalcard);
           element.removeAttribute("hidden");
-          console.log(finalresults)
-          console.log(finalresult)
-          console.log(finalresulted)
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
-            console.log(map_out[0])
-            console.log(map_out[1])
-            console.log(iteration)
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
@@ -353,15 +342,12 @@ function groupErrorsByUrl(map_out) {
               heart.style.top = '7px' 
               heart.style.right = '10px'
               yourMessage.append(heart)
-              console.log('warning')
               yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
               document.getElementById(finalcard).style.borderColor = "#CF7C40";
               warnings = warnings + 1;
               const yoursummary = document.getElementById("warning")
               yoursummary.innerText = warnings;
             }
-          console.log('this is the map_out')
-          console.log(map_out)
           const groupedData = groupErrorsByUrl(map_out);
           // console.log(groupedData)
           const filteredErrors = groupedData.flatMap(group =>
@@ -428,12 +414,9 @@ function groupErrorsByUrl(map_out) {
           rsved.innerHTML = errorsHTML;
             
           if (iteration == '0'){
-            console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             rsv.innerHTML = map_out[0]
-            console.log(iteration)
-            console.log(bname)
             const yourBeacon = document.getElementById('beaconparams');
             yourBeacon.removeAttribute("hidden");
             const BeaconName = yourBeacon.querySelector('#beaconName')
@@ -469,15 +452,9 @@ function groupErrorsByUrl(map_out) {
 
           let element = document.getElementById(finalcard);
           element.removeAttribute("hidden");
-          console.log(finalresults)
-          console.log(finalresult)
-          console.log(finalresulted)
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
-            console.log(map_out[0])
-            console.log(map_out[1])
-            console.log(iteration)
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
@@ -534,12 +511,9 @@ function groupErrorsByUrl(map_out) {
 
           rsved.innerHTML = errorsHTML;
           if (iteration == '0'){
-            console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             rsv.innerHTML = map_out[0][0]
-            console.log(iteration)
-            console.log(bname)
             const yourBeacon = document.getElementById('beaconparams');
             yourBeacon.removeAttribute("hidden");
             const BeaconName = yourBeacon.querySelector('#beaconName')
@@ -571,7 +545,7 @@ function groupErrorsByUrl(map_out) {
       });
   }
   const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-  let checks = 0;
+  let checks = 1;
   let warnings = 0;
   let errors = 0;
   const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected, checks, warnings, errors) => {
@@ -603,7 +577,6 @@ function groupErrorsByUrl(map_out) {
 
               await sleep(delay);
               var width = (i/mapping.length)*100
-              console.log(width)
 
               if (document.getElementById("stop-btn").value=="no"){
                 break} else {
@@ -618,10 +591,6 @@ function groupErrorsByUrl(map_out) {
           if (document.getElementById("stop-btn").value=="si"){
           const formData2 =new FormData();
           formData2.set('url_link', mapping[i]);
-          console.log(mapping)
-          console.log(include)
-          console.log(granularity)
-          console.log(test_mode)
           formData2.set('include_resultset_responses', include);
           formData2.set('granularity', granularity);
           formData2.set('test_mode', test_mode);
@@ -650,7 +619,6 @@ function groupErrorsByUrl(map_out) {
             const endpoints_collected = res.endpoints_collected;
             const datasets_collected = res.datasets_collected;
             updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, endpoints_collected, datasets_collected, bname, bid, bversion, checks, warnings, errors)
-            console.log(res);
           })
           .catch((error) => {
             console.error('Error:', error)
@@ -712,7 +680,6 @@ function groupErrorsByUrl(map_out) {
 
       // Get all field data from the form
       const formData = new URLSearchParams(new FormData(yourForm));
-      console.log(formData);
 
       fetch('/validator/', {
         method: 'POST',
@@ -724,7 +691,6 @@ function groupErrorsByUrl(map_out) {
         .then(response => response.json())
         .then((res) => {
           // after we get Celery task id, we start polling
-          console.log('response is')
           const task_id = res.task_id;
           const bash_out = res.bash_out;
           const mapstring = res.map;
@@ -734,12 +700,9 @@ function groupErrorsByUrl(map_out) {
           const test_mode = res.test_mode;
           const endpoints_collected = res.endpoints_collected;
           const datasets_collected = res.datasets_collected;
-          console.log(mapstring)
           
           updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode, endpoints_collected, datasets_collected);
-          console.log(res);
           const mapping = bash_out
-          console.log(mapping)
 
           
 
@@ -790,11 +753,11 @@ function groupErrorsByUrl(map_out) {
 
         list.forEach(function(item, index) {
             if (
-                index > 0 &&
-                list[index - 1].textContent.includes("http")
+                index < list.length - 1 &&
+                list[index].textContent.includes("http") && !list[index+1].textContent.includes("Error")
             ) {
-                list[index - 1].textContent += " Successful validation";
-            }
+                list[index].textContent += " Successful validation";
+            } else if (index === list.length && list[index].textContent.includes("http")){list[index].textContent += " Successful validation";}
         });
 
         list = settings_collected.concat(list);
