@@ -122,6 +122,8 @@ class EndpointsForm(forms.Form):
         if endpoint_url:
             self.fields["endpoints_collected"].choices = get_map_endpoints_list(endpoint_url)
             self.fields["endpoints_collected"].initial = [choice[0] for choice in self.fields["endpoints_collected"].choices]
+            self.fields["endpoints_collected"].required = True
+            print('am I required?: {}'.format(self.fields["endpoints_collected"].required), flush=True)
             self.fields['map_url'].widget.attrs['readonly'] = True
             self.fields['map_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
             self.fields['map_url'].initial=endpoint_url+'/map'
@@ -133,6 +135,17 @@ class EndpointsForm(forms.Form):
             self.fields["granularity"].choices = [(granularity[0], granularity[0])]
         if test_mode:
             self.fields["test_mode"].choices = [(test_mode[0], test_mode[0])]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        endpoints_chosen = cleaned_data.get("endpoints_collected")
+        print('my endpoints chosen are: {}'.format(endpoints_chosen))
+        if endpoints_chosen == None:
+            print('None of my endpoints are chosen', flush=True)
+            msg = "Please, select at least 1 endpoint to validate."
+
+            self.add_error("endpoints_collected", msg)
+            cleaned_data["msg"]=msg
 
 
 class DatasetsForm(forms.Form):

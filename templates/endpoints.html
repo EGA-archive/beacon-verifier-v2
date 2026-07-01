@@ -68,6 +68,11 @@
                       <div class="settings-box-endpoints">
                         
 {% for f in form %}
+    {% if f.errors %}
+                  <div class="field-error" id="endpoints-error">
+                      Please select at least one endpoint
+                  </div>
+              {% endif %}
     {% if f.name == "endpoints_collected" %}
         <div class="setting-item">
             {{ f }}
@@ -75,6 +80,7 @@
 
         </div>
     {% endif %}
+
 {% endfor %}
                       </div>
 

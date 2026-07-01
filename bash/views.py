@@ -346,7 +346,8 @@ def map_check(url, include, granularity, test_mode, access_token):
     logs=JSONSchemaValidator.validate(total_response, response, resolver)
     for log in logs:
         if 'JSONDecodeError' not in str(log):
-            output_validation.append(str(log))
+            json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, include, granularity)
+            output_validation.append(json_object_with_the_log_of_the_error_to_return)
         else:
             output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
     return endpoints_to_verify, output_validation
@@ -600,6 +601,16 @@ class LandingPage(View):
                     "token_expired": token_expired
                 }
                 return render(request, "datasets.html", context)
+            else:
+                context = {
+                    "form": form,
+                    "url": endpoint_url,
+                    "include": include,
+                    "granularity": granularity,
+                    "test_mode": test_mode,
+                    "token_expired": token_expired
+                }
+                return render(request, "endpoints.html", context)
         elif "datasets" in request.POST:
             endpoint_url=request.POST.get("endpoint_url")
             include=request.POST.get("include")
@@ -867,7 +878,10 @@ class ChannelView(View):
 
         try:
             map_out = task.get()
-            validation = map_out[1][1:]
+            if len(map_out[1])<=1:
+                validation = []
+            else:
+                validation = map_out[1]
 
         except Exception as e:
             validation = [e]
@@ -879,7 +893,7 @@ class ChannelView(View):
             "granularity": granularity,
             "test_mode": test_mode,
             "map": f"{url}/map",
-            "validation": self.format_validation(validation),
+            "validation": validation,
             "endpoints_collected": endpoints_collected,
             "datasets_collected": datasets_collected
         })

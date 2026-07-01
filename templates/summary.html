@@ -61,7 +61,7 @@
                   <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
                     <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
                   </div></div>
-                                    <div class="verificationtable">
+                                    <div class="verificationtable" id="verificationtable">
                   <div><b>Verification Settings</b></div>
                   <hr style="width: 430px; margin-top: -10px;"></hr>
                                     <div class="wow"><b>API URL:</b> <span>{{endpoint_url}}</span></div>
@@ -98,9 +98,9 @@
                 cursor: pointer;
                 border-radius: 8px;"><b>&nbsp; Download Report</b></button> 
                 <hr style="width: 350px; margin-top: 10px;"></hr> 
-                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
+                <div id="generalcheck" class="bi bi-check-circle" style="color: #40946C; margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     <span style="color: black;">Successful validation</span><div id="check" style="position: relative; float: right;  display: inline; color: black;">0</div></div>
+                <div class="bi bi-exclamation-triangle" style="color:#CF7C40; margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     <span style="color: black;">Validation error</span><div id="warning" style="position: relative; float: right;  display: inline; color: black;">0</div></div>
+                <div class="bi bi-x-circle" style="color: #B85353; margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     <span style="color: black;">Server error</span><div id="error" style="position: relative; float: right; display: inline; color: black;">0</div></div>
 
               
                 </div>
@@ -171,9 +171,9 @@
               <a id="date" class="m-2 mt-0"></a>
             <div id="beaconparams" hidden="hidden" class="card m-2">
               <div class="card-header">
-              <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
-              <div id="bname" hidden="hidden"><b>The beacon's name you are validating is: </b><a id="beaconName"></a></div>
-              <div id="bversion" hidden="hidden"><b>The beacon's version is: </b><a id="beaconVersion"></a></div>
+              <div id="bid" hidden="hidden"><b>Beacon ID: </b><a id="beaconId"></a></div>
+              <div id="bname" hidden="hidden"><b>Beacon name: </b><a id="beaconName"></a></div>
+              <div id="bversion" hidden="hidden"><b>Beacon version: </b><a id="beaconVersion"></a></div>
             </div>
             </div>
 

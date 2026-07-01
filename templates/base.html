@@ -132,10 +132,71 @@ function groupErrorsByUrl(map_out) {
           element0.removeAttribute("hidden");
           document.getElementById('summarytable').removeAttribute("hidden");
           const yourMessage = document.getElementById("results_validation");
-            const rsv = yourMessage.querySelector('#result_validation');
-            rsv.innerHTML = mapstring
-            const rsved = yourMessage.querySelector('#resulted_validation');
-            rsved.innerHTML = mapvalidation
+          const rsv = yourMessage.querySelector('#result_validation');
+          rsv.innerHTML = mapstring
+          const rsved = yourMessage.querySelector('#resulted_validation');
+          const groupedData = groupErrorsByUrl(mapvalidation);
+
+          const filteredErrors = groupedData.flatMap(group =>
+            group.errors.filter(
+              errorObj =>
+                errorObj.raw.datasetId == null ||
+                datasets_collected.includes(errorObj.raw.datasetId)
+            )
+          );
+          const totalErrors = filteredErrors.length;
+          const totalErrorsHTML =
+            totalErrors > 0
+              ? `
+                <div style="position: absolute; top: 7px; right: 35px;">
+                  (${totalErrors})
+                </div>
+              `
+              : "";
+          const errorsHTML = `
+            ${totalErrorsHTML}
+
+            ${filteredErrors.map((errorObj, index) => {
+              const raw = errorObj.raw;
+              const path = raw.received?.path || [];
+              const value = raw.received?.value;
+              const schema = raw.schema?.definition || {};
+
+              return `
+                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
+
+                ${
+                  raw.datasetId != null
+                    ? `<div><b>Dataset</b>: ${raw.datasetId}</div>`
+                    : `<div><b>Errors</b></div>`
+                }
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
+                    </div>
+
+                  </div>
+                </details>
+
+                <br>
+              `;
+            }).join("<hr>")}
+          `;
+
+          rsved.innerHTML = errorsHTML;
             if (mapvalidation == '') {
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
@@ -299,8 +360,10 @@ function groupErrorsByUrl(map_out) {
               const yoursummary = document.getElementById("warning")
               yoursummary.innerText = warnings;
             }
+          console.log('this is the map_out')
+          console.log(map_out)
           const groupedData = groupErrorsByUrl(map_out);
-
+          // console.log(groupedData)
           const filteredErrors = groupedData.flatMap(group =>
             group.errors.filter(
               errorObj =>
@@ -308,6 +371,7 @@ function groupErrorsByUrl(map_out) {
                 datasets_collected.includes(errorObj.raw.datasetId)
             )
           );
+          // console.log(filteredErrors)
           const totalErrors = filteredErrors.length;
           const totalErrorsHTML =
             totalErrors > 0
@@ -375,9 +439,13 @@ function groupErrorsByUrl(map_out) {
             const BeaconName = yourBeacon.querySelector('#beaconName')
             const BeaconId = yourBeacon.querySelector('#beaconId')
             const BeaconVersion = yourBeacon.querySelector('#beaconVersion')
-            BeaconName.innerHTML = bname;
-            BeaconId.innerHTML = bid;
-            BeaconVersion.innerHTML = bversion;
+            if (bname != undefined){BeaconName.innerHTML = bname;}
+            else {BeaconName.innerHTML = "Beacon name unavailable if /info endpoint not added to verification"}
+            if (bid != undefined){BeaconId.innerHTML = bid;}
+            else {BeaconId.innerHTML = "Beacon ID unavailable if /info endpoint not added to verification"}
+            if (bversion != undefined){BeaconVersion.innerHTML = bversion;}
+            else {BeaconVersion.innerHTML = "Beacon version unavailable if /info endpoint not added to verification"}
+            
             let elementbid = document.getElementById('bid');
             elementbid.removeAttribute("hidden");
             let elementbname = document.getElementById('bname');
@@ -503,7 +571,7 @@ function groupErrorsByUrl(map_out) {
       });
   }
   const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-  let checks = 1;
+  let checks = 0;
   let warnings = 0;
   let errors = 0;
   const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected, checks, warnings, errors) => {
@@ -712,8 +780,24 @@ function groupErrorsByUrl(map_out) {
   document.getElementById("downl")
       .addEventListener("click", function () {
         var nodes = document.getElementById("theresultscol").querySelectorAll("a");
-        console.log(nodes)
-        var list = [].slice.call(nodes);
+        var verificationsettings = document.getElementById("verificationtable").querySelectorAll("div");
+
+        var settings_collected = Array.from(verificationsettings);
+
+        var list = Array.from(nodes).filter(function(node) {
+            return node.textContent.trim() !== "";
+        });
+
+        list.forEach(function(item, index) {
+            if (
+                index > 0 &&
+                list[index - 1].textContent.includes("http")
+            ) {
+                list[index - 1].textContent += " Successful validation";
+            }
+        });
+
+        list = settings_collected.concat(list);
         var innertext = list.map(function(e) { return e.innerText; }).join("\n");
           let filename = "verifier.txt";
 
@@ -755,6 +839,12 @@ selectboxBtn.addEventListener("click", () => setAll(true));
 clearboxBtn.addEventListener("click", () => setAll(false));
 
 document.addEventListener("DOMContentLoaded", () => {
+    const checkboxes = getCheckboxes();
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    setState(allChecked);
+});
+
+document.addEventListener("click", () => {
     const checkboxes = getCheckboxes();
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
     setState(allChecked);
