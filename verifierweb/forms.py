@@ -1,36 +1,203 @@
 from django import forms
-from bash.models import AgeOfOnset
+from bash.validations import endpoint_request, list_endpoints, list_dataset_endpoint
+import json
+from django.core.exceptions import ValidationError
+
+def get_map_endpoints_list(url):
+    new_url = url + '/map'
+    f, output_validation = endpoint_request(new_url)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
+    resultsets = total_response["response"]
+    endpoints = resultsets["endpointSets"]
+    list_of_endpoints=[]
+    endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
+    try:
+
+        final_list=[]
+
+        initial_list = [
+            f"{url}/info",
+            f"{url}/configuration",
+            f"{url}/filtering_terms",
+        ]
+
+        for m in endpoints_to_verify:
+            initial_list.append(m)
+
+        for item in initial_list:
+            item = "..." +item.split('.')[-1]
+            final_list.append((item, item))
+    except Exception as e:
+        final_list = []
+    return final_list
+
+def get_datasets_list(url):
+    initial_list=[]
+    final_list=[]
+    f, output_validation = endpoint_request(url+'/map')
+    total_response = json.loads(f.text)
+    new_url = list_dataset_endpoint(total_response)
+
+    f, output_validation = endpoint_request(new_url)
+    try:
+        total_response = json.loads(f.text)
+    except Exception as e:
+        output_validation.append(e)
+    datasets_records = total_response["response"]["collections"]
+    for dataset_record in datasets_records:
+        initial_list.append(dataset_record["id"])
+    for item in initial_list:
+        final_list.append((item, item))
+    return final_list
+
+class SettingsForm(forms.Form):
+    choices_irr = [("HIT", "HIT"), ("MISS", "MISS"), ("ALL", "ALL"), ("NONE", "NONE")]
+    choices_granularity = [("record", "record"), ("count", "count"), ("boolean", "boolean")]
+    choices_testmode = [("True", "True"), ("False", "False")]
+    url_link = forms.CharField(widget=forms.TextInput(attrs={'size':50}), max_length=100, required=True, help_text="<div style='margin-bottom: 8px;'>Beacon URL</div>", label="")
+    include_resultset_responses = forms.MultipleChoiceField(
+        choices=choices_irr, 
+        widget=forms.CheckboxSelectMultiple,
+        initial=[choice[0] for choice in choices_irr]
+    )
+    granularity = forms.MultipleChoiceField(
+        choices=choices_granularity, 
+        widget=forms.CheckboxSelectMultiple,
+        initial=[choice[0] for choice in choices_granularity]
+    )
+    test_mode = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'ios-switch'},),
+        initial=False
+    )
+    def clean(self):
+        cleaned_data = super().clean()
+        msg=None
+        include = cleaned_data.get("include_resultset_responses") or []
+        granularity = cleaned_data.get("granularity") or []
+        if include==["NONE"] and granularity==["record"]:
+            msg = "The query record + NONE is not possible, please select other options."
+
+            self.add_error("include_resultset_responses", msg)
+            self.add_error("granularity", msg)
+            cleaned_data["msg"]=msg
+
+        elif "NONE" in include and "record" in granularity:
+            msg = "The query record + NONE is not possible. It will be excluded, while all other selected queries will be performed."
 
 
-class BamForm(forms.Form):
-    url_link = forms.CharField(widget=forms.TextInput(attrs={'size':50}), max_length=100, required=False, help_text="<div style='margin-bottom: 8px;'>Beacon URL</div>", label="")
+        return cleaned_data
 
-class AgeOfOnsetForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(AgeOfOnsetForm, self).__init__(*args, **kwargs)
-        # assign a (computed, I assume) default value to the choice field 
-    choices_time = [("P65Y", "P65Y")]
-    choices_histological = [("ICDO3:8480/3", "ICDO3:8480/3")]
-    choices_tumorProgression= [("ICD10:C18.6", "ICD10:C18.6")]
-    choices_tumorGrade= [("NCIT:C27982", "NCIT:C27982")]
-    choices_procedure= [("No Neoadjuvant Therapy Given", "No Neoadjuvant Therapy Given")]
-    timeOfCollection2 = forms.ChoiceField(choices=choices_time, label="timeOfCollection")
-    histologicalDiagnosis2 = forms.ChoiceField(choices=choices_histological, label="histologicalDiagnosis")
-    tumorProgression2 = forms.ChoiceField(choices=choices_tumorProgression, label="tumorGrade")
-    tumorGrade2 = forms.ChoiceField(choices=choices_tumorGrade, label="tumorGrade")
-    procedure2 = forms.ChoiceField(choices=choices_procedure, label="procedure")
+class EndpointsForm(forms.Form):
 
-class NewForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super(NewForm, self).__init__(*args, **kwargs)
-        # assign a (computed, I assume) default value to the choice field 
-    biosampleId = forms.BooleanField(initial=False, required=False,help_text="id=sample2")
-    individualId = forms.BooleanField(initial=False, required=False,help_text="individualId=patient1")
-    sampledTissue = forms.BooleanField(initial=False, required=False,help_text="sampledTissue.id=ICD10:C18.7")
-    timeOfCollection = forms.BooleanField(initial=False,required=False,help_text="timeOfCollection.age.iso8601duration=P77Y")
-    histologicalDiagnosis = forms.BooleanField(initial=False,required=False,help_text="histologicalDiagnosis.id=ICDO3:8480/3")
-    tumorProgression = forms.BooleanField(initial=False,required=False,help_text="tumorProgression.id=NCIT:C27982")
-    tumorGrade = forms.BooleanField(initial=False,required=False,help_text="tumorGrade.id=NCIT:C27982")
-    
+    map_url = forms.CharField(
+        widget=forms.TextInput(attrs={'size':50}), max_length=100, help_text="<div style='margin-bottom: 8px;'>Loaded URL</div>", label=""
+    )
+    endpoint_url = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+    include = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+    granularity = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+    test_mode = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+
+    number_of_endpoints = forms.CharField(widget=forms.TextInput(attrs={'size':0}))
+
+    endpoints_collected = forms.MultipleChoiceField(
+        choices=[],
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None,**kwargs):
+        super().__init__(*args, **kwargs)
+
+        if endpoint_url:
+            self.fields["endpoints_collected"].choices = get_map_endpoints_list(endpoint_url)
+            self.fields["endpoints_collected"].initial = [choice[0] for choice in self.fields["endpoints_collected"].choices]
+            self.fields["endpoints_collected"].required = True
+            print('am I required?: {}'.format(self.fields["endpoints_collected"].required), flush=True)
+            self.fields['map_url'].widget.attrs['readonly'] = True
+            self.fields['map_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
+            self.fields['map_url'].initial=endpoint_url+'/map'
+            self.fields['number_of_endpoints'].widget.attrs['readonly'] = True
+            self.fields['number_of_endpoints'].initial = len(self.fields["endpoints_collected"].choices)
+        if include:
+            self.fields["include"].choices = [(include[0], include[0])]
+        if granularity:
+            self.fields["granularity"].choices = [(granularity[0], granularity[0])]
+        if test_mode:
+            self.fields["test_mode"].choices = [(test_mode[0], test_mode[0])]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        endpoints_chosen = cleaned_data.get("endpoints_collected")
+        print('my endpoints chosen are: {}'.format(endpoints_chosen))
+        if endpoints_chosen == None:
+            print('None of my endpoints are chosen', flush=True)
+            msg = "Please, select at least 1 endpoint to validate."
+
+            self.add_error("endpoints_collected", msg)
+            cleaned_data["msg"]=msg
 
 
+class DatasetsForm(forms.Form):
+    datasets_url = forms.CharField(
+        widget=forms.TextInput(attrs={'size':50}), max_length=100, help_text="<div style='margin-bottom: 8px;'>Loaded URL</div>", label=""
+    )
+    endpoint_url = forms.CharField(widget=forms.HiddenInput())
+    include = forms.CharField(widget=forms.HiddenInput())
+    granularity = forms.CharField(widget=forms.HiddenInput())
+    test_mode = forms.CharField(widget=forms.HiddenInput())
+    endpoints_collected = forms.CharField(widget=forms.HiddenInput())
+
+    number_of_datasets = forms.CharField(widget=forms.TextInput(attrs={'size':0}))
+
+    datasets_collected = forms.MultipleChoiceField(
+        choices=[],
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if endpoint_url:
+            self.fields["datasets_collected"].choices = get_datasets_list(endpoint_url)
+            self.fields["datasets_collected"].initial = [choice[0] for choice in self.fields["datasets_collected"].choices]
+            self.fields['number_of_datasets'].widget.attrs['readonly'] = True
+            self.fields['number_of_datasets'].initial = len(self.fields["datasets_collected"].choices)
+            self.fields['datasets_url'].widget.attrs['readonly'] = True
+            self.fields['datasets_url'].widget.attrs['class'] = 'form-control bg-light text-muted'
+            self.fields['datasets_url'].initial=endpoint_url+'/datasets'
+
+class SummaryForm(forms.Form):
+    datasets_url = forms.CharField(
+       widget=forms.HiddenInput()
+    )
+    url_link = forms.CharField(widget=forms.HiddenInput())
+    include_resultset_responses = forms.CharField(widget=forms.HiddenInput())
+    granularity = forms.CharField(widget=forms.HiddenInput())
+    test_mode = forms.CharField(widget=forms.HiddenInput())
+    endpoints_collected = forms.CharField(widget=forms.HiddenInput())
+
+    number_of_datasets = forms.CharField(widget=forms.HiddenInput())
+
+    datasets_collected = forms.MultipleChoiceField(
+        choices=[],
+        widget=forms.HiddenInput()
+    )
+
+class ChannelForm(forms.Form):
+    url_link = forms.CharField(widget=forms.HiddenInput())
+    include_resultset_responses = forms.CharField(widget=forms.HiddenInput())
+    granularity = forms.CharField(widget=forms.HiddenInput())
+    test_mode = forms.CharField(widget=forms.HiddenInput())
+    endpoints_collected = forms.CharField(widget=forms.HiddenInput())
+    datasets_collected = forms.CharField(widget=forms.HiddenInput())

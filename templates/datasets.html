@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+            <div class="greyform" style="background-color: #EEEEEE;">
+          
+
+              <div class="row">
+                <div class="col reduce">
+                  <div class="row">
+                  </div>
+                                    <div class="circle-wrapper">
+
+                    <div class="dashed-line"></div>
+                    <div class="dashed-line2"></div>
+                    <div class="dashed-line3"></div>
+
+                    <div class="circle-container">
+
+                      <div class="circle-item">
+                        <div class="circlegreen">1</div>
+                        <span class="circle-label">Settings</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegreen">2</div>
+                        <span class="circle-label">Endpoints</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegreen">3</div>
+                        <span class="circle-label">Datasets</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">4</div>
+                        <span class="circle-label">Summary</span>
+                      </div>
+
+                    </div>
+                  </div>
+                    <form method="post" class="formsettings">
+                        {% csrf_token %}
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+                            
+                            {% for f in form %}
+                            {% if f.name == "datasets_url" %}
+                            
+                                <b>{{ f.help_text|safe }} {{ f }}</b>
+                            {% endif %}
+                            {% endfor %}
+
+                          <div class="selectallwrapper">
+                                                        {% for f in form %}
+                            {% if f.name == "number_of_datasets" %}
+                            
+                                <b class="endpointsfound">{{ f }} <span class="textef">Datasets found:</span></b>
+                            {% endif %}
+                            {% endfor %}
+                              <button type="button" class="selectall inactive" id="selectbox">Select All</button>
+                              <button type="button" class="selectall" id="clearbox">Unselect All</button>
+                          </div>
+
+
+                      <div class="settings-box-endpoints">
+                        
+{% for f in form %}
+    {% if f.name == "datasets_collected" %}
+        <div class="setting-item">
+            {{ f }}
+
+
+        </div>
+    {% endif %}
+{% endfor %}
+                      </div>
+
+
+
+                </div>
+
+              </div>
+
+                    <div class="buttonwrapper">
+
+                    <button id="primerbutton" name="datasets" value="{{ url }}" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbuttonendpoints"> <span>Next</span><span class="bi bi-arrow-right"> </span></button>
+                    </div>
+                    <div style="margin-top: 30px;">
+                    
+                </div>
+                
+
+
+                  
+                  </form>
+
+
+
+
+
+                  
+            </div>
+
+            </div>
+                
+              
+                
+            </div>  
+            
+
+         
+        
+            
+
+
+
+        
+
+{% endblock %}  

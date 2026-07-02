@@ -3,630 +3,31 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Beacon Verifier</title>
-    <link rel="stylesheet" href="staticfiles/mystyle.css">
+    <link rel="stylesheet" href="{% static 'mystyle.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <link href="https://unpkg.com/@popperjs/core@2" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <script src="media/tablesorter.js"></script>
-    <script src="media/arrows.js"></script>
   </head>
 <body>
-    <nav class="navbar navbar-expand-lg barrav" style="z-index: 2; height: 62px; width: 1512 px; background-color: #40946C;">
-        <div class="container-fluid">
-          <span class="navbar-text titulo">
-            <img class="mx-auto" src="{% static 'CRG_White.png' %}" alt="CRG" style="height: 32.8px; padding-right: 62px; padding-left: 35px;">
-          </span>
-          <a class="navbar-brand" href="/" ><p class="bi bi-patch-check mx-auto p-2 fw-bold ms-5" style="color: white; height: 32.8px;">&nbsp; Beacon Verifier</p></a>
-          <div class="collapse navbar-collapse" id="navbarText">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-          </div>
-        </div>
-
-      </nav>
+    {% include "navbar.html" %}
+    <div class="pagewrapper">
       
-            <div class="row">
+    {% block content %}
+    {% endblock %}
 
-            <div class="col-4 reduce" style="background-color: #EEEEEE;">
-          
+    </div>
 
-              <div class="row">
-                <div class="col reduce">
-                  <form id="your-form" method="post" style="padding: 34px 61px 34px 61px; width: 100%">
-                    {% csrf_token %}
-                    <div class="row"><div>
-                    {% for f in form %}
-                    <b>{{f.help_text|safe}} {{f}} </b>   
-                    {% endfor %}
-                </div>
+    
+</body>
+{% include "footer.html" %}
+</html>
 
-              </div>
-
-                    <div class="mb-3" id="messages"></div>
-                    <button id="primerbutton2" hidden="hidden" onClick="window.location.reload();" type="button" class="vbut bi bi-patch-check" style="  background-color: #40946C;
-                    border: none;
-                    width: 100%;
-                    color: white;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    margin: 4px 2px;
-                    cursor: pointer;
-                    border-radius: 100px;"> New Verification</button>
-                    <button id="primerbutton" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'"" type="submit" class="vbut bi bi-play" style="  background-color: #40946C;
-                    border: none;
-                    width: 48%;
-                    color: white;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    margin: 4px 2px;
-                    cursor: pointer;
-                    border-radius: 100px;"> Start</button>
-                    <button type="disabled" value="si" onclick="functionToExecute()" id="stop-btn" class="vbut bi bi-stop" style="  background-color: #ddd;
-                    border: none;
-                    width: 48%;
-                    color: black;
-                    padding: 10px 20px;
-                    text-align: center;
-                    text-decoration: none;
-                    display: inline-block;
-                    margin: 4px 2px;
-                    cursor: pointer;
-                    border-radius: 100px;"> Stop</button>
-                  <div style="margin-top: 30px;">
-                    
-                </div>
-                
-                  <div style="padding-left: 50px; padding-right: 25px;">
-                    <div style="position: relative; right: 50px; top: 10px;"><span id="pdot" class="dot">
-                      <span id="dot21" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="dot22" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="dot23" class="dot2" style="position: relative; left: 11px; top: 7px"></span>
-                    </span><span id="pdot2" class="dot" hidden="hidden">
-                      <span id="pdot21" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="pdot22" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                      <span id="pdot23" class="iep" style="position: relative; left: 11px; top: 7px"></span>
-                    </span><span id="myPercent" style="font-size: 18px; color: #999999; position: relative; bottom: -5px; left: 15px; font-weight: bold;">0%</span>
-                      <span id ="myPercentext" style="font-size: 12px; color: #999999; position: relative; bottom: -5px; left: 15px;">Paste URL and start verification</span></div>
-                  <div id="myProgress" style="width: 100%; background-color: #E0E0E0; border-radius: 50px; margin-left: 10px">
-                    <div id="myBar" style="width: 0%; height: 9px; background-color: #636363; border-radius: 50px;"></div>
-                  </div>
-                  
-                </div>
-                <div id="summarytable" hidden="hidden">
-                <div style="margin-top: 40px">Summary</div>
-                <div id="generalcheck" class="bi bi-check-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Successful validation<div id="check" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-exclamation-triangle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Validation error<div id="warning" style="position: relative; float: right;  display: inline">0</div></div>
-                <div class="bi bi-x-circle" style="margin-left: 20px; margin-top: 20px; border-bottom: 1px solid #E0E0E0; padding-bottom: 10px; text-align: left; font-size: 18px">&nbsp;     Server error<div id="error" style="position: relative; float: right; display: inline">0</div></div>
-                <button hidden="hidden" class="bi bi-download" id="downl" value="Download" style="margin-left: 20px; margin-top: 20px; float: right;
-                border: 1 px solid #636363;
-                width: 75%;
-                color: #636363;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                margin: 4px 2px;
-                cursor: pointer;
-                border-radius: 100px;">&nbsp; Download Report</button>  
-              
-
-              
-                </div>
-
-                <div class="association" style="position: absolute; top: 75vh; left: 65px; max-width: 400px;">
-
-                  <p style="margin-bottom: 0px""><b style="font-weight: 12px;">In association with:</b></p>
-                  <img src="{% static 'logo.png' %}" alt="EGA" height="40px" style="padding-right: 10px;">
-                  <img src="{% static 'bsc.webp' %}" alt="BSC" height="60px" style="padding-right: 10px;">
-                  <img src="{% static 'elixir.png' %}" alt="Elixir" height="50px" style="padding-right: 10px;">
-                  <img src="{% static 'GA-logo.png' %}" alt="GA4GH" height="40px" style="padding-right: 10px;">
-                  <img src="{% static 'Ebi_official_logo.png' %}" alt="EBI" height="40px" style="padding-right: 10px;">
-                  
-                </div>
-                  
-                  </form>
-
-
-
-
-
-                  
-            </div>
-
-            </div>
-                
-              
-                
-            </div>  
-            <div id="theresultscol" class="col" style="height: 93vh; overflow: scroll; margin-top: -15px;">
-              <div id="messages" style="display: none; ">
-            </div>
-            
-            <div class="m-5">
-              <div id="resultscards" class="m-2 mt-0" hidden="hidden">Results</div>
-              <a id="date" class="m-2 mt-0"></a>
-            <div id="beaconparams" hidden="hidden" class="card m-2">
-              <div class="card-header">
-              <div id="bid" hidden="hidden"><b>This is the id of the beacon you are validating: </b><a id="beaconId"></a></div>
-              <div id="bname" hidden="hidden"><b>The beacon's name you are validating is: </b><a id="beaconName"></a></div>
-              <div id="bversion" hidden="hidden"><b>The beacon's version is: </b><a id="beaconVersion"></a></div>
-            </div>
-            </div>
-
-            <div id="cardinitial" hidden="hidden" class="card m-2">
-              <div id="results_validation" class="card-header">
-                <b><a id="result_validation" style="display: block"></a></b>
-                <a id="resulted_validation" style="display: block"></a>
-              </div>
-            </div>
-            <div id="card0" hidden="hidden" class="card m-2">
-              <div id="results0_validation" class="card-header">
-                <b><a id="result0_validation" style="display: block"></a></b>
-                <div></div>
-                <a id="resulted0_validation" style="display: block"></a>
-              </div>
-            </div>
-              <div id="card1" hidden="hidden" class="card m-2">
-              <div id="results1_validation" class="card-header">
-                <b><a id="result1_validation" style="display: block"></a></b>
-                <div></div>
-                <a id="resulted1_validation" style="display: block"></a>
-              </div>
-              </div>
-              <div id="card2" hidden="hidden" class="card m-2">
-                <div id="results2_validation" class="card-header">
-                  <b><a id="result2_validation" style="display: block"></a></b>
-                  <div></div>
-                  <a id="resulted2_validation" style="display: block"></a></b>
-                </div>
-                </div>
-                <div id="card3" hidden="hidden" class="card m-2">
-                  <div id="results3_validation" class="card-header">
-                    <b><a id="result3_validation" style="display: block"></a></b>
-                    <div></div>
-                    <a id="resulted3_validation" style="display: block"></a></b>
-                  </div>
-                  </div>
-                  <div id="card4" hidden="hidden" class="card m-2">
-                    <div id="results4_validation" class="card-header">
-                      <b><a id="result4_validation" style="display: block"></a></b>
-                      <div></div>
-                      <a id="resulted4_validation" style="display: block"></a></b>
-                    </div>
-                    </div>
-                    <div id="card5" hidden="hidden" class="card m-2">
-                      <div id="results5_validation" class="card-header">
-                        <b><a id="result5_validation" style="display: block"></a></b>
-                        <div></div>
-                        <a id="resulted5_validation" style="display: block"></a></b>
-                      </div>
-                      </div>
-                      <div id="card6" hidden="hidden" class="card m-2">
-                        <div id="results6_validation" class="card-header">
-                          <b><a id="result6_validation" style="display: block"></a></b>
-                          <div></div>
-                          <a id="resulted6_validation" style="display: block"></a></b>
-                        </div>
-                        </div>
-                        <div id="card7" hidden="hidden" class="card m-2">
-                          <div id="results7_validation" class="card-header">
-                            <b><a id="result7_validation" style="display: block"></a></b>
-                            <div></div>
-                            <a id="resulted7_validation" style="display: block"></a></b>
-                          </div>
-                          </div>
-                          <div id="card8" hidden="hidden" class="card m-2">
-                            <div id="results8_validation" class="card-header">
-                              <b><a id="result8_validation" style="display: block"></a></b>
-                              <div></div>
-                              <a id="resulted8_validation" style="display: block"></a></b>
-                            </div>
-                            </div>
-                            <div id="card9" hidden="hidden" class="card m-2">
-                              <div id="results9_validation" class="card-header">
-                                <b><a id="result9_validation" style="display: block"></a></b>
-                                <div></div>
-                                <a id="resulted9_validation" style="display: block"></a></b>
-                              </div>
-                              </div>
-                              <div id="card10" hidden="hidden" class="card m-2">
-                                <div id="results10_validation" class="card-header">
-                                  <b><a id="result10_validation" style="display: block"></a></b>
-                                  <a id="resulted10_validation" style="display: block"></a></b>
-                                </div>
-                                </div>
-                                <div id="card11" hidden="hidden" class="card m-2">
-                                  <div id="results11_validation" class="card-header">
-                                    <b><a id="result11_validation" style="display: block"></a></b>
-                                    <a id="resulted11_validation" style="display: block"></a></b>
-                                  </div>
-                                  </div>
-                                  <div id="card12" hidden="hidden" class="card m-2">
-                                    <div id="results12_validation" class="card-header">
-                                      <b><a id="result12_validation" style="display: block"></a></b>
-                                      <a id="resulted12_validation" style="display: block"></a></b>
-                                    </div>
-                                    </div>
-                                    <div id="card13" hidden="hidden" class="card m-2">
-                                      <div id="results13_validation" class="card-header">
-                                        <b><a id="result13_validation" style="display: block"></a></b>
-                                        <a id="resulted13_validation" style="display: block"></a></b>
-                                      </div>
-                                      </div>
-                                      <div id="card14" hidden="hidden" class="card m-2">
-                                        <div id="results14_validation" class="card-header">
-                                          <b><a id="result14_validation" style="display: block"></a></b>
-                                          <a id="resulted14_validation" style="display: block"></a></b>
-                                        </div>
-                                        </div>
-                                        <div id="card15" hidden="hidden" class="card m-2">
-                                          <div id="results15_validation" class="card-header">
-                                            <b><a id="result15_validation" style="display: block"></a></b>
-                                            <a id="resulted15_validation" style="display: block"></a></b>
-                                          </div>
-                                          </div>
-                                          <div id="card16" hidden="hidden" class="card m-2">
-                                            <div id="results16_validation" class="card-header">
-                                              <b><a id="result16_validation" style="display: block"></a></b>
-                                              <a id="resulted16_validation" style="display: block"></a></b>
-                                            </div>
-                                            </div>
-                                            <div id="card17" hidden="hidden" class="card m-2">
-                                              <div id="results17_validation" class="card-header">
-                                                <b><a id="result17_validation" style="display: block"></a></b>
-                                                <a id="resulted17_validation" style="display: block"></a></b>
-                                              </div>
-                                              </div>
-                                              <div id="card18" hidden="hidden" class="card m-2">
-                                                <div id="results18_validation" class="card-header">
-                                                  <b><a id="result18_validation" style="display: block"></a></b>
-                                                  <a id="resulted18_validation" style="display: block"></a></b>
-                                                </div>
-                                                </div>
-                                                <div id="card19" hidden="hidden" class="card m-2">
-                                                  <div id="results19_validation" class="card-header">
-                                                    <b><a id="result19_validation" style="display: block"></a></b>
-                                                    <a id="resulted19_validation" style="display: block"></a></b>
-                                                  </div>
-                                                  </div>
-                                                  <div id="card20" hidden="hidden" class="card m-2">
-                                                    <div id="results20_validation" class="card-header">
-                                                      <b><a id="result20_validation" style="display: block"></a></b>
-                                                      <a id="resulted20_validation" style="display: block"></a></b>
-                                                    </div>
-                                                    </div>
-                                                    <div id="card21" hidden="hidden" class="card m-2">
-                                                      <div id="results21_validation" class="card-header">
-                                                        <b><a id="result21_validation" style="display: block"></a></b>
-                                                        <a id="resulted21_validation" style="display: block"></a></b>
-                                                      </div>
-                                                      </div>
-                                                      <div id="card22" hidden="hidden" class="card m-2">
-                                                        <div id="results22_validation" class="card-header">
-                                                          <b><a id="result22_validation" style="display: block"></a></b>
-                                                          <a id="resulted22_validation" style="display: block"></a></b>
-                                                        </div>
-                                                      </div>
-                                                        <div id="card23" hidden="hidden" class="card m-2">
-                                                        <div id="results23_validation" class="card-header">
-                                                          <b><a id="result23_validation" style="display: block"></a></b>
-                                                          <a id="resulted23_validation" style="display: block"></a></b>
-                                                        </div>
-                                                        </div>
-                                                        <div id="card24" hidden="hidden" class="card m-2">
-                                                          <div id="results24_validation" class="card-header">
-                                                            <b><a id="result24_validation" style="display: block"></a></b>
-                                                            <a id="resulted24_validation" style="display: block"></a></b>
-                                                          </div>
-                                                          </div>
-                                                          <div id="card25" hidden="hidden" class="card m-2">
-                                                            <div id="results25_validation" class="card-header">
-                                                              <b><a id="result25_validation" style="display: block"></a></b>
-                                                              <a id="resulted25_validation" style="display: block"></a></b>
-                                                            </div>
-                                                            </div>
-                                                            <div id="card26" hidden="hidden" class="card m-2">
-                                                              <div id="results26_validation" class="card-header">
-                                                                <b><a id="result26_validation" style="display: block"></a></b>
-                                                                <a id="resulted26_validation" style="display: block"></a></b>
-                                                              </div>
-                                                              </div>
-                                                              <div id="card27" hidden="hidden" class="card m-2">
-                                                                <div id="results27_validation" class="card-header">
-                                                                  <b><a id="result27_validation" style="display: block"></a></b>
-                                                                  <a id="resulted27_validation" style="display: block"></a></b>
-                                                                </div>
-                                                                </div>
-                                                                <div id="card28" hidden="hidden" class="card m-2">
-                                                                  <div id="results28_validation" class="card-header">
-                                                                    <b><a id="result28_validation" style="display: block"></a></b>
-                                                                    <a id="resulted28_validation" style="display: block"></a></b>
-                                                                  </div>
-                                                                  </div>
-                                                                  <div id="card29" hidden="hidden" class="card m-2">
-                                                                    <div id="results29_validation" class="card-header">
-                                                                      <b><a id="result29_validation" style="display: block"></a></b>
-                                                                      <a id="resulted29_validation" style="display: block"></a></b>
-                                                                    </div>
-                                                                    </div>
-                                                                    <div id="card30" hidden="hidden" class="card m-2">
-                                                                      <div id="results30_validation" class="card-header">
-                                                                        <b><a id="result30_validation" style="display: block"></a></b>
-                                                                        <a id="resulted30_validation" style="display: block"></a></b>
-                                                                      </div>
-                                                                      </div>
-                                                                      <div id="card31" hidden="hidden" class="card m-2">
-                                                                        <div id="results31_validation" class="card-header">
-                                                                          <b><a id="result31_validation" style="display: block"></a></b>
-                                                                          <a id="resulted31_validation" style="display: block"></a></b>
-                                                                        </div>
-                                                                        </div>
-                                                                        <div id="card32" hidden="hidden" class="card m-2">
-                                                                          <div id="results32_validation" class="card-header">
-                                                                            <b><a id="result32_validation" style="display: block"></a></b>
-                                                                            <a id="resulted32_validation" style="display: block"></a></b>
-                                                                          </div>
-                                                                          </div>
-                                                                          <div id="card33" hidden="hidden" class="card m-2">
-                                                                            <div id="results33_validation" class="card-header">
-                                                                              <b><a id="result33_validation" style="display: block"></a></b>
-                                                                              <a id="resulted33_validation" style="display: block"></a></b>
-                                                                            </div>
-                                                                            </div>
-                                                                            <div id="card34" hidden="hidden" class="card m-2">
-                                                                              <div id="results34_validation" class="card-header">
-                                                                                <b><a id="result34_validation" style="display: block"></a></b>
-                                                                                <a id="resulted34_validation" style="display: block"></a></b>
-                                                                              </div>
-                                                                              </div>
-                                                                              <div id="card35" hidden="hidden" class="card m-2">
-                                                                                <div id="results35_validation" class="card-header">
-                                                                                  <b><a id="result35_validation" style="display: block"></a></b>
-                                                                                  <a id="resulted35_validation" style="display: block"></a></b>
-                                                                                </div>
-                                                                                </div>
-                                                                                <div id="card36" hidden="hidden" class="card m-2">
-                                                                                  <div id="results36_validation" class="card-header">
-                                                                                    <b><a id="result36_validation" style="display: block"></a></b>
-                                                                                    <a id="resulted36_validation" style="display: block"></a></b>
-                                                                                  </div>
-                                                                                  </div>
-                                                                                  <div id="card37" hidden="hidden" class="card m-2">
-                                                                                    <div id="results37_validation" class="card-header">
-                                                                                      <b><a id="result37_validation" style="display: block"></a></b>
-                                                                                      <a id="resulted37_validation" style="display: block"></a></b>
-                                                                                    </div>
-                                                                                    </div>
-                                                                                    <div id="card38" hidden="hidden" class="card m-2">
-                                                                                      <div id="results38_validation" class="card-header">
-                                                                                        <b><a id="result38_validation" style="display: block"></a></b>
-                                                                                        <a id="resulted38_validation" style="display: block"></a></b>
-                                                                                      </div>
-                                                                                      </div>
-                                                                                      <div id="card39" hidden="hidden" class="card m-2">
-                                                                                        <div id="results39_validation" class="card-header">
-                                                                                          <b><a id="result39_validation" style="display: block"></a></b>
-                                                                                          <a id="resulted39_validation" style="display: block"></a></b>
-                                                                                        </div>
-                                                                                        </div>
-                                                                                        <div id="card40" hidden="hidden" class="card m-2">
-                                                                                          <div id="results40_validation" class="card-header">
-                                                                                            <b><a id="result40_validation" style="display: block"></a></b>
-                                                                                            <a id="resulted40_validation" style="display: block"></a></b>
-                                                                                          </div>
-                                                                                          </div>
-                                                                                          <div id="card41" hidden="hidden" class="card m-2">
-                                                                                            <div id="results41_validation" class="card-header">
-                                                                                              <b><a id="result41_validation" style="display: block"></a></b>
-                                                                                              <a id="resulted41_validation" style="display: block"></a></b>
-                                                                                            </div>
-                                                                                            </div>
-                                                                                            <div id="card42" hidden="hidden" class="card m-2">
-                                                                                              <div id="results42_validation" class="card-header">
-                                                                                                <b><a id="result42_validation" style="display: block"></a></b>
-                                                                                                <a id="resulted42_validation" style="display: block"></a></b>
-                                                                                              </div>
-                                                                                              </div>
-                                                                                              <div id="card43" hidden="hidden" class="card m-2">
-                                                                                                <div id="results43_validation" class="card-header">
-                                                                                                  <b><a id="result43_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted43_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card44" hidden="hidden" class="card m-2">
-                                                                                                <div id="results44_validation" class="card-header">
-                                                                                                  <b><a id="result44_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted44_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card45" hidden="hidden" class="card m-2">
-                                                                                                <div id="results45_validation" class="card-header">
-                                                                                                  <b><a id="result45_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted45_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card46" hidden="hidden" class="card m-2">
-                                                                                                <div id="results46_validation" class="card-header">
-                                                                                                  <b><a id="result46_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted46_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card47" hidden="hidden" class="card m-2">
-                                                                                                <div id="results47_validation" class="card-header">
-                                                                                                  <b><a id="result47_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted47_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card48" hidden="hidden" class="card m-2">
-                                                                                                <div id="results48_validation" class="card-header">
-                                                                                                  <b><a id="result48_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted48_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card49" hidden="hidden" class="card m-2">
-                                                                                                <div id="results49_validation" class="card-header">
-                                                                                                  <b><a id="result49_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted49_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card50" hidden="hidden" class="card m-2">
-                                                                                                <div id="results50_validation" class="card-header">
-                                                                                                  <b><a id="result50_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted50_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card51" hidden="hidden" class="card m-2">
-                                                                                                <div id="results51_validation" class="card-header">
-                                                                                                  <b><a id="result51_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted51_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card52" hidden="hidden" class="card m-2">
-                                                                                                <div id="results52_validation" class="card-header">
-                                                                                                  <b><a id="result52_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted52_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card53" hidden="hidden" class="card m-2">
-                                                                                                <div id="results53_validation" class="card-header">
-                                                                                                  <b><a id="result53_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted53_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card54" hidden="hidden" class="card m-2">
-                                                                                                <div id="results54_validation" class="card-header">
-                                                                                                  <b><a id="result54_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted54_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card55" hidden="hidden" class="card m-2">
-                                                                                                <div id="results55_validation" class="card-header">
-                                                                                                  <b><a id="result55_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted55_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card56" hidden="hidden" class="card m-2">
-                                                                                                <div id="results56_validation" class="card-header">
-                                                                                                  <b><a id="result56_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted56_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card57" hidden="hidden" class="card m-2">
-                                                                                                <div id="results57_validation" class="card-header">
-                                                                                                  <b><a id="result57_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted57_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                                                              <div id="card58" hidden="hidden" class="card m-2">
-                                                                                                <div id="results58_validation" class="card-header">
-                                                                                                  <b><a id="result58_validation" style="display: block"></a></b>
-                                                                                                  <a id="resulted58_validation" style="display: block"></a></b>
-                                                                                                </div>
-                                                                                                </div>
-                                                        
-            
-
-            
-
-                                                                                              </div>
-
-
-
-
-              
-
-         
-        
-            
-
-
-
-        
-          </div>
-          </div>
-              </div>
-
-            
-        </div>
-      {% include "footer.html" %}
-      <style>
-        .dot {
-          height: 45px;
-          width: 45px;
-          background-color: #E0E0E0;
-          border-radius: 50%;
-          display: inline-block;
-        }
-        .dot2 {
-          height: 5px;
-          width: 5px;
-          background-color: #E0E0E0;
-          border-radius: 50%;
-          display: inline-block;
-        }
-        .iep {
-          height: 5px;
-          width: 5px;
-          background-color: #CF7C40;
-          border-radius: 50%;
-          display: inline-block;
-        }
-        #id_url_link{
-          width: 100%;
-        }
-        #stop-btn {
-          pointer-events: none;
-        }
-        @media only screen and (max-width: 1100px) {
-
-  .reduce{
-    width: 100vw;
-    max-width: 1000px;
-    background-color: white;
-  }
-
-  .titulo {
-    display: none;
-  }
-
-  .barrav {
-    width: 100vw;
-  }
-
-  .association {
-    display: none;
-  }
-}
-html, body {
-    overflow: auto;
-}
-body {
-  width: 100vw;
-  max-width: 100%;
-  overflow-x: hidden;
-  min-height: 100% !important;
-}
-
-@media only screen and (max-width: 1300px) {
-  .association {
-    display: none;
-  }
-}
-
-@media only screen and (max-height: 800px) {
-.association {
-  display: none;
-}
-}
-        </style>
 <script>
   function myFunction() {
   var x = document.getElementById("myDIV");
@@ -701,7 +102,7 @@ function groupErrorsByUrl(map_out) {
     return results;
 }
 
-  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation) {
+  function updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode, endpoints_collected, datasets_collected) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
@@ -728,13 +129,77 @@ function groupErrorsByUrl(map_out) {
           element0.removeAttribute("hidden");
           document.getElementById('summarytable').removeAttribute("hidden");
           const yourMessage = document.getElementById("results_validation");
-            const rsv = yourMessage.querySelector('#result_validation');
-            rsv.innerHTML = mapstring
-            const rsved = yourMessage.querySelector('#resulted_validation');
-            rsved.innerHTML = mapvalidation
+          const rsv = yourMessage.querySelector('#result_validation');
+          rsv.innerHTML = mapstring
+          const rsved = yourMessage.querySelector('#resulted_validation');
+          const groupedData = groupErrorsByUrl(mapvalidation);
+
+          const filteredErrors = groupedData.flatMap(group =>
+            group.errors.filter(
+              errorObj =>
+                errorObj.raw.datasetId == null ||
+                datasets_collected.includes(errorObj.raw.datasetId)
+            )
+          );
+          const totalErrors = filteredErrors.length;
+          const totalErrorsHTML =
+            totalErrors > 0
+              ? `
+                <div style="position: absolute; top: 7px; right: 35px;">
+                  (${totalErrors})
+                </div>
+              `
+              : "";
+          const errorsHTML = `
+            ${totalErrorsHTML}
+
+            ${filteredErrors.map((errorObj, index) => {
+              const raw = errorObj.raw;
+              const path = raw.received?.path || [];
+              const value = raw.received?.value;
+              const schema = raw.schema?.definition || {};
+
+              return `
+                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
+
+                ${
+                  raw.datasetId != null
+                    ? `<div><b>Dataset</b>: ${raw.datasetId}</div>`
+                    : `<div><b>Errors</b></div>`
+                }
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
+                    </div>
+
+                  </div>
+                </details>
+
+                <br>
+              `;
+            }).join("<hr>")}
+          `;
+
+          rsved.innerHTML = errorsHTML;
             if (mapvalidation == '') {
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
               document.getElementById('cardinitial').style.borderColor = "#40946C";
@@ -742,9 +207,11 @@ function groupErrorsByUrl(map_out) {
               const yoursummary = document.getElementById("check")
               yoursummary.innerText = checks;
             } else {
-              console.log('warning')
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
               document.getElementById('cardinitial').style.borderColor = "#CF7C40";
@@ -764,6 +231,9 @@ function groupErrorsByUrl(map_out) {
             rsved.innerHTML = mapvalidation
             var heart = document.createElement('i')
             heart.className = 'bi-x-circle'
+            heart.style.position = 'absolute'
+            heart.style.top = '7px' 
+            heart.style.right = '10px'
             yourMessage.append(heart)
             yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
             document.getElementById('cardinitial').style.borderColor = "#B85353";
@@ -801,14 +271,14 @@ function groupErrorsByUrl(map_out) {
     document.getElementById("pdot21").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot22").style.backgroundColor = "#CF7C3F";
     document.getElementById("pdot23").style.backgroundColor = "#CF7C3F";
+    document.getElementById("checkprogress").style.color = "#CF7C3F";
     document.getElementById("pdot2").removeAttribute("hidden");
     document.getElementById("downl").removeAttribute("hidden");
     document.getElementById("stop-btn").value="no";
-    console.log(document.getElementById("stop-btn").value);
     
 
   }
-  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion) {
+  async function updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, endpoints_collected, datasets_collected, bname, bid, bversion) {
     fetch(`/task_status/?task_id=${task_id}`, {
       method: 'GET',
     })
@@ -832,21 +302,18 @@ function groupErrorsByUrl(map_out) {
 
           let element = document.getElementById(finalcard);
           element.removeAttribute("hidden");
-          console.log(finalresults)
-          console.log(finalresult)
-          console.log(finalresulted)
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
-            console.log(map_out[0])
-            console.log(map_out[1])
-            console.log(iteration)
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
           if (validation == '') {
               var heart = document.createElement('i')
               heart.className = 'bi-check-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgba(51, 170, 51, .1)";
               document.getElementById(finalcard).style.borderColor = "#40946C";
@@ -856,6 +323,9 @@ function groupErrorsByUrl(map_out) {
             } else if(map_out[1].errorMessage?.includes("Internal Server Error")){
               var heart = document.createElement('i')
               heart.className = 'bi-x-circle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
               yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
               yourMessage.style.borderColor = "#B85353";
@@ -868,8 +338,10 @@ function groupErrorsByUrl(map_out) {
             else {
               var heart = document.createElement('i')
               heart.className = 'bi-exclamation-triangle'
+              heart.style.position = 'absolute'
+              heart.style.top = '7px' 
+              heart.style.right = '10px'
               yourMessage.append(heart)
-              console.log('warning')
               yourMessage.style.backgroundColor = "rgb(255, 165, 0, .1)";
               document.getElementById(finalcard).style.borderColor = "#CF7C40";
               warnings = warnings + 1;
@@ -877,47 +349,86 @@ function groupErrorsByUrl(map_out) {
               yoursummary.innerText = warnings;
             }
           const groupedData = groupErrorsByUrl(map_out);
+          // console.log(groupedData)
+          const filteredErrors = groupedData.flatMap(group =>
+            group.errors.filter(
+              errorObj =>
+                errorObj.raw.datasetId == null ||
+                datasets_collected.includes(errorObj.raw.datasetId)
+            )
+          );
+          // console.log(filteredErrors)
+          const totalErrors = filteredErrors.length;
+          const totalErrorsHTML =
+            totalErrors > 0
+              ? `
+                <div style="position: absolute; top: 7px; right: 35px;">
+                  (${totalErrors})
+                </div>
+              `
+              : "";
+          const errorsHTML = `
+            ${totalErrorsHTML}
 
-          const errorsHTML = groupedData.flatMap(group => {
-              return group.errors.map((errorObj, index) => {
-                  const raw = errorObj.raw;
-                  const path = raw.received?.path || [];
-                  const value = raw.received?.value;
-                  const schema = raw.schema?.definition || {};
+            ${filteredErrors.map((errorObj, index) => {
+              const raw = errorObj.raw;
+              const path = raw.received?.path || [];
+              const value = raw.received?.value;
+              const schema = raw.schema?.definition || {};
 
-                  return `
-                  <details>
-                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
-                      <details>
-                          <summary>Expected schema</summary>
-                          <pre>${JSON.stringify(schema, null, 2)}</pre>
-                      </details>
-                      <details>
-                          <summary>Received response & path</summary>
-                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
-                      </details>
-                  </details>
-                  <br>`;
-              });
-          }).join('<hr>'); // separate each error visually
+              return `
+                <div><b>Error ${index + 1}</b>: ${raw.errorMessage}</div>
+                <div><b>Query</b>: ${raw.granularity} + ${raw.include}</div>
+
+                ${
+                  raw.datasetId != null
+                    ? `<div><b>Dataset</b>: ${raw.datasetId}</div>`
+                    : `<div><b>Errors</b></div>`
+                }
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
+                    </div>
+
+                  </div>
+                </details>
+
+                <br>
+              `;
+            }).join("<hr>")}
+          `;
 
           rsved.innerHTML = errorsHTML;
             
           if (iteration == '0'){
-            console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
-            rsv.innerHTML = map_out[0][0]
-            console.log(iteration)
-            console.log(bname)
+            rsv.innerHTML = map_out[0]
             const yourBeacon = document.getElementById('beaconparams');
             yourBeacon.removeAttribute("hidden");
             const BeaconName = yourBeacon.querySelector('#beaconName')
             const BeaconId = yourBeacon.querySelector('#beaconId')
             const BeaconVersion = yourBeacon.querySelector('#beaconVersion')
-            BeaconName.innerHTML = bname;
-            BeaconId.innerHTML = bid;
-            BeaconVersion.innerHTML = bversion;
+            if (bname != undefined){BeaconName.innerHTML = bname;}
+            else {BeaconName.innerHTML = "Beacon name unavailable if /info endpoint not added to verification"}
+            if (bid != undefined){BeaconId.innerHTML = bid;}
+            else {BeaconId.innerHTML = "Beacon ID unavailable if /info endpoint not added to verification"}
+            if (bversion != undefined){BeaconVersion.innerHTML = bversion;}
+            else {BeaconVersion.innerHTML = "Beacon version unavailable if /info endpoint not added to verification"}
+            
             let elementbid = document.getElementById('bid');
             elementbid.removeAttribute("hidden");
             let elementbname = document.getElementById('bname');
@@ -941,20 +452,17 @@ function groupErrorsByUrl(map_out) {
 
           let element = document.getElementById(finalcard);
           element.removeAttribute("hidden");
-          console.log(finalresults)
-          console.log(finalresult)
-          console.log(finalresulted)
           const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             const rsved = yourMessage.querySelector(finalresulted);
-            console.log(map_out[0])
-            console.log(map_out[1])
-            console.log(iteration)
           if (iteration != '0'){
             rsv.innerHTML = map_out[0]
           }
           var heart = document.createElement('i')
           heart.className = 'bi-x-circle'
+          heart.style.position = 'absolute'
+          heart.style.top = '7px' 
+          heart.style.right = '10px'
           yourMessage.append(heart)
           yourMessage.style.backgroundColor = "rgb(255, 0, 0, .1)";
           yourMessage.style.borderColor = "#B85353";
@@ -973,29 +481,39 @@ function groupErrorsByUrl(map_out) {
                   const schema = raw.schema?.definition || {};
 
                   return `
-                  <details>
-                      <summary>Error ${index + 1}: ${errorObj.message}</summary>
-                      <details>
-                          <summary>Expected schema</summary>
-                          <pre>${JSON.stringify(schema, null, 2)}</pre>
-                      </details>
-                      <details>
-                          <summary>Received response & path</summary>
-                          <pre>${JSON.stringify({ path, value }, null, 2)}</pre>
-                      </details>
-                  </details>
+                  <div style="position: absolute; top: 7px; right: 30px;">
+                    (1)
+                  </div>
+                  <div>Error ${index + 1}: ${errorObj.message}</div>
+                <details>
+                  <summary>Received response & path vs. Expected schema</summary>
+
+                  <div style="display:flex; gap:16px; margin-top:12px; align-items:flex-start;">
+
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #d0e3ff;">
+                        <span>Received response & path</span>
+                        <pre style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify({ path, value }, null, 2)}</pre>
+                    </div>
+                    
+                    <div style="flex:1; background:#fcf8f3; padding:12px; border-radius:6px; border:1px solid #dee2e6; position: relative;">
+                        <span>Expected schema</span>
+                        <img src="{% static 'copy.svg' %}" alt="Copy" title="Copy JSON" onclick="copySchema()" style="width:18px; height:18px; cursor:pointer; position: absolute; top: 12px; right: 12px;">
+                        <pre id="expected-schema" style="white-space:pre-wrap; word-break:break-word; max-height:400px; min-height:400px; overflow-y:auto; margin:0;">
+          ${JSON.stringify(schema, null, 2)}</pre>
+                    </div>
+
+                  </div>
+                </details>
                   <br>`;
               });
           }).join('<hr>'); // separate each error visually
 
           rsved.innerHTML = errorsHTML;
           if (iteration == '0'){
-            console.log(map_out[0][0])
             const yourMessage = document.getElementById(finalresults);
             const rsv = yourMessage.querySelector(finalresult);
             rsv.innerHTML = map_out[0][0]
-            console.log(iteration)
-            console.log(bname)
             const yourBeacon = document.getElementById('beaconparams');
             yourBeacon.removeAttribute("hidden");
             const BeaconName = yourBeacon.querySelector('#beaconName')
@@ -1030,13 +548,35 @@ function groupErrorsByUrl(map_out) {
   let checks = 1;
   let warnings = 0;
   let errors = 0;
-  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, checks, warnings, errors) => {
+  const repeatedGreetings = async (yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected, checks, warnings, errors) => {
     
 
     for (let i = 0; i < mapping.length; i++) {
-            await sleep(5000)
+              let delay = 5000; // Default
+
+              if (include.length > 2 && granularity.length > 2) {
+                  delay = 30000;
+              }
+              else if (include.length < 2 && granularity.length < 2) {
+                  delay = 7000;
+              }
+              else if (include.length < 3 && granularity.length < 3) {
+                  delay = 12000;
+              } else if (include.length < 5 && granularity.length < 5) {
+                  delay = 25000;
+              }
+
+              if (
+                  mapping[i].includes("info") ||
+                  mapping[i].includes("map") ||
+                  mapping[i].includes("filtering_terms") ||
+                  mapping[i].includes("configuration")
+              ) {
+                  delay = 5000;
+              }
+
+              await sleep(delay);
               var width = (i/mapping.length)*100
-              console.log(width)
 
               if (document.getElementById("stop-btn").value=="no"){
                 break} else {
@@ -1051,6 +591,11 @@ function groupErrorsByUrl(map_out) {
           if (document.getElementById("stop-btn").value=="si"){
           const formData2 =new FormData();
           formData2.set('url_link', mapping[i]);
+          formData2.set('include_resultset_responses', include);
+          formData2.set('granularity', granularity);
+          formData2.set('test_mode', test_mode);
+          formData2.set('endpoints_collected', endpoints_collected);
+          formData2.set('datasets_collected', datasets_collected);
 
     fetch('/validator/', {
                   method: 'POST',
@@ -1068,8 +613,12 @@ function groupErrorsByUrl(map_out) {
             const bname = res.beaconName;
             const bid = res.beaconId;
             const bversion = res.beaconVersion;
-            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, bname, bid, bversion, checks, warnings, errors)
-            console.log(res);
+            const include = res.include;
+            const granularity = res.granularity;
+            const test_mode = res.test_mode;
+            const endpoints_collected = res.endpoints_collected;
+            const datasets_collected = res.datasets_collected;
+            updateProgress2(yourForm, task_id, btnHtml, bash_out, map_out, iteration, mapstring, validation, include, granularity, test_mode, endpoints_collected, datasets_collected, bname, bid, bversion, checks, warnings, errors)
           })
           .catch((error) => {
             console.error('Error:', error)
@@ -1097,6 +646,7 @@ function groupErrorsByUrl(map_out) {
         document.getElementById("myBar").style.backgroundColor = "#40946C";
         document.getElementById("pdot").setAttribute("hidden", true);
         document.getElementById("pdot2").style.backgroundColor = "#40946C";
+        document.getElementById("checkprogress").style.color = "#40946C";
         document.getElementById("pdot21").style.backgroundColor = "#40946C";
         document.getElementById("pdot22").style.backgroundColor = "#40946C";
         document.getElementById("pdot23").style.backgroundColor = "#40946C";
@@ -1130,7 +680,6 @@ function groupErrorsByUrl(map_out) {
 
       // Get all field data from the form
       const formData = new URLSearchParams(new FormData(yourForm));
-      console.log(formData);
 
       fetch('/validator/', {
         method: 'POST',
@@ -1146,17 +695,19 @@ function groupErrorsByUrl(map_out) {
           const bash_out = res.bash_out;
           const mapstring = res.map;
           const mapvalidation = res.validation;
-          console.log(mapstring)
+          const include = res.include;
+          const granularity = res.granularity;
+          const test_mode = res.test_mode;
+          const endpoints_collected = res.endpoints_collected;
+          const datasets_collected = res.datasets_collected;
           
-          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation);
-          console.log(res);
+          updateProgress(yourForm, task_id, btnHtml, bash_out, mapstring, mapvalidation, include, granularity, test_mode, endpoints_collected, datasets_collected);
           const mapping = bash_out
-          console.log(mapping)
 
           
 
           
-          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping);
+          repeatedGreetings(yourForm, btnHtml, bash_out, mapstring, mapping, include, granularity, test_mode, endpoints_collected, datasets_collected);
 
 
           
@@ -1192,14 +743,206 @@ function groupErrorsByUrl(map_out) {
   document.getElementById("downl")
       .addEventListener("click", function () {
         var nodes = document.getElementById("theresultscol").querySelectorAll("a");
-        console.log(nodes)
-        var list = [].slice.call(nodes);
+        var verificationsettings = document.getElementById("verificationtable").querySelectorAll("div");
+
+        var settings_collected = Array.from(verificationsettings);
+
+        var list = Array.from(nodes).filter(function(node) {
+            return node.textContent.trim() !== "";
+        });
+
+        list.forEach(function(item, index) {
+            if (
+                index < list.length - 1 &&
+                list[index].textContent.includes("http") && !list[index+1].textContent.includes("Error")
+            ) {
+                list[index].textContent += " Successful validation";
+            } else if (index === list.length && list[index].textContent.includes("http")){list[index].textContent += " Successful validation";}
+        });
+
+        list = settings_collected.concat(list);
         var innertext = list.map(function(e) { return e.innerText; }).join("\n");
           let filename = "verifier.txt";
 
           download(filename, innertext);
       }, false);
 </script>
-</body>
-</html>
 
+<script>
+const selectboxBtn = document.getElementById("selectbox");
+const clearboxBtn = document.getElementById("clearbox");
+
+function getCheckboxes() {
+    return document.querySelectorAll('input[type="checkbox"]:not(#id_test_mode)');
+}
+
+function setState(allChecked) {
+    const nonerecordmsg = document.getElementById("nonerecordmsg");
+    if (allChecked) {
+        clearboxBtn.classList.remove("inactive");
+        selectboxBtn.classList.add("inactive");
+        nonerecordmsg.removeAttribute("hidden", true);
+
+    } else {
+        selectboxBtn.classList.remove("inactive");
+        clearboxBtn.classList.add("inactive");
+        nonerecordmsg.setAttribute("hidden", true);
+    }
+}
+
+function setAll(state) {
+    getCheckboxes().forEach(cb => cb.checked = state);
+    setState(state);
+    oala.style.display = 'none'
+    reserror.style.display = 'none'
+
+}
+
+selectboxBtn.addEventListener("click", () => setAll(true));
+clearboxBtn.addEventListener("click", () => setAll(false));
+
+document.addEventListener("DOMContentLoaded", () => {
+    const checkboxes = getCheckboxes();
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    setState(allChecked);
+});
+
+document.addEventListener("click", () => {
+    const checkboxes = getCheckboxes();
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    setState(allChecked);
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("settingsForm");
+    const loading = document.getElementById("loadingContainer");
+
+    if (!form || !loading) {
+        console.error("Form or loading container not found");
+        return;
+    }
+
+    form.addEventListener("submit", function () {
+        loading.style.display = "block";
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("endpointsform");
+    const loading = document.getElementById("loadingContainer");
+
+    if (!form || !loading) {
+        console.error("Form or loading container not found");
+        return;
+    }
+
+    form.addEventListener("submit", function () {
+        loading.style.display = "block";
+    });
+});
+</script>
+<script>
+function hideMessage(isNONEChecked, isrecordChecked, isHITChecked, iscountChecked, isMISSChecked, isbooleanChecked, isALLChecked) {
+  const nonerecordmsg = document.getElementById("nonerecordmsg");
+  const onlynonerecordmsg = document.getElementById("onlynonerecordmsg");
+  if (isNONEChecked && isrecordChecked) {
+    if (!isALLChecked && !isbooleanChecked && !isMISSChecked && !iscountChecked && !isHITChecked) {
+      document.getElementById("settings-box").classList.add('settings-box-red');
+      document.getElementById("settings-box").classList.remove('settings-box');
+      onlynonerecordmsg.removeAttribute("hidden");
+      nonerecordmsg.setAttribute("hidden", true);
+      document.getElementById("primerbutton").disabled = true;
+      document.getElementById("primerbutton").classList.remove('nextbutton');
+      document.getElementById("primerbutton").classList.add('nextbuttongrey');
+    }
+    else {
+      onlynonerecordmsg.setAttribute("hidden", true);
+      nonerecordmsg.removeAttribute("hidden");
+      document.getElementById("settings-box").classList.remove('settings-box-red');
+      document.getElementById("settings-box").classList.add('settings-box');
+      document.getElementById("primerbutton").disabled = false;
+      document.getElementById("primerbutton").classList.remove('nextbuttongrey');
+      document.getElementById("primerbutton").classList.add('nextbutton');
+      
+
+    }
+  } else {
+    nonerecordmsg.setAttribute("hidden", true);
+    onlynonerecordmsg.setAttribute("hidden", true);
+    document.getElementById("settings-box").classList.remove('settings-box-red');
+    document.getElementById("settings-box").classList.add('settings-box');
+    document.getElementById("primerbutton").disabled = false;
+    document.getElementById("primerbutton").classList.remove('nextbuttongrey');
+    document.getElementById("primerbutton").classList.add('nextbutton');
+  }
+}
+const nonecheckbox = document.getElementById('id_include_resultset_responses_3');
+const recordcheckbox = document.getElementById('id_granularity_0');
+const hitcheckbox = document.getElementById('id_include_resultset_responses_0');
+const countcheckbox = document.getElementById('id_granularity_1');
+const misscheckbox = document.getElementById('id_include_resultset_responses_1');
+const booleancheckbox = document.getElementById('id_granularity_2');
+const allcheckbox = document.getElementById('id_include_resultset_responses_2');
+nonecheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+recordcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+hitcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+countcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+misscheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+booleancheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+allcheckbox.addEventListener("click", () => hideMessage(nonecheckbox.checked, recordcheckbox.checked, hitcheckbox.checked, countcheckbox.checked, misscheckbox.checked, booleancheckbox.checked, allcheckbox.checked));
+
+</script>
+<script>
+function copySchema() {
+    const text = document.getElementById('expected-schema').innerText;
+
+    navigator.clipboard.writeText(text)
+        .then(() => console.log('Copied'))
+        .catch(err => console.error('Copy failed:', err));
+}
+</script>
+<script>
+  const checkboxes1 = [
+    document.getElementById('id_include_resultset_responses_3'),
+    document.getElementById('id_include_resultset_responses_0'),
+    document.getElementById('id_include_resultset_responses_1'),
+    document.getElementById('id_include_resultset_responses_2')
+];
+
+const reserror = document.getElementById('response-type-error');
+
+function toggleReserror() {
+    const anyChecked = checkboxes1.some(cb => cb.checked);
+    reserror.style.display = anyChecked ? 'none' : '';
+}
+
+toggleReserror();
+
+checkboxes1.forEach(cb => {
+    cb.addEventListener('change', toggleReserror);
+});
+</script>
+<script>
+  const checkboxes2 = [
+    document.getElementById('id_granularity_0'),
+    document.getElementById('id_granularity_1'),
+    document.getElementById('id_granularity_2')
+];
+
+const oala = document.getElementById('granularity-error');
+
+function toggleOala() {
+    const anyChecked = checkboxes2.some(cb => cb.checked);
+    oala.style.display = anyChecked ? 'none' : '';
+}
+
+// Run once on page load
+toggleOala();
+
+// Listen for changes
+checkboxes2.forEach(cb => {
+    cb.addEventListener('change', toggleOala);
+});
+</script>

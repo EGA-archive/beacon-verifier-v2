@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+            <div class="greyform" style="background-color: #EEEEEE;">
+          
+
+              <div class="row">
+                <div class="col reduce">
+                  <div class="row">
+                  </div>
+                                    <div class="circle-wrapper">
+
+                    <div class="dashed-line"></div>
+                    <div class="dashed-line2"></div>
+                    <div class="dashed-line3"></div>
+
+                    <div class="circle-container">
+
+                      <div class="circle-item">
+                        <div class="circlegreen">1</div>
+                        <span class="circle-label">Settings</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">2</div>
+                        <span class="circle-label">Endpoints</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">3</div>
+                        <span class="circle-label">Datasets</span>
+                      </div>
+
+                      <div class="circle-item">
+                        <div class="circlegrey">4</div>
+                        <span class="circle-label">Summary</span>
+                      </div>
+
+                    </div>
+                  </div>
+                    <form id="settingsForm" method="post" class="formsettings">
+                        {% csrf_token %}
+
+                        
+                            {% for f in form %}
+                            {% if f.name == "url_link" %}
+                                <b>{{ f.help_text|safe }} {{ f }}</b>
+                            {% endif %}
+                            {% endfor %}
+
+                          <div class="selectallwrapper">
+                              <button type="button" class="selectall inactive" id="selectbox">Select All</button>
+                              <button type="button" class="selectall" id="clearbox">Unselect All</button>
+                          </div>
+
+                        <div style="margin-top: -30px;">
+                          <span class="granu"><b>Response Type</b></span>
+                          <span class="granu2"><b>Granularity</b></span>
+                          
+                      <div id="settings-box" class="settings-box">
+                        
+                          {% for f in form %}
+                              {% if f.name != "test_mode" and f.name != "url_link" %}
+                                  <div class="setting-item">
+
+                                      {{ f }}
+
+                                  </div>
+                              {% endif %}
+                          {% endfor %}
+                              <div class="toggle-inline">
+                                  <span><b>Test Mode</b></span><span>Off</span>
+
+                                  {% for f in form %}
+                                      {% if f.name == "test_mode" %}
+                                          {{ f }}
+                                      {% endif %}
+                                  {% endfor %}
+
+                                  <span>On</span>
+                              </div>
+                              <div id="nonerecordmsg">The query record + NONE is not possible. It will be excluded, while all other selected queries will be performed.</div>
+                              <div id="onlynonerecordmsg" hidden="hidden">The query record + NONE is not possible, please select other options.</div>
+                              
+                              {% for f in form %}
+                              {% if f.name == "granularity" %}
+                                                                                  {% if f.errors %}
+                  <div class="field-error" id="granularity-error">
+                      Please select at least one option for Granularity
+                  </div>
+              {% endif %}
+              {% endif %}
+                              {% if f.name == "include_resultset_responses" %}
+                                                                                  {% if f.errors %}
+                  <div class="field-error" id="response-type-error">
+                      Please select at least one option for Response Type
+                  </div>
+                  {% endif %}
+              {% endif %}
+
+              {% endfor %}
+                      </div>
+
+                      </div>
+
+
+                </div>
+
+              </div>
+
+                    <button id="primerbutton" name="settings" onclick="document.getElementById('myPercentext').innerText = 'Verifying...'" type="submit" class="nextbutton"> <span>Next</span><span class="bi bi-arrow-right"> </span></button>
+                  <div id="loadingContainer" style="display:none;">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading endpoints...</div>
+</div>
+                    <div style="margin-top: 30px;">
+                    
+                </div>
+                
+
+
+                  
+                  </form>
+
+
+
+
+
+                  
+            </div>
+
+            </div>
+                
+              
+                
+            </div>  
+            
+
+         
+        
+            
+
+
+
+        
+
+{% endblock %}  

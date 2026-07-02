@@ -47,7 +47,7 @@ RUN sed -i 's/\r$//g' /start-flower
 RUN chmod +x /start-flower
 
 RUN mkdir /app
-RUN mkdir /app/staticfiles
+RUN mkdir /app/static
 RUN mkdir /app/mediafiles
 WORKDIR /app
 

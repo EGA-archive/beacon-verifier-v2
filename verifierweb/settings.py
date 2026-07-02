@@ -28,19 +28,25 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("SECRET_KEY", "&nl8s430j^j8l*je+m&ys5dv#zoy)0a2+x1!m8hx290_sx&0gh")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=1))
+#DEBUG = True
+DEBUG = False
+
+#ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(" ")
-#ALLOWED_HOSTS = ['localhost']
-CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org']
+CSRF_TRUSTED_ORIGINS = ['https://beacon-cancer-registry-test.ega-archive.org', 'https://beacon-verifier-demo.ega-archive.org', 'https://beacon-images-api-test.ega-archive.org', 'http://localhost:8000']
 
-STATICFILES_DIRS = [ os.path.join(PROJECT_DIR, "frontend/" )]
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, '/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 # Application definition
 
@@ -55,7 +61,12 @@ INSTALLED_APPS = [
     'bash',
     'crispy_forms',
     'mozilla_django_oidc',
-    'channels'
+    'channels',
+    "django_browser_reload",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.openid_connect'
 ]
 
 MIDDLEWARE = [
@@ -66,7 +77,41 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
+    "allauth.account.middleware.AccountMiddleware"
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "openid_connect": {
+        # Optional PKCE defaults to False, but may be required by your provider
+        # Can be set globally, or per app (settings).
+        "OAUTH_PKCE_ENABLED": True,
+        "APPS": [
+            {
+                "provider_id": "my-server",
+                "name": "My Login Server",
+                "client_id": os.getenv("CLIENT_ID"),
+                "secret": os.getenv("CLIENT_SECRET"),
+                "settings": {
+                    # When enabled, an additional call to the userinfo
+                    # endpoint takes place. The data returned is stored in
+                    # `SocialAccount.extra_data`. When disabled, the (decoded) ID
+                    # token payload is used instead.
+                    "fetch_userinfo": True,
+                    "store_tokens": True,
+                    "oauth_pkce_enabled": True,
+                    "server_url": "https://login.aai.lifescience-ri.eu/oidc",
+                    # Optional token endpoint authentication method.
+                    # May be one of "client_secret_basic", "client_secret_post"
+                    # If omitted, a method from the the server's
+                    # token auth methods list is used,
+                    'redirect_uri': os.getenv("REDIRECT_URI"),
+                    "token_auth_method": "client_secret_basic"
+                },
+            }
+        ]
+    }
+}
 
 ROOT_URLCONF = 'verifierweb.urls'
 
@@ -149,33 +194,27 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHENTICATION_BACKENDS = [
-'django.contrib.auth.backends.ModelBackend',
-'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
-#OIDC_RP_CLIENT_ID = env('OIDC_RP_CLIENT_ID')
-#OIDC_RP_CLIENT_SECRET = env('OIDC_RP_CLIENT_SECRET')
-
-#OIDC_OP_AUTHORIZATION_ENDPOINT = "http://localhost:8080/auth/realms/Beacon/protocol/openid-connect/auth"
-#OIDC_OP_TOKEN_ENDPOINT = "http://idp:8080/auth/realms/Beacon/protocol/openid-connect/token"
-#OIDC_OP_USER_ENDPOINT = "http://idp:8080/auth/realms/Beacon/protocol/openid-connect/userinfo"
-
-OIDC_OP_AUTHORIZATION_ENDPOINT = "https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/auth"
-OIDC_OP_TOKEN_ENDPOINT = "https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/token"
-OIDC_OP_USER_ENDPOINT = "https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/userinfo"
-OIDC_STORE_ID_TOKEN = True
-OIDC_OP_LOGOUT_URL_METHOD = 'my_auth.provider_logout'
-OIDC_OP_LOGOUT_ENDPOINT = "https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/logout"
-
-LOGIN_REDIRECT_URL = "http://localhost:8003"
-LOGOUT_REDIRECT_URL = "http://localhost:8003"
-#LOGIN_REDIRECT_URL = "https://beacon-test.ega-archive.org"
-#LOGOUT_REDIRECT_URL = "https://beacon-test.ega-archive.org"
-
-	
-OIDC_RP_SIGN_ALGO = 'RS256'
-#OIDC_OP_JWKS_ENDPOINT = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/certs'
-OIDC_OP_JWKS_ENDPOINT = 'https://beacon-network-demo2.ega-archive.org/auth/realms/Beacon/protocol/openid-connect/certs'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL='/'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_LOGOUT_REDIRECT = '/'
+ACCOUNT_PRESERVE_USERNAME_CASING = False
+ACCOUNT_SESSION_REMEMBER = False
+ACCOUNT_USERNAME_MIN_LENGTH = 2
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://127.0.0.1:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://127.0.0.1:6379/0")
@@ -188,3 +227,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+SOCIALACCOUNT_ADAPTER = "verifierweb.adapter.MyOIDCAdapter"
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+SOCIALACCOUNT_STORE_TOKENS = True
