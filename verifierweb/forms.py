@@ -8,10 +8,13 @@ def get_map_endpoints_list(url):
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
-    resultsets = total_response["response"]
-    endpoints = resultsets["endpointSets"]
+    except Exception:
+        return []
+    try:
+        resultsets = total_response["response"]
+        endpoints = resultsets["endpointSets"]
+    except Exception:
+        return []
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
     try:
@@ -38,15 +41,24 @@ def get_datasets_list(url):
     initial_list=[]
     final_list=[]
     f, output_validation = endpoint_request(url+'/map')
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception:
+        return []
     new_url = list_dataset_endpoint(total_response)
-
+    if not new_url:
+        # Beacon exposes no `dataset` entry type - nothing to list (and requests would
+        # raise MissingSchema on an empty URL).
+        return []
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
-    datasets_records = total_response["response"]["collections"]
+    except Exception:
+        return []
+    try:
+        datasets_records = total_response["response"]["collections"]
+    except Exception:
+        return []
     for dataset_record in datasets_records:
         initial_list.append(dataset_record["id"])
     for item in initial_list:
@@ -200,4 +212,9 @@ class ChannelForm(forms.Form):
     granularity = forms.CharField(widget=forms.HiddenInput())
     test_mode = forms.CharField(widget=forms.HiddenInput())
     endpoints_collected = forms.CharField(widget=forms.HiddenInput())
-    datasets_collected = forms.CharField(widget=forms.HiddenInput())
+    # A Beacon implements only the entry types it holds; the framework allows as few as one
+    # (beaconMapSchema.json, `endpointSets` rootUrl description: "in very simple Beacons, that
+    # endpoint could be the only one implemented"), and entryTypesSchema requires no specific
+    # entry type. So `dataset` need not exist and this may be empty - it must not be rejected
+    # as a bad request.
+    datasets_collected = forms.CharField(widget=forms.HiddenInput(), required=False)
