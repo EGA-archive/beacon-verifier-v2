@@ -99,6 +99,13 @@
                       Please select at least one option for Response Type
                   </div>
                   {% endif %}
+                  {% endif %}
+                              {% if f.name == "url_link" %}
+                                                                                  {% if f.errors %}
+                  <div class="field-error" id="url-link">
+                      The URL provided: {{f.value}}, is not a root URL for a beacon. Please, note that the URL must be the whole part before which each endpoint adds its termination (e.g. https://www.example.com/api/individuals, then URL to enter is https://www.example.com/api)
+                  </div>
+                  {% endif %}
               {% endif %}
 
               {% endfor %}

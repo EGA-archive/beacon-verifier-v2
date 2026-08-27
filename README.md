@@ -14,8 +14,23 @@ git clone https://github.com/EGA-archive/beacon-verifier-v2.git
 Add an .env file inside the folder [verifierweb](https://github.com/EGA-archive/beacon-verifier-v2/blob/main/ui_image.png), with the next variables:
 ```bash
 SECRET_KEY="your_django_secret_key"
-OIDC_RP_CLIENT_ID='your_client_id'
-OIDC_RP_CLIENT_SECRET='your_client_secret'
+CLIENT_ID='your_client_id'
+SERVER_NAME=localhost
+REDIRECT_URI='http://localhost:8000/oidc/my-server/login/callback/'
+DJANGO_ALLOWED_HOSTS=*
+SQL_ENGINE=django.db.backends.postgresql
+SQL_DATABASE=hello_django
+SQL_USER=hello_django
+SQL_PASSWORD=hello_django
+SQL_HOST=db
+SQL_PORT=5432
+RABBITMQ_DEFAULT_USER=admin
+RABBITMQ_DEFAULT_PASS=admin
+CELERY_BROKER=amqp://admin:admin@rabbitmq:5672/
+CELERY_BACKEND=redis://redis:6379/0
+CELERY_FLOWER_USER=admin
+CELERY_FLOWER_PASSWORD=admin
+CHANNELS_REDIS=redis://redis:6379/0
 ```
 
 We *STRONGLY RECOMMEND* to modify the variable SECRET_KEY. To generate a safe Django SECRET_KEY and copy it to .env file, you can install python django package with pip install Django and generate yours with a script like this:
@@ -40,7 +55,7 @@ Once the container is up and running you can start using beacon verifier v2, con
 
 ### Tutorial for using verifier in your browser
 
-Please, open the verifier UI in your browser going to http://localhost:80 (dev environment deployment) or http://localhost:3015 (production environment deployment).
+Please, open the verifier UI in your browser going to http://localhost:8000 (dev environment deployment) or http://localhost:3015 (production environment deployment).
 
 The Verifier has four steps that need to be followed in order to configurate how you want to verify your beacon.
 

@@ -78,6 +78,13 @@ class SettingsForm(forms.Form):
         msg=None
         include = cleaned_data.get("include_resultset_responses") or []
         granularity = cleaned_data.get("granularity") or []
+        url = cleaned_data.get("url_link")
+        try:
+            get_map_endpoints_list(url)
+        except Exception as e:
+            msg=f"The URL provided: {url}, is not a root URL for a beacon. Please, note that the URL must be the whole part before which each endpoint adds its termination (e.g. www.example.com/api/individuals, then URL to enter is www.example.com/api)"
+            self.add_error("url_link", msg)
+            return cleaned_data
         if include==["NONE"] and granularity==["record"]:
             msg = "The query record + NONE is not possible, please select other options."
 
@@ -118,7 +125,6 @@ class EndpointsForm(forms.Form):
 
     def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None,**kwargs):
         super().__init__(*args, **kwargs)
-
         if endpoint_url:
             self.fields["endpoints_collected"].choices = get_map_endpoints_list(endpoint_url)
             self.fields["endpoints_collected"].initial = [choice[0] for choice in self.fields["endpoints_collected"].choices]
