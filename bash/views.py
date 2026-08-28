@@ -254,12 +254,7 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                         # only beaconResultsetsResponse.json also requires `response`. So a
                         # boolean/count response carries no `response`, and validating it against
                         # the resultsets schema wrongly flags `response` as a required property.
-                        if gran == 'count':
-                            path='ref_schemas/framework/json/responses/beaconCountResponse.json'
-                        elif gran == 'boolean':
-                            path='ref_schemas/framework/json/responses/beaconBooleanResponse.json'
-                        else:
-                            path='ref_schemas/framework/json/responses/beaconResultsetsResponse.json'
+                        path='ref_schemas/framework/json/responses/beaconResultsetsResponse.json'
                         resolver, response = resolve_validation_path(path)
                         logs=JSONSchemaValidator.validate(total_response, response, resolver)
                         for log in logs:

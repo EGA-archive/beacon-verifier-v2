@@ -8,13 +8,10 @@ def get_map_endpoints_list(url):
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
-    except Exception:
-        return []
-    try:
-        resultsets = total_response["response"]
-        endpoints = resultsets["endpointSets"]
-    except Exception:
-        return []
+    except Exception as e:
+        output_validation.append(e)
+    resultsets = total_response["response"]
+    endpoints = resultsets["endpointSets"]
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
     try:
