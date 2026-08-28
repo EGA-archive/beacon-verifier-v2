@@ -99,8 +99,9 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     f = requests.post(url, json = myobj)
                 try:
                     total_response = json.loads(f.text)
-                except Exception as e:
-                    endpoint_validation.append(e)
+                except Exception:
+                    endpoint_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+                    continue
             else:
                 last_part = url.split('{')
                 new_url = last_part[0][0:-1]
@@ -247,6 +248,12 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                             path='ref_schemas/framework/json/responses/beaconCollectionsResponse.json'
                             resolver, response = resolve_validation_path(path)
                     else:
+                        # Envelope schema by granularity. Beacon v2 framework response schemas
+                        # (framework/json/responses/): beaconBooleanResponse.json and
+                        # beaconCountResponse.json both require only {meta, responseSummary};
+                        # only beaconResultsetsResponse.json also requires `response`. So a
+                        # boolean/count response carries no `response`, and validating it against
+                        # the resultsets schema wrongly flags `response` as a required property.
                         path='ref_schemas/framework/json/responses/beaconResultsetsResponse.json'
                         resolver, response = resolve_validation_path(path)
                         logs=JSONSchemaValidator.validate(total_response, response, resolver)
@@ -287,18 +294,19 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                                 json_object_with_the_log_of_the_error_to_return = error_message_to_return(log, inc, gran)
                                 endpoint_validation.append(json_object_with_the_log_of_the_error_to_return)
                     else:
-                        try:
-                            resultsets=total_response["response"]["resultSets"]
-                        except Exception as exc:
-                            with open("ref_schemas/framework/json/responses/sections/beaconResultsets.json", 'r') as f:
-                                definition = json.load(f)
-                            error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets"], total_response, definition, exc, inc, gran)
-                            endpoint_validation.append(error_validation_to_return_in_json)
-                            continue
+                        # Per-variant model validation only applies to record responses;
+                        # boolean/count responses carry no resultSets.
                         if gran == 'record':
+                            try:
+                                resultsets=total_response["response"]["resultSets"]
+                            except Exception as exc:
+                                with open("ref_schemas/framework/json/responses/sections/beaconResultsets.json", 'r') as f:
+                                    definition = json.load(f)
+                                error_validation_to_return_in_json = return_unhandled_error(["response", "resultSets"], total_response, definition, exc, inc, gran)
+                                endpoint_validation.append(error_validation_to_return_in_json)
+                                continue
                             for resultset in resultsets:
                                 datasetId=resultset["id"]
-                                LOG.warning('validating model record for {} and dataset {}'.format(url, datasetId))
                                 try:
                                     results = resultset["results"]
                                 except Exception:
@@ -336,10 +344,15 @@ def map_check(url, include, granularity, test_mode, access_token):
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
-    resultsets = total_response["response"]
-    endpoints = resultsets["endpointSets"]
+    except Exception:
+        output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+        return [], output_validation
+    try:
+        resultsets = total_response["response"]
+        endpoints = resultsets["endpointSets"]
+    except Exception:
+        output_validation.append("Invalid /map response: missing 'response' or 'endpointSets' property.")
+        return [], output_validation
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
     resolver, response = resolve_validation_path(path)
@@ -357,9 +370,12 @@ def info_check(url, include, granularity, test_mode, access_token):
     f, output_validation = endpoint_request(url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
-        return output_validation
+    except Exception:
+        # Append a JSON-serializable message (a raw exception breaks the Celery result
+        # backend), and return the (output_validation, beaconId, beaconName, beaconVersion)
+        # tuple the caller unpacks - not a bare list.
+        output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+        return output_validation, '', '', ''
     try:
         beaconId=total_response['response']['id']
         beaconName=total_response['response']['name']

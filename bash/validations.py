@@ -60,7 +60,9 @@ def endpoint_request(url):
     return f, output_validation
 
 def resolve_validation_path(path):
-    root_path = '/app/'
+    # Resolve bundled schema files relative to the project root, so the tool works both
+    # inside the Docker image (code at /app) and in a local checkout or test run.
+    root_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '')
     with open(root_path+path, 'r') as f:
         spec_json = json.load(f)
     schema_path = 'file:///{0}/'.format(
@@ -77,7 +79,8 @@ def verifier_check(url, path):
     f, output_validation = endpoint_request(url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
+    except Exception:
+        output_validation.append('Internal Server Error. Cannot decode JSON. Look if this endpoint is working')
+        return output_validation
     output_validation=verify_response(path,output_validation,total_response)
     return output_validation

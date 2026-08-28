@@ -38,15 +38,24 @@ def get_datasets_list(url):
     initial_list=[]
     final_list=[]
     f, output_validation = endpoint_request(url+'/map')
-    total_response = json.loads(f.text)
+    try:
+        total_response = json.loads(f.text)
+    except Exception:
+        return []
     new_url = list_dataset_endpoint(total_response)
-
+    if not new_url:
+        # Beacon exposes no `dataset` entry type - nothing to list (and requests would
+        # raise MissingSchema on an empty URL).
+        return []
     f, output_validation = endpoint_request(new_url)
     try:
         total_response = json.loads(f.text)
-    except Exception as e:
-        output_validation.append(e)
-    datasets_records = total_response["response"]["collections"]
+    except Exception:
+        return []
+    try:
+        datasets_records = total_response["response"]["collections"]
+    except Exception:
+        return []
     for dataset_record in datasets_records:
         initial_list.append(dataset_record["id"])
     for item in initial_list:
@@ -78,6 +87,13 @@ class SettingsForm(forms.Form):
         msg=None
         include = cleaned_data.get("include_resultset_responses") or []
         granularity = cleaned_data.get("granularity") or []
+        url = cleaned_data.get("url_link")
+        try:
+            get_map_endpoints_list(url)
+        except Exception as e:
+            msg=f"The URL provided: {url}, is not a root URL for a beacon. Please, note that the URL must be the whole part before which each endpoint adds its termination (e.g. www.example.com/api/individuals, then URL to enter is www.example.com/api)"
+            self.add_error("url_link", msg)
+            return cleaned_data
         if include==["NONE"] and granularity==["record"]:
             msg = "The query record + NONE is not possible, please select other options."
 
@@ -118,7 +134,6 @@ class EndpointsForm(forms.Form):
 
     def __init__(self, *args, endpoint_url=None, include=None, granularity=None, test_mode=None, endpoints_collected=None,**kwargs):
         super().__init__(*args, **kwargs)
-
         if endpoint_url:
             self.fields["endpoints_collected"].choices = get_map_endpoints_list(endpoint_url)
             self.fields["endpoints_collected"].initial = [choice[0] for choice in self.fields["endpoints_collected"].choices]
@@ -200,4 +215,9 @@ class ChannelForm(forms.Form):
     granularity = forms.CharField(widget=forms.HiddenInput())
     test_mode = forms.CharField(widget=forms.HiddenInput())
     endpoints_collected = forms.CharField(widget=forms.HiddenInput())
-    datasets_collected = forms.CharField(widget=forms.HiddenInput())
+    # A Beacon implements only the entry types it holds; the framework allows as few as one
+    # (beaconMapSchema.json, `endpointSets` rootUrl description: "in very simple Beacons, that
+    # endpoint could be the only one implemented"), and entryTypesSchema requires no specific
+    # entry type. So `dataset` need not exist and this may be empty - it must not be rejected
+    # as a bad request.
+    datasets_collected = forms.CharField(widget=forms.HiddenInput(), required=False)
