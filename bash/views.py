@@ -740,6 +740,10 @@ class ChannelView(View):
             endpoints_collected=[endpoints_collected]
         postfix=url.split('/')
         for m in endpoints_collected:
+            if 'http://' in m:
+                m = m.replace('http://', '')
+            elif 'https://' in m:
+                m = m.replace('https://', '')
             suffix = m.split("/",1)[-1].split("'")[0]
             if postfix[-1] in suffix:
                 suffix=suffix.split('/',1)[-1]
