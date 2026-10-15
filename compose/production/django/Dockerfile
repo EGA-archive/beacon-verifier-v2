@@ -1,10 +1,11 @@
-FROM python:3.11-bullseye
+FROM python:3.11-bookworm
 
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update \
   # dependencies for building Python packages
-  && apt-get install -y build-essential netcat \
+  && apt-get install -y --no-install-recommends \
+    netcat-openbsd \
   # psycopg2 dependencies
   && apt-get install -y libpq-dev \
   # Translations dependencies
