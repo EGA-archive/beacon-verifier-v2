@@ -596,16 +596,28 @@ class LandingPage(View):
 
                 endpoints = form.cleaned_data["endpoints_collected"]
                 endpoint_url = form.cleaned_data["endpoint_url"]
-                datasets_form = DatasetsForm(
-                    endpoint_url=endpoint_url,
-                    initial={
-                        "endpoint_url": endpoint_url,
+                try:
+                    datasets_form = DatasetsForm(
+                        endpoint_url=endpoint_url,
+                        initial={
+                            "endpoint_url": endpoint_url,
+                            "include": include,
+                            "granularity": granularity,
+                            "test_mode": test_mode,
+                            "endpoints_collected": endpoints
+                        }
+                    )
+                except Exception:
+                    context = {
+                        "form": form,
+                        "url": endpoint_url,
                         "include": include,
                         "granularity": granularity,
                         "test_mode": test_mode,
-                        "endpoints_collected": endpoints
+                        "token_expired": token_expired,
+                        "error": 'Unable to access the different endpoints for your beacon, please check the urls shown in the /map endpoint bring the domain where your beacon API is being served'
                     }
-                )
+                    return render(request, "endpoints.html", context)
 
                 context = {
                     "form": datasets_form,

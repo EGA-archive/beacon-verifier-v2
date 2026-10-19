@@ -82,7 +82,13 @@
     {% endif %}
 
 {% endfor %}
+
                       </div>
+                      {% if error %}
+                  <div class="field-error" style="margin-left:10px;">
+                      {{error}}
+                  </div>
+{% endif %}
 
 
 
