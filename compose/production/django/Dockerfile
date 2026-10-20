@@ -1,62 +1,62 @@
 FROM python:3.11-bookworm
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
+# System dependencies
 RUN apt-get update \
-  # dependencies for building Python packages
-  && apt-get install -y --no-install-recommends \
-    netcat-openbsd \
-  # psycopg2 dependencies
-  && apt-get install -y libpq-dev \
-  # Translations dependencies
-  && apt-get install -y gettext \
-  # Additional dependencies
-  && apt-get install -y git \
-  # cleaning up unused files
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends \
+        netcat-openbsd \
+        libpq-dev \
+        gettext \
+        git \
+        gosu \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN addgroup --system django \
-    && adduser --system --ingroup django django
+# Create Django user with stable IDs
+RUN addgroup --system --gid 102 django \
+    && adduser --system --uid 100 --ingroup django django
 
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements.txt /requirements.txt
-RUN pip install -r /requirements.txt
+# Install Python dependencies
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
-COPY ./compose/production/django/entrypoint /entrypoint
-RUN sed -i 's/\r$//g' /entrypoint
-RUN chmod +x /entrypoint
-RUN chown django /entrypoint
+# Copy startup scripts
+COPY compose/production/django/entrypoint /entrypoint
+COPY compose/production/django/start /start
+COPY compose/production/django/celery/worker/start /start-celeryworker
+COPY compose/production/django/celery/beat/start /start-celerybeat
+COPY compose/production/django/celery/flower/start /start-flower
 
-COPY ./compose/production/django/start /start
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
-RUN chown django /start
+# Normalize line endings and permissions
+RUN sed -i 's/\r$//g' \
+        /entrypoint \
+        /start \
+        /start-celeryworker \
+        /start-celerybeat \
+        /start-flower \
+    && chmod +x \
+        /entrypoint \
+        /start \
+        /start-celeryworker \
+        /start-celerybeat \
+        /start-flower \
+    && chown django:django \
+        /entrypoint \
+        /start \
+        /start-celeryworker \
+        /start-celerybeat \
+        /start-flower
 
-COPY ./compose/production/django/celery/worker/start /start-celeryworker
-RUN sed -i 's/\r$//g' /start-celeryworker
-RUN chmod +x /start-celeryworker
-RUN chown django /start-celeryworker
+# Application directories
+RUN mkdir -p /app/static /app/staticfiles /app/mediafiles \
+    && chown -R django:django /app
 
-COPY ./compose/production/django/celery/beat/start /start-celerybeat
-RUN sed -i 's/\r$//g' /start-celerybeat
-RUN chmod +x /start-celerybeat
-RUN chown django /start-celerybeat
-
-COPY ./compose/production/django/celery/flower/start /start-flower
-RUN sed -i 's/\r$//g' /start-flower
-RUN chmod +x /start-flower
-
-RUN mkdir /app
-RUN mkdir /app/static
-RUN mkdir /app/mediafiles
 WORKDIR /app
 
-# copy project code
-COPY . .
-
+# Copy application code
+COPY . /app
 RUN chown -R django:django /app
 
-USER django
-
+# The entrypoint must start as root to fix mounted-volume permissions,
+# then drop privileges to django before executing the requested command.
 ENTRYPOINT ["/entrypoint"]
