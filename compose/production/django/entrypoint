@@ -4,10 +4,18 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+# Fix static files volume permissions when running as root.
+if [ "$(id -u)" -eq 0 ]; then
+    mkdir -p /app/staticfiles
+    chown -R django:django /app/staticfiles
+
+    # Drop root privileges and restart this entrypoint as django.
+    exec gosu django "$0" "$@"
+fi
+
 postgres_ready() {
 python << END
 import sys
-
 import psycopg2
 
 try:
@@ -20,22 +28,23 @@ try:
     )
 except psycopg2.OperationalError:
     sys.exit(-1)
-sys.exit(0)
 
+sys.exit(0)
 END
 }
-until postgres_ready; do
-  >&2 echo 'Waiting for PostgreSQL to become available...'
-  sleep 1
-done
->&2 echo 'PostgreSQL is available'
 
+until postgres_ready; do
+    >&2 echo 'Waiting for PostgreSQL to become available...'
+    sleep 1
+done
+
+>&2 echo 'PostgreSQL is available'
 
 rabbitmq_ready() {
     echo "Waiting for rabbitmq..."
 
     while ! nc -z rabbitmq 5672; do
-      sleep 1
+        sleep 1
     done
 
     echo "rabbitmq started"
