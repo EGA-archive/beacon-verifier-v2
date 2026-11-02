@@ -1,4 +1,4 @@
-FROM python:3.11-slim-buster
+FROM python:3.13.18-bookworm
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -15,6 +15,14 @@ RUN apt-get update \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install --no-cache-dir --upgrade \
+    "pip>=26.2.2" \
+    "certifi>=2026.10.19" \
+    setuptools \
+    wheel \
+    && update-ca-certificates -f \
+    && rm -rf /var/lib/apt/lists/*
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements.txt /requirements.txt
