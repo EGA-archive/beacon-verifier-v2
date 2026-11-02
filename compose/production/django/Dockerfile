@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.13.18-bookworm
 
 ENV PYTHONUNBUFFERED=1
 
@@ -10,6 +10,14 @@ RUN apt-get update \
         gettext \
         git \
         gosu \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install --no-cache-dir --upgrade \
+    "pip>=26.2.2" \
+    "certifi>=2026.10.19" \
+    setuptools \
+    wheel \
+    && update-ca-certificates -f \
     && rm -rf /var/lib/apt/lists/*
 
 # Create Django user with stable IDs
