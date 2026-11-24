@@ -23,11 +23,29 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from datetime import datetime
 import time
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
 
+def build_url(root_url, endpoint):
+    root = root_url.rstrip("/")
+    endpoint = endpoint.strip("/")
 
+    root_parts = urlparse(root).netloc.split(".") + urlparse(root).path.strip("/").split("/")
+    endpoint_parts = endpoint.split("/")
+
+    # Find the longest matching suffix of the root
+    # and prefix of the endpoint
+    overlap = 0
+
+    for i in range(1, min(len(root_parts), len(endpoint_parts)) + 1):
+        if root_parts[-i:] == endpoint_parts[:i]:
+            overlap = i
+
+    endpoint_parts = endpoint_parts[overlap:]
+
+    return root + "/" + "/".join(endpoint_parts)
 
 
 def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
@@ -355,6 +373,8 @@ def map_check(url, include, granularity, test_mode, access_token):
         return [], output_validation
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
+    print('my endpoints to verify', flush=True)
+    print(endpoints_to_verify, flush=True)
     resolver, response = resolve_validation_path(path)
     logs=JSONSchemaValidator.validate(total_response, response, resolver)
     for log in logs:
@@ -463,7 +483,7 @@ class LandingPage(View):
     def get(self, request, *args, **kwargs):
 
         account, access_token, token_expired = get_token_data(self, request)
-
+        print(access_token, flush=True)
         form = SettingsForm()
         context = {"form": form, "token_expired": token_expired,
         "access_token": access_token }
@@ -750,6 +770,10 @@ class ChannelView(View):
             endpoints_collected=endpoints_collected.split(',')
         else:
             endpoints_collected=[endpoints_collected]
+        print('here my endpoints collected', flush=True)
+        print(endpoints_collected, flush=True)
+        print('here my url', flush=True)
+        print(url, flush=True)
         postfix=url.split('/')
         for m in endpoints_collected:
             if 'http://' in m:
@@ -757,10 +781,16 @@ class ChannelView(View):
             elif 'https://' in m:
                 m = m.replace('https://', '')
             suffix = m.split("/",1)[-1].split("'")[0]
-            if postfix[-1] in suffix:
-                suffix=suffix.split('/',1)[-1]
-            result = url + '/'+ suffix
+            m=m.replace("'","")
+            m=m.replace("[", "")
+            m=m.replace("]", "")
+            m=m.replace(".","")
+            m=m.replace(" ", "")
+            endpoint_suffix = m.split(url, 1)[-1]
+            result=build_url(url, endpoint_suffix)
             final_endpoints_collected.append(result)
+        print('the final endpoints collected', flush=True)
+        print(final_endpoints_collected, flush=True)
         datasets_collected = form.cleaned_data["datasets_collected"]
 
         if token_expired:
