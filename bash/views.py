@@ -483,7 +483,6 @@ class LandingPage(View):
     def get(self, request, *args, **kwargs):
 
         account, access_token, token_expired = get_token_data(self, request)
-        print(access_token, flush=True)
         form = SettingsForm()
         context = {"form": form, "token_expired": token_expired,
         "access_token": access_token }
