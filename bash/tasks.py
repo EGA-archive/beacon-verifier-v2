@@ -25,6 +25,7 @@ def verification(self, url_link, include, granularity, test_mode, function_name,
 
     if self.is_aborted():
         return 'Task stopped!'
+    print(function_name, flush=True)
     function = functions[function_name]
     bash_out = function(url_link, include, granularity, test_mode, access_token)
     return bash_out 
