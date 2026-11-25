@@ -50,7 +50,6 @@ def build_url(root_url, endpoint):
 
 def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
     endpoint_validation=[]
-    print('is there an endpoint check?', flush=True)
     for gran in requestedgranularity:
         for inc in include:
             if gran == 'record' and inc == 'NONE':
@@ -110,17 +109,12 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     "requestedGranularity": gran
                 }
             }
-            print('where am I', flush=True)
             if id_parameter == False:
                 if access_token != None:
-                    print("access_token is not None", flush=True)
                     f = requests.post(url, json = myobj, headers={
                 "Authorization": f"Bearer {access_token}"
             })
                 else:
-                    print("access_token is None", flush=True)
-                    print(url, flush=True)
-                    print(myobj, flush=True)
                     f = requests.post(url, json = myobj)
                 try:
                     total_response = json.loads(f.text)
@@ -380,8 +374,6 @@ def map_check(url, include, granularity, test_mode, access_token):
         return [], output_validation
     list_of_endpoints=[]
     endpoints_to_verify = list_endpoints(list_of_endpoints, endpoints)
-    print('my endpoints to verify', flush=True)
-    print(endpoints_to_verify, flush=True)
     resolver, response = resolve_validation_path(path)
     logs=JSONSchemaValidator.validate(total_response, response, resolver)
     for log in logs:
@@ -781,7 +773,6 @@ class ChannelView(View):
                 m = m.replace('http://', '')
             elif 'https://' in m:
                 m = m.replace('https://', '')
-            suffix = m.split("/",1)[-1].split("'")[0]
             m=m.replace("'","")
             m=m.replace("[", "")
             m=m.replace("]", "")
@@ -790,7 +781,7 @@ class ChannelView(View):
             endpoint_suffix = m.split(url, 1)[-1]
             result=build_url(url, endpoint_suffix)
             final_endpoints_collected.append(result)
-
+        
         datasets_collected = form.cleaned_data["datasets_collected"]
 
         if token_expired:

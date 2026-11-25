@@ -46,7 +46,6 @@ meta = total_response["meta"]
 
 try:
     resultsets = total_response["response"]["resultSets"]
-    print("{}".format(url))
     for resultset in resultsets:
         results = resultset["results"]
         dataset = resultset["id"]
@@ -55,23 +54,11 @@ try:
             for result in results:
                 Analyses(**result)
             
-            print("{} is OK".format(dataset))
         except ValidationError as e:
-            print("{} got the next validation errors:".format(dataset))
-            print(e)
             continue
-except Exception:
-    results = resultset["results"]
-    dataset = resultsets["id"]
-    try:
-        Meta(**meta)
-        for result in results:
-            Analyses(**resultsets)
-        
-        print("{} is OK".format(dataset))
-    except ValidationError as e:
-        print("{} got the next validation errors:".format(dataset))
-        print(e)
+except Exception as e:
+    print("got the next validation errors:")
+    print(e)
 
 
 url = args.url + '/g_variants'
