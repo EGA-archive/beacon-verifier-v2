@@ -50,14 +50,16 @@ def build_url(root_url, endpoint):
 
 def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
     endpoint_validation=[]
+    print('is there an endpoint check?', flush=True)
     for gran in requestedgranularity:
         for inc in include:
             if gran == 'record' and inc == 'NONE':
                 continue
-            if test_mode == 0:
-                test_mode = True
-            else:
-                test_mode = False
+            if not isinstance(test_mode, bool):
+                if test_mode == 0:
+                    test_mode = True
+                else:
+                    test_mode = False
             is_error = False
             is_appended = False
             if 'd}' in url:
@@ -108,12 +110,17 @@ def endpoint_check(url, include, requestedgranularity, test_mode, access_token):
                     "requestedGranularity": gran
                 }
             }
+            print('where am I', flush=True)
             if id_parameter == False:
                 if access_token != None:
+                    print("access_token is not None", flush=True)
                     f = requests.post(url, json = myobj, headers={
                 "Authorization": f"Bearer {access_token}"
             })
                 else:
+                    print("access_token is None", flush=True)
+                    print(url, flush=True)
+                    print(myobj, flush=True)
                     f = requests.post(url, json = myobj)
                 try:
                     total_response = json.loads(f.text)
@@ -769,11 +776,6 @@ class ChannelView(View):
             endpoints_collected=endpoints_collected.split(',')
         else:
             endpoints_collected=[endpoints_collected]
-        print('here my endpoints collected', flush=True)
-        print(endpoints_collected, flush=True)
-        print('here my url', flush=True)
-        print(url, flush=True)
-        postfix=url.split('/')
         for m in endpoints_collected:
             if 'http://' in m:
                 m = m.replace('http://', '')
@@ -788,8 +790,7 @@ class ChannelView(View):
             endpoint_suffix = m.split(url, 1)[-1]
             result=build_url(url, endpoint_suffix)
             final_endpoints_collected.append(result)
-        print('the final endpoints collected', flush=True)
-        print(final_endpoints_collected, flush=True)
+
         datasets_collected = form.cleaned_data["datasets_collected"]
 
         if token_expired:
@@ -911,7 +912,6 @@ class ChannelView(View):
         global_validation=[]
         include=ast.literal_eval(include)
         granularity=ast.literal_eval(granularity)
-
         task = verification.delay(url, include, granularity, test_mode, "endpoint_check", access_token)
         try:
             map_out = task.get()
